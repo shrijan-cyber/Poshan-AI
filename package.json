@@ -1,0 +1,11 @@
+{
+  "name": "poshanai",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev --prefix poshanai-backend\" \"npm run dev --prefix poshanai-frontend\"",
+    "build": "npm run build --prefix poshanai-frontend",
+    "start": "npm run start --prefix poshanai-backend"
+  },
+  "devDependencies": { "concurrently": "^9.1.2" }
+}
