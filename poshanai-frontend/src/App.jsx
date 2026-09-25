@@ -1,0 +1,32 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Layout from './components/common/Layout.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
+import ProtectedRoute from './routes/ProtectedRoute.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import Profile from './pages/Profile.jsx';
+import UploadReport from './pages/UploadReport.jsx';
+import MealPlanView from './pages/MealPlanView.jsx';
+import NotFound from './pages/NotFound.jsx';
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/upload" element={<UploadReport />} />
+            <Route path="/meal-plan/:id" element={<MealPlanView />} />
+          </Route>
+        </Route>
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Routes>
+    </AuthProvider>
+  );
+}

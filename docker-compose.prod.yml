@@ -14,7 +14,7 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes: ["redis_data:/data"]
   api:
-    build: ./server
+    build: ./poshanai-backend
     restart: always
     environment:
       NODE_ENV: production
@@ -28,7 +28,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: client/Dockerfile
+      dockerfile: poshanai-frontend/Dockerfile
     restart: always
     ports: ["80:80"]
     depends_on: [api]
