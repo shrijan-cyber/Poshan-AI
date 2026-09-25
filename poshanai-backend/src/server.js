@@ -1,11 +1,55 @@
-import mongoose from 'mongoose';
 import app from './app.js';
+import connectDB from './config/db.js';
 import { env } from './config/env.js';
+import logger from './utils/logger.js';
 
-try {
-  await mongoose.connect(env.mongoUri, { serverSelectionTimeoutMS: 5000 });
-  app.listen(env.port, '0.0.0.0', () => console.log(`PoshanAI API listening on ${env.port}`));
-} catch (error) {
-  console.error(`Startup failed: ${error.message}`);
+let server;
+let shuttingDown = false;
+
+async function startServer() {
+  await connectDB();
+  server = app.listen(env.port, '0.0.0.0', () => {
+    logger.info(`PoshanAI API listening on port ${env.port}`);
+  });
+}
+
+async function shutdown(reason) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.error(reason);
+
+  if (server) {
+    await new Promise((resolve) => server.close(resolve));
+  }
+
   process.exit(1);
 }
+
+process.on('unhandledRejection', () => {
+  void shutdown('Unhandled promise rejection');
+});
+
+process.on('uncaughtException', () => {
+  void shutdown('Uncaught exception');
+});
+
+process.on('SIGTERM', () => {
+  if (server) {
+    server.close(() => process.exit(0));
+  } else {
+    process.exit(0);
+  }
+});
+
+process.on('SIGINT', () => {
+  if (server) {
+    server.close(() => process.exit(0));
+  } else {
+    process.exit(0);
+  }
+});
+
+startServer().catch(() => {
+  logger.error('Backend startup failed');
+  process.exit(1);
+});
