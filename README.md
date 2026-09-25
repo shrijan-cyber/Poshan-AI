@@ -1,26 +1,31 @@
 # PoshanAI
 
-Starter monorepo for an Indian-context nutrition awareness and meal-planning platform. The architecture reference is in `PoshanAI_System_Architecture.md` if you add it to this repository; OCR, Firebase/JWT auth, IFCT retrieval, and Gemini generation are future modules, not implemented integrations in this scaffold.
+Starter monorepo for an Indian-context nutrition awareness and meal-planning platform.
 
-## Structure
+## Folder structure
 
 ```text
-poshanai/
-├── poshanai-frontend/   # React + Vite + Tailwind client
-├── poshanai-backend/    # Express API, MongoDB connection, security middleware
-├── ai-service/          # Reserved for optional Python OCR/AI workers
-├── nginx/               # Reverse proxy and static hosting config
-├── docker-compose.yml   # Local MongoDB, Redis, API, and frontend
+PoshanAI/
+├── client/                 # React + Vite + Tailwind frontend
+├── server/                 # Express API and MongoDB connection
+├── ai-service/             # Optional Python OCR/RAG/pose service
+├── nginx/                  # Reverse proxy and static hosting config
+├── docker-compose.yml      # Local development stack
+├── docker-compose.prod.yml # Production-oriented Compose overrides
 ├── .env.example
 └── README.md
 ```
 
+`client/src` is organized into components, pages, hooks, services, utils, store, and assets. `server/src` is organized into config, controllers, models, routes, middleware, services, utils, and `app.js`.
+
 ## Run locally
 
-1. Copy `.env.example` to `.env` and set a long random `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` before adding authentication. Never commit `.env`.
-2. For containers: `docker compose up --build` then open `http://localhost:8080`; API health is at `http://localhost:4000/health`.
-3. For local development: run `npm install` in the root, `poshanai-backend`, and `poshanai-frontend`; start MongoDB locally, set `MONGODB_URI=mongodb://127.0.0.1:27017/poshanai` and `CLIENT_ORIGIN=http://localhost:5173` in `.env`; run `npm run dev` at the root.
+1. Copy `.env.example` to `.env`. Replace the example JWT secrets before implementing authentication; never commit `.env`.
+2. Run `docker compose up --build` and open `http://localhost:8080`. API health is available at `http://localhost:4000/health`.
+3. To run the JS apps directly, install dependencies in the root, `server`, and `client`; run MongoDB locally, set `MONGODB_URI=mongodb://127.0.0.1:27017/poshanai` in `.env`, then run `npm run dev` at the root.
 
-API has Helmet headers, strict CORS origin, JSON size limits, Mongo operator sanitization, basic API rate limiting, safe error responses, and health/readiness routes. Before production, add authentication and route-level authorization, refresh-token rotation, request schemas for each endpoint, secure uploaded-file storage, TLS, and secret management.
+## Current implementation
 
-PoshanAI provides awareness and food suggestions only. It must not diagnose deficiencies or replace clinical advice.
+The frontend is a responsive landing page. The Express API connects to MongoDB and includes health endpoints, Helmet, restricted CORS, request-size limits, Mongo operator sanitization, API rate limiting, and non-revealing error responses. The `ai-service` directories are extension points only. Firebase/JWT authentication, OCR, IFCT retrieval, Gemini meal-plan generation, and application data routes are not implemented yet.
+
+PoshanAI is intended for nutrition awareness and food suggestions. It must not diagnose or replace advice from a qualified healthcare professional.
