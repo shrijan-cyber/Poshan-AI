@@ -14,19 +14,19 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes: ["redis_data:/data"]
   api:
-    build: ./server
+    build: ./poshanai-backend
     env_file: .env
     environment:
       MONGODB_URI: mongodb://mongo:27017/poshanai
       REDIS_URL: redis://redis:6379
-    ports: ["4000:4000"]
+    ports: ["5000:5000"]
     depends_on:
       mongo: { condition: service_healthy }
       redis: { condition: service_started }
   web:
     build:
       context: .
-      dockerfile: client/Dockerfile
+      dockerfile: poshanai-frontend/Dockerfile
     ports: ["8080:80"]
     depends_on: [api]
 volumes:

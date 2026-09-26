@@ -1,0 +1,409 @@
+{
+  "meta": {
+    "file": "AI_CONTEXT.json",
+    "version": "1.0.0",
+    "project": "PoshanAI",
+    "purpose": "Single source of truth for AI agents. Read this BEFORE generating any code. Do not ask for context that is already here.",
+    "usage_instruction": "AI Agent: Read this entire file first. Then follow team_member_roles to know which folder you are allowed to edit. Follow coding_conventions, security_rules, and do_not rules strictly. Use quick_prompts as templates. Minimize token usage by not repeating what is here.",
+    "last_updated": "2025-01-01"
+  },
+
+  "project": {
+    "name": "PoshanAI",
+    "tagline": "AI-Powered Micronutrient Deficiency Diet Planner for Indian Context",
+    "course": "Project Seminar (CSP-018)",
+    "institution": "JB Institute of Technology, Veer Madho Singh Bhandari Uttarakhand Technical University",
+    "problem": "50%+ Indian women are anemic, 70-90% have Vitamin D deficiency, 47% urban population has B12 deficiency. Blood reports are hard to understand, generic diet apps use Western food data, and Indian thali/local food/medical conditions are not considered.",
+    "solution": "Web app that takes user profile + blood report (OCR) + diet + routine, detects micronutrient deficiencies, and generates personalized Indian meal plans using IFCT 2017 database + Gemini API (RAG). Suggests blood tests with medical disclaimers.",
+    "core_innovation": [
+      "Blood report OCR + nutrient extraction",
+      "IFCT 2017 (Indian Food Composition Table) integration",
+      "LLM + RAG for personalized meal planning",
+      "Multi-input personalization (age, weight, height, condition, diet, routine)",
+      "Medical safety: AI never diagnoses, only awareness + suggestion with disclaimers"
+    ],
+    "target_users": ["Anemia patients", "Women 15-45", "Elderly", "Dietitians", "Diagnostic labs", "Corporate wellness"],
+    "phase_plan": {
+      "phase_1_mvp": "Profile intake, diet analysis, IFCT meal plan, basic deficiency risk",
+      "phase_2": "Blood report OCR, deficiency detection, blood test suggestion",
+      "phase_3": "Body picture analysis (posture, body composition)",
+      "phase_4": "Progress tracking, dietitian dashboard"
+    }
+  },
+
+  "tech_stack": {
+    "frontend": {
+      "framework": "React 18",
+      "build_tool": "Vite",
+      "styling": "Tailwind CSS",
+      "animations": ["Framer Motion", "GSAP"],
+      "state": "Redux Toolkit",
+      "routing": "React Router v6",
+      "http": "Axios",
+      "validation": "Zod",
+      "forms": "React Hook Form"
+    },
+    "backend": {
+      "runtime": "Node.js 20",
+      "framework": "Express.js",
+      "database": "MongoDB (Atlas)",
+      "odm": "Mongoose",
+      "cache": "Redis",
+      "queue": "BullMQ",
+      "auth": ["Firebase Auth", "JWT"],
+      "validation": "Joi",
+      "logging": "Winston",
+      "file_upload": "Multer"
+    },
+    "ai_layer": {
+      "llm": "Gemini API",
+      "rag_framework": "LangChain",
+      "vector_db": "Chroma / Pinecone",
+      "embeddings": "Gemini Embeddings",
+      "ocr": ["Tesseract.js", "PaddleOCR"],
+      "pose_estimation": "MediaPipe"
+    },
+    "devops": {
+      "containerization": "Docker + Docker Compose",
+      "reverse_proxy": "Nginx",
+      "ci_cd": "GitHub Actions",
+      "hosting": ["Vercel (frontend)", "Render (backend)", "MongoDB Atlas"],
+      "monitoring": "Winston + Prometheus (future)"
+    },
+    "tools": ["Git", "GitHub", "Postman", "VS Code"]
+  },
+
+  "folder_structure": {
+    "root": {
+      "nginx/": "Nginx reverse proxy config",
+      "poshanai-backend/": "Express + MongoDB backend",
+      "poshanai-frontend/": "React + Vite frontend",
+      "docker-compose.yml": "Dev orchestration",
+      "docker-compose.prod.yml": "Prod orchestration",
+      ".env.example": "Environment variable template",
+      "AI_CONTEXT.json": "This file — AI agent context",
+      "README.md": "Project overview"
+    },
+    "frontend": {
+      "src/api/": "Axios instances + endpoint wrappers (client.js, authApi.js, reportApi.js, mealPlanApi.js)",
+      "src/assets/": "Images, fonts, static files",
+      "src/components/common/": "Button, Modal, Loader, Toast",
+      "src/components/upload/": "ReportUploader, OCRPreview",
+      "src/components/profile/": "ProfileForm, ProfileCard",
+      "src/components/mealplan/": "MealCard, NutrientChart",
+      "src/context/": "AuthContext, ThemeContext",
+      "src/hooks/": "useAuth, useFetch, useDebounce",
+      "src/pages/": "Dashboard, UploadReport, Profile, MealPlanView, AdminPanel",
+      "src/routes/": "ProtectedRoute, RoleBasedRoute",
+      "src/store/": "Redux slices",
+      "src/utils/": "validators, formatters",
+      "src/App.jsx": "Root component",
+      "src/main.jsx": "Entry point"
+    },
+    "backend": {
+      "src/config/": "db.js, firebase.js, redis.js, env.js",
+      "src/modules/auth/": "auth.controller.js, auth.routes.js, auth.middleware.js, auth.service.js",
+      "src/modules/users/": "user.model.js, user.controller.js, user.routes.js",
+      "src/modules/reports/": "report.model.js, report.controller.js, report.routes.js, ocr.service.js",
+      "src/modules/mealplans/": "mealplan.model.js, mealplan.controller.js, mealplan.routes.js, ai.service.js",
+      "src/modules/deficiencylogs/": "deficiencylog.model.js, deficiencylog.controller.js, deficiencylog.routes.js",
+      "src/rag/": "ifctLoader.js, embedder.js, vectorStore.js, promptBuilder.js",
+      "src/jobs/": "queue.js, ocr.worker.js, aiPlan.worker.js",
+      "src/middleware/": "errorHandler.js, rateLimiter.js, validateRequest.js, sanitize.js",
+      "src/utils/": "logger.js, apiResponse.js",
+      "src/app.js": "Express app setup",
+      "src/server.js": "Server entry point"
+    }
+  },
+
+  "coding_conventions": {
+    "language": "JavaScript (ES2022+), no TypeScript for now",
+    "modules": "ES Modules (import/export), not CommonJS",
+    "naming": {
+      "files": "camelCase for JS files, PascalCase for React components",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "classes": "PascalCase",
+      "database_collections": "PascalCase (User, Report, MealPlan)",
+      "api_routes": "kebab-case (/api/meal-plans, /api/deficiency-logs)"
+    },
+    "async": "Always use async/await, never raw promises with .then()",
+    "error_handling": "Always try/catch in async functions. Pass errors to next() in Express.",
+    "comments": "Only for complex logic. Do not comment obvious code.",
+    "formatting": "Prettier defaults (2 spaces, single quotes, semicolons)",
+    "imports": "Absolute imports from src/ where possible. Order: built-in → external → internal.",
+    "functions": "Small, single responsibility. Max 50 lines. Use arrow functions for callbacks.",
+    "react": {
+      "components": "Functional components only. No class components.",
+      "hooks": "Custom hooks for reusable logic. Prefix with 'use'.",
+      "props": "Destructure props in function signature.",
+      "styling": "Tailwind classes only. No inline styles. No CSS modules unless necessary.",
+      "state": "Redux Toolkit for global state, useState for local, React Query for server state"
+    },
+    "api_response_format": {
+      "success": "{ success: true, data: {...}, message: 'optional' }",
+      "error": "{ success: false, error: { code: 'ERROR_CODE', message: 'Human readable' } }"
+    }
+  },
+
+  "api_contract": {
+    "base_url": "/api",
+    "auth": {
+      "POST /api/auth/register": "Register user (public)",
+      "POST /api/auth/login": "Login, issue JWT (public)",
+      "POST /api/auth/refresh": "Refresh access token (public)",
+      "POST /api/auth/logout": "Invalidate session (auth)"
+    },
+    "users": {
+      "GET /api/users/me": "Get own profile (auth)",
+      "PUT /api/users/me": "Update profile (auth)",
+      "GET /api/users": "List all users (admin)",
+      "PATCH /api/users/:id/role": "Change user role (admin)"
+    },
+    "reports": {
+      "POST /api/reports/upload": "Upload blood report (auth, multipart)",
+      "GET /api/reports/:id": "Get report + OCR results (owner/admin)",
+      "GET /api/reports": "List own reports (auth)",
+      "DELETE /api/reports/:id": "Delete report (owner/admin)",
+      "GET /api/reports/:id/status": "Poll OCR status (owner)"
+    },
+    "mealplans": {
+      "POST /api/mealplans/generate": "Trigger AI meal plan generation (auth)",
+      "GET /api/mealplans/:id": "Fetch meal plan (owner/admin)",
+      "GET /api/mealplans": "List user meal plans (auth)",
+      "PATCH /api/mealplans/:id/status": "Mark active/completed (owner)"
+    },
+    "deficiency_logs": {
+      "GET /api/deficiency-logs": "Get deficiency history (auth)",
+      "GET /api/deficiency-logs/trends": "Get trend chart data (auth)"
+    },
+    "admin_dietitian": {
+      "GET /api/admin/analytics": "Platform stats (admin)",
+      "GET /api/dietitian/reviews/:userId": "Review AI plans (dietitian)",
+      "POST /api/dietitian/reviews/:planId/approve": "Approve/edit plan (dietitian)"
+    }
+  },
+
+  "database_schema": {
+    "User": {
+      "_id": "ObjectId",
+      "firebaseUid": "String | null",
+      "email": "String (unique)",
+      "passwordHash": "String (if not Firebase)",
+      "role": "String (user | dietitian | admin)",
+      "profile": {
+        "name": "String",
+        "age": "Number",
+        "gender": "String",
+        "weightKg": "Number",
+        "heightCm": "Number",
+        "dietType": "String (veg | non-veg | vegan)",
+        "allergies": "[String]",
+        "region": "String",
+        "activityLevel": "String"
+      },
+      "createdAt": "Date",
+      "updatedAt": "Date",
+      "isActive": "Boolean"
+    },
+    "Report": {
+      "_id": "ObjectId",
+      "userId": "ObjectId (ref User, indexed)",
+      "fileUrl": "String (S3/GCS)",
+      "fileType": "String (pdf | image)",
+      "ocrStatus": "String (pending | processing | done | failed)",
+      "rawOcrText": "String",
+      "extractedValues": [
+        {
+          "nutrient": "String",
+          "value": "Number",
+          "unit": "String",
+          "referenceRange": "String",
+          "flag": "String (low | normal | high)"
+        }
+      ],
+      "uploadedAt": "Date",
+      "processedAt": "Date"
+    },
+    "MealPlan": {
+      "_id": "ObjectId",
+      "userId": "ObjectId (ref User, indexed)",
+      "reportId": "ObjectId (ref Report)",
+      "targetDeficiencies": "[String]",
+      "planDurationDays": "Number",
+      "meals": [
+        {
+          "day": "Number",
+          "mealType": "String (breakfast | lunch | dinner | snack)",
+          "items": [
+            {
+              "foodName": "String",
+              "ifctCode": "String",
+              "quantityGrams": "Number",
+              "nutrients": "Object"
+            }
+          ]
+        }
+      ],
+      "aiModelUsed": "String",
+      "ragSourcesUsed": "[String]",
+      "status": "String (draft | active | completed)",
+      "generatedAt": "Date"
+    },
+    "DeficiencyLog": {
+      "_id": "ObjectId",
+      "userId": "ObjectId (ref User, indexed)",
+      "reportId": "ObjectId (ref Report)",
+      "nutrient": "String",
+      "severity": "String (mild | moderate | severe)",
+      "detectedAt": "Date",
+      "resolvedAt": "Date",
+      "trend": [{ "date": "Date", "value": "Number" }],
+      "recommendedAction": "String"
+    }
+  },
+
+  "security_rules": {
+    "mandatory_middleware": ["helmet", "cors (whitelist only)", "express-rate-limit", "express-mongo-sanitize", "cookie-parser"],
+    "input_validation": "Joi on every POST/PUT/PATCH route. Reject unknown fields.",
+    "auth": "JWT access token (15min) + refresh token (7d, httpOnly, Secure, SameSite=Strict cookie). Rotate refresh tokens.",
+    "password": "bcrypt with 12 rounds. Never log passwords.",
+    "rbac": "requireRole(['admin']) middleware on all admin routes. Check ownership on every resource access (BOLA prevention).",
+    "secrets": "ALL secrets in .env. Never in code, never in Git. Use .env.example as template.",
+    "error_handling": "Never expose stack traces to client. Log full error server-side, send generic message to client.",
+    "rate_limiting": "100 requests / 15 min per IP on general routes. 5 requests / 15 min on auth routes.",
+    "file_upload": "Validate MIME type, max size 10MB, scan for malware if possible. Store with random UUID name.",
+    "ai_safety": [
+      "Sanitize OCR text before sending to LLM (prompt injection prevention)",
+      "Validate AI output against nutrient bounds (no dangerous dosages)",
+      "RAG grounding restricted to verified IFCT dataset only",
+      "Always include medical disclaimer in AI responses"
+    ],
+    "logging": "Winston with PII redaction. Never log passwords, tokens, blood report contents, or personal health data.",
+    "compliance": ["India DPDP Act", "Explicit user consent for health data", "Data retention + deletion policy"]
+  },
+
+  "team": {
+    "total_members": 4,
+    "members": {
+      "member_1": {
+        "role": "Frontend + UI/UX",
+        "branch": "feature/frontend-ui",
+        "allowed_folders": ["poshanai-frontend/src/**"],
+        "forbidden_folders": ["poshanai-backend/**", "nginx/**"],
+        "primary_ai_tools": ["v0 (Vercel)", "Cursor"],
+        "deliverables": ["All React pages", "Responsive UI", "Framer Motion animations", "Figma designs"]
+      },
+      "member_2": {
+        "role": "Backend + OCR",
+        "branch": "feature/backend-api",
+        "allowed_folders": ["poshanai-backend/src/modules/**", "poshanai-backend/src/config/**", "poshanai-backend/src/middleware/**"],
+        "forbidden_folders": ["poshanai-frontend/**", "poshanai-backend/src/rag/**"],
+        "primary_ai_tools": ["Cursor", "Windsurf"],
+        "deliverables": ["REST APIs", "MongoDB models", "Auth + RBAC", "OCR pipeline"]
+      },
+      "member_3": {
+        "role": "AI/ML + RAG",
+        "branch": "feature/ai-rag-ocr",
+        "allowed_folders": ["poshanai-backend/src/rag/**", "poshanai-backend/src/jobs/**", "poshanai-backend/src/modules/reports/ocr.service.js", "poshanai-backend/src/modules/mealplans/ai.service.js"],
+        "forbidden_folders": ["poshanai-frontend/**", "nginx/**"],
+        "primary_ai_tools": ["Claude Code", "Cursor"],
+        "deliverables": ["RAG pipeline", "Gemini integration", "IFCT data loading", "OCR extraction"]
+      },
+      "member_4": {
+        "role": "DevOps + Security + Testing + Business",
+        "branch": "feature/devops-security",
+        "allowed_folders": ["nginx/**", "docker-compose*.yml", ".github/workflows/**", "poshanai-backend/src/utils/logger.js", "docs/**"],
+        "forbidden_folders": ["poshanai-frontend/src/**", "poshanai-backend/src/modules/**"],
+        "primary_ai_tools": ["Warp", "Cursor", "CodeRabbit"],
+        "deliverables": ["Docker setup", "CI/CD pipeline", "Security audit", "Business plan", "PPT"]
+      }
+    },
+    "workflow": {
+      "main_branch": "production-ready, protected, no direct push",
+      "feature_branches": "feature/member-name-task (short-lived, 1-3 days)",
+      "commit_format": "type: short description (feat, fix, docs, refactor, test, chore)",
+      "pr_required": true,
+      "approvals_required": 1,
+      "ci_must_pass": true,
+      "merge_strategy": "squash merge"
+    }
+  },
+
+  "ai_prompt_guidelines": {
+    "token_saving_rules": [
+      "Always start prompt with: 'Read AI_CONTEXT.json first. Do not ask for info already there.'",
+      "Reference file paths instead of pasting file contents.",
+      "Ask for ONE feature at a time, not the whole project.",
+      "Specify exact output file path.",
+      "Say 'follow coding_conventions and security_rules from AI_CONTEXT.json' instead of re-explaining.",
+      "Do not paste database schema in prompt — say 'use User schema from AI_CONTEXT.json'."
+    ],
+    "prompt_template": "Act as a [ROLE]. Read AI_CONTEXT.json. Build [SPECIFIC FEATURE] at [FILE PATH]. Follow coding_conventions, security_rules, and do_not from AI_CONTEXT.json. Output: complete code with comments only for complex logic.",
+    "role_map": {
+      "frontend_task": "Senior Frontend Engineer (React + Tailwind + Framer Motion)",
+      "backend_task": "Senior Backend Engineer (Node + Express + MongoDB)",
+      "ai_task": "Senior AI Engineer (Gemini + LangChain + RAG)",
+      "devops_task": "Senior DevOps Engineer (Docker + Nginx + GitHub Actions)",
+      "security_task": "Senior Security Engineer (OWASP API Top 10)"
+    }
+  },
+
+  "common_patterns": {
+    "express_controller": "async (req, res, next) => { try { ... res.json({ success: true, data }); } catch (err) { next(err); } }",
+    "mongoose_model": "const schema = new mongoose.Schema({...}, { timestamps: true }); export default mongoose.model('Name', schema);",
+    "react_component": "export default function ComponentName({ prop1, prop2 }) { ... return (...); }",
+    "api_call_frontend": "const { data } = await apiClient.post('/endpoint', payload); return data.data;",
+    "validation_schema_joi": "const schema = Joi.object({ field: Joi.string().required() }); const { error, value } = schema.validate(req.body);",
+    "error_middleware": "app.use((err, req, res, next) => { logger.error(err); res.status(err.status || 500).json({ success: false, error: { code: err.code || 'SERVER_ERROR', message: err.message || 'Something went wrong' } }); });"
+  },
+
+  "do_not": [
+    "Do NOT push directly to main branch",
+    "Do NOT commit .env file or any secrets",
+    "Do NOT use TypeScript (project is JavaScript)",
+    "Do NOT use class components in React",
+    "Do NOT use inline styles (use Tailwind)",
+    "Do NOT install new dependencies without team discussion",
+    "Do NOT expose stack traces in API responses",
+    "Do NOT log sensitive data (passwords, tokens, health data)",
+    "Do NOT write AI prompts that diagnose medical conditions",
+    "Do NOT modify another member's folder without PR",
+    "Do NOT use CommonJS require() — use ES modules import",
+    "Do NOT write fake/placeholder functions — implement real functionality",
+    "Do NOT skip input validation on any route",
+    "Do NOT use console.log — use Winston logger"
+  ],
+
+  "quick_prompts": {
+    "frontend_form": "Act as Senior Frontend Engineer. Read AI_CONTEXT.json. Build a [FORM NAME] at poshanai-frontend/src/components/[path].jsx. Fields: [list]. Use React Hook Form + Zod. Tailwind for styling. Framer Motion for animations. Responsive + accessible. Follow coding_conventions from AI_CONTEXT.json.",
+    "backend_endpoint": "Act as Senior Backend Engineer. Read AI_CONTEXT.json. Build [METHOD] [ROUTE] at poshanai-backend/src/modules/[module]/[file].controller.js. Follow api_response_format. Use Joi validation + auth middleware + rate limiter. Use [Model] schema from AI_CONTEXT.json. Follow security_rules.",
+    "ai_service": "Act as Senior AI Engineer. Read AI_CONTEXT.json. Build [AI FEATURE] at poshanai-backend/src/rag/[file].js. Use Gemini API + LangChain. Follow ai_safety rules. Include medical disclaimers. Handle API failures gracefully.",
+    "dockerfile": "Act as Senior DevOps Engineer. Read AI_CONTEXT.json. Create production Dockerfile for [service]. Multi-stage build. Non-root user. Health check. Follow devops rules from AI_CONTEXT.json."
+  },
+
+  "phase_1_mvp_scope": {
+    "must_have": [
+      "User registration + login (JWT + Firebase)",
+      "Profile form (age, weight, height, condition, diet, routine)",
+      "Diet analysis using IFCT 2017 data",
+      "Basic deficiency risk scoring",
+      "Deficiency report UI",
+      "Basic meal plan generation (Gemini API)"
+    ],
+    "out_of_scope_for_phase_1": [
+      "Blood report OCR (Phase 2)",
+      "Body picture analysis (Phase 3)",
+      "Progress tracking dashboard (Phase 4)",
+      "Dietitian review panel (Phase 4)"
+    ]
+  },
+
+  "external_resources": {
+    "ifct_dataset": "IFCT 2017 — Indian Food Composition Tables (publicly available)",
+    "gemini_api_docs": "https://ai.google.dev/docs",
+    "langchain_docs": "https://js.langchain.com/docs",
+    "owasp_api_top_10": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
+    "dpdp_act": "India Digital Personal Data Protection Act 2023"
+  }
+}
