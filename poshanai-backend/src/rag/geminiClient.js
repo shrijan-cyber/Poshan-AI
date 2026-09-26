@@ -1,41 +1,45 @@
-import { ensureMedicalDisclaimer } from './promptBuilder.js';
+import logger from '../utils/logger.js';
+import { ensureMedicalDisclaimer, MEDICAL_DISCLAIMER } from './promptBuilder.js';
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
+const DEFAULT_MODEL = process.env.OMNIROUTE_MODEL;
+const API_BASE_URL = process.env.OMNIROUTE_BASE_URL || 'http://localhost:20128';
+const UNAVAILABLE_MESSAGE = 'AI meal-plan generation is temporarily unavailable. Please try again later.';
 
 export const generateText = async (prompt, {
-  apiKey = process.env.GEMINI_API_KEY,
+  apiKey = process.env.OMNIROUTE_API_KEY,
   model = DEFAULT_MODEL,
   signal,
   temperature = 0.3,
 } = {}) => {
-  if (!apiKey) throw new Error('Gemini is unavailable: GEMINI_API_KEY is not configured.');
-  if (typeof prompt !== 'string' || !prompt.trim()) throw new TypeError('Gemini prompt must be a non-empty string.');
+  if (typeof prompt !== 'string' || !prompt.trim()) throw new TypeError('AI prompt must be a non-empty string.');
+  if (!apiKey || !model) {
+    logger.error('OmniRoute configuration is incomplete.');
+    return `${UNAVAILABLE_MESSAGE}\n\n${MEDICAL_DISCLAIMER}`;
+  }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/models/${encodeURIComponent(model)}:generateContent`, {
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-goog-api-key': apiKey },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt.trim() }] }],
-        generationConfig: { temperature },
+        model,
+        messages: [{ role: 'user', content: prompt.trim() }],
+        temperature,
       }),
       signal,
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const message = body?.error?.message || `Gemini returned HTTP ${response.status}.`;
-      throw new Error(message);
-    }
-    const text = body?.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || '')
-      .join('')
-      .trim();
-    if (!text) throw new Error('Gemini returned no usable text.');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text = body?.choices?.[0]?.message?.content?.trim();
+    if (!text) throw new Error('Empty completion');
     return text;
   } catch (error) {
     if (error.name === 'AbortError') throw error;
-    throw new Error('Meal-plan generation is temporarily unavailable. Please try again later.', { cause: error });
+    logger.error('OmniRoute chat completion failed; returning fallback response.');
+    return `${UNAVAILABLE_MESSAGE}\n\n${MEDICAL_DISCLAIMER}`;
   }
 };
 
