@@ -20,9 +20,11 @@ PoshanAI/
 
 ## Run locally
 
-1. Copy `.env.example` to `.env` and set long random values for both JWT secrets; never commit `.env`.
-2. Run `docker compose up --build` and open `http://localhost:8080`. API health is available at `http://localhost:5000/health`.
-3. To run the JS apps directly, install dependencies in the root, `poshanai-backend`, and `poshanai-frontend`; run MongoDB locally, set `MONGODB_URI=mongodb://127.0.0.1:27017/poshanai` in `.env`, then run `npm run dev` at the root.
+1. Copy `poshanai-backend/.env.example` to `poshanai-backend/.env`; set long random values for both JWT secrets and configure `MONGODB_URI` for local MongoDB or Atlas. Replace the sample Atlas username/password placeholders with real credentials (URL-encode reserved characters in the password). Never commit `.env`.
+2. Install dependencies in the root, `poshanai-backend`, and `poshanai-frontend`. Start the apps with `npm.cmd run dev` from PowerShell (this bypasses a restrictive `npm.ps1` execution policy without changing system settings). Open `http://localhost:5173`; API health is at `http://localhost:5000/health`.
+3. If port 5000 is occupied, identify the listener with `Get-NetTCPConnection -LocalPort 5000 -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess`. Stop only a process you recognize, or set `PORT=5001` in `poshanai-backend/.env` and set `VITE_API_URL=http://localhost:5001/api` in `poshanai-frontend/.env`.
+
+The backend falls back to `mongodb://127.0.0.1:27017/poshanai` when the Atlas URI still contains `<username>` or `<password>` placeholders. Start a local MongoDB service for that fallback, or set a valid Atlas URI. See `poshanai-frontend/src/components/motion/README.md` for Motion Primitives setup notes.
 
 ## Current implementation
 

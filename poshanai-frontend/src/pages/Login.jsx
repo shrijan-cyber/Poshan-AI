@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import { Button, Input } from '../components/common';
+import logo from '../assets/logo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email('Enter a valid email address.'),
@@ -45,7 +47,10 @@ export default function Login() {
         className="w-full max-w-md rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-9"
         aria-labelledby="login-title"
       >
-        <a href="/" className="text-lg font-bold text-leaf">PoshanAI</a>
+        <Link to="/" className="mx-auto flex w-fit flex-col items-center text-center" aria-label="PoshanAI home">
+          <img src={logo} alt="PoshanAI: AI-powered micronutrient deficiency diet planner for Indian context" className="mb-3 h-28 w-28 rounded-full object-cover" />
+          <span className="font-heading text-xl font-bold text-leaf">Poshan<span className="text-orange">AI</span></span>
+        </Link>
         <h1 id="login-title" className="mt-8 text-3xl font-bold tracking-tight">Welcome back</h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">Sign in to continue your nutrition awareness journey.</p>
 
@@ -90,6 +95,7 @@ export default function Login() {
         <p className="mt-6 text-center text-xs leading-5 text-slate-500">
           PoshanAI provides nutrition awareness and suggestions. It does not diagnose or replace advice from a qualified healthcare professional.
         </p>
+        <p className="mt-4 text-center text-sm text-slate-600">New to PoshanAI? <Link to="/register" className="font-semibold text-leaf underline-offset-2 hover:underline">Create an account</Link></p>
         <span className="sr-only" role="status" aria-live="polite">{isSubmitting ? 'Signing in' : ''}</span>
       </motion.section>
     </main>

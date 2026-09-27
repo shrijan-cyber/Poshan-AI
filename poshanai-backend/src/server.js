@@ -11,8 +11,15 @@ try {
   }
   await mongoose.connect(env.mongoUri, { serverSelectionTimeoutMS: 5000 });
   logger.info('Connected to MongoDB');
-  const port = process.env.PORT || 5000;
-  app.listen(port, '0.0.0.0', () => logger.info(`PoshanAI API listening on port ${port}`));
+  const server = app.listen(env.port, '0.0.0.0', () => logger.info(`PoshanAI API listening on port ${env.port}`));
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      logger.error(`Port ${env.port} is already in use. Stop its process or set PORT to another free port (for example, PORT=5001).`);
+      process.exit(1);
+    }
+    logger.error(`HTTP server failed: ${error.message}`);
+    process.exit(1);
+  });
 } catch (error) {
   logger.error(`Startup failed: ${error.message}`, { stack: error.stack });
   process.exit(1);
