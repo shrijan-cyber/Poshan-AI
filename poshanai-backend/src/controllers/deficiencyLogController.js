@@ -5,7 +5,8 @@ export async function listDeficiencyLogs(req, res, next) {
     const filter = { userId: req.user.id };
 
     if (req.query.nutrient) {
-      filter.nutrient = new RegExp(req.query.nutrient.trim(), 'i');
+      const nutrient = req.query.nutrient.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.nutrient = new RegExp(nutrient, 'i');
     }
     if (req.query.severity) {
       filter.severity = req.query.severity.trim().toLowerCase();

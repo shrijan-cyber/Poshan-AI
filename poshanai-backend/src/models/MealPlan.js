@@ -60,7 +60,7 @@ const mealPlanSchema = new mongoose.Schema(
     },
     aiModelUsed: {
       type: String,
-      default: 'gemini-1.5-flash',
+      default: 'curated-template-v1',
     },
     ragSourcesUsed: {
       type: [String],

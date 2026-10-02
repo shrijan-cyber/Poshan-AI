@@ -8,15 +8,10 @@ import { store } from './store/index.js';
 import Layout from './components/layout/Layout.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import { InView } from '@/components/ui/in-view.jsx';
-import logo from './assets/logo.png';
 
 function LandingPage() {
   return (
     <main className="min-h-[70vh] bg-cream px-5 py-8 text-slate-800 sm:px-10">
-      <header className="mx-auto flex max-w-6xl items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold text-leaf"><img src={logo} alt="" className="h-10 w-10 rounded-full object-cover" />Poshan<span className="text-orange">AI</span></Link>
-        <Link to="/login" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-leaf focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf">Sign in</Link>
-      </header>
       <section className="mx-auto grid max-w-6xl gap-10 py-20 md:grid-cols-2 md:items-center md:py-28">
         <div>
           <p className="mb-4 font-semibold uppercase tracking-widest text-leaf">Nutrition, grounded in India</p>
@@ -43,9 +38,6 @@ function DashboardPage() {
   return (
     <main className="bg-cream px-4 py-10 text-slate-800 sm:px-6">
       <section className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-sm sm:p-9">
-        <header className="flex items-center justify-between gap-4">
-          <Link to="/dashboard" className="font-heading text-xl font-bold text-leaf">Poshan<span className="text-orange">AI</span></Link>
-        </header>
         <h1 className="mt-10 text-3xl font-bold">Welcome{user.profile?.name ? `, ${user.profile.name}` : ''}</h1>
         <p className="mt-3 text-slate-600">Your nutrition awareness dashboard is ready for your profile and reports.</p>
         <p className="mt-8 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">PoshanAI provides nutrition awareness and suggestions. It does not diagnose or replace advice from a qualified healthcare professional.</p>

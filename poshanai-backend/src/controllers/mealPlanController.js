@@ -21,43 +21,43 @@ export const updateMealPlanStatusSchema = Joi.object({
 }).required();
 
 // Helper to generate Phase 1 Indian-context IFCT meal items
-function buildDefaultIndianMeals(durationDays, dietType = 'veg', deficiencies = []) {
+function buildDefaultIndianMeals(durationDays, dietType = 'veg') {
   const mealTemplates = [
     {
       breakfast: [
-        { foodName: 'Sprouted Moong Dosa', ifctCode: 'B005', quantityGrams: 150, nutrients: { ironMg: 4.2, proteinG: 12.5, folateMcg: 65 } },
-        { foodName: 'Mint & Coriander Chutney', ifctCode: 'F012', quantityGrams: 30, nutrients: { ironMg: 1.1, vitaminCMg: 15.0 } },
+        { foodName: 'Sprouted Moong Dosa', quantityGrams: 150 },
+        { foodName: 'Mint & Coriander Chutney', quantityGrams: 30 },
       ],
       lunch: [
-        { foodName: 'Brown Rice / Red Rice', ifctCode: 'A003', quantityGrams: 150, nutrients: { fiberG: 3.5, magnesiumMg: 42 } },
-        { foodName: 'Palak Dal (Spinach Lentil)', ifctCode: 'C014', quantityGrams: 200, nutrients: { ironMg: 5.6, folateMcg: 120, proteinG: 14 } },
-        { foodName: 'Amla Cucumber Salad', ifctCode: 'D008', quantityGrams: 100, nutrients: { vitaminCMg: 70, zincMg: 0.8 } },
+        { foodName: 'Brown Rice / Red Rice', quantityGrams: 150 },
+        { foodName: 'Palak Dal (Spinach Lentil)', quantityGrams: 200 },
+        { foodName: 'Amla Cucumber Salad', quantityGrams: 100 },
       ],
       snack: [
-        { foodName: 'Roasted Bengal Gram (Chana) & Jaggery', ifctCode: 'B022', quantityGrams: 50, nutrients: { ironMg: 4.8, proteinG: 8.5 } },
+        { foodName: 'Roasted Bengal Gram (Chana) & Jaggery', quantityGrams: 50 },
       ],
       dinner: [
-        { foodName: 'Bajra or Jowar Roti', ifctCode: 'A010', quantityGrams: 100, nutrients: { ironMg: 3.8, zincMg: 2.1, fiberG: 5.2 } },
-        { foodName: dietType === 'non-veg' ? 'Egg Curry / Fish Curry' : 'Methi Paneer Bhurji', ifctCode: 'E004', quantityGrams: 180, nutrients: { proteinG: 16.5, vitaminB12Mcg: 1.4, calciumMg: 220 } },
-        { foodName: 'Spiced Buttermilk (Chaas)', ifctCode: 'G002', quantityGrams: 200, nutrients: { calciumMg: 140, probiotics: true } },
+        { foodName: 'Bajra or Jowar Roti', quantityGrams: 100 },
+        { foodName: dietType === 'non-veg' ? 'Egg Curry / Fish Curry' : dietType === 'vegan' ? 'Tofu and Methi Bhurji' : 'Methi Paneer Bhurji', quantityGrams: 180 },
+        { foodName: dietType === 'vegan' ? 'Unsweetened Fortified Plant Beverage' : 'Spiced Buttermilk (Chaas)', quantityGrams: 200 },
       ],
     },
     {
       breakfast: [
-        { foodName: 'Ragi Idli with Sambhar', ifctCode: 'A018', quantityGrams: 200, nutrients: { calciumMg: 340, ironMg: 3.9, proteinG: 10.2 } },
+        { foodName: 'Ragi Idli with Sambhar', quantityGrams: 200 },
       ],
       lunch: [
-        { foodName: 'Moringa Leaf Dal', ifctCode: 'C019', quantityGrams: 200, nutrients: { ironMg: 6.2, vitaminAMcg: 450, calciumMg: 180 } },
-        { foodName: 'Millet Rice (Kodo / Foxtail)', ifctCode: 'A025', quantityGrams: 150, nutrients: { ironMg: 2.8, fiberG: 4.2 } },
-        { foodName: 'Beetroot Raita', ifctCode: 'D015', quantityGrams: 100, nutrients: { folateMcg: 45, potassiumMg: 280 } },
+        { foodName: 'Moringa Leaf Dal', quantityGrams: 200 },
+        { foodName: 'Millet Rice (Kodo / Foxtail)', quantityGrams: 150 },
+        { foodName: dietType === 'vegan' ? 'Beetroot Salad' : 'Beetroot Raita', quantityGrams: 100 },
       ],
       snack: [
-        { foodName: 'Sesame (Til) & Peanut Chikki', ifctCode: 'K006', quantityGrams: 40, nutrients: { calciumMg: 210, ironMg: 2.5 } },
+        { foodName: 'Sesame (Til) & Peanut Chikki', quantityGrams: 40 },
       ],
       dinner: [
-        { foodName: 'Whole Wheat Phulka (2 pcs)', ifctCode: 'A001', quantityGrams: 80, nutrients: { fiberG: 3.2, proteinG: 6.0 } },
-        { foodName: 'Rajma / Chana Masala', ifctCode: 'B011', quantityGrams: 200, nutrients: { proteinG: 15.0, ironMg: 5.1, folateMcg: 90 } },
-        { foodName: 'Warm Turmeric Spiced Milk', ifctCode: 'G001', quantityGrams: 150, nutrients: { calciumMg: 180, vitaminD3Iu: 60 } },
+        { foodName: 'Whole Wheat Phulka (2 pcs)', quantityGrams: 80 },
+        { foodName: 'Rajma / Chana Masala', quantityGrams: 200 },
+        { foodName: dietType === 'vegan' ? 'Warm Turmeric Fortified Plant Beverage' : 'Warm Turmeric Spiced Milk', quantityGrams: 150 },
       ],
     },
   ];
@@ -82,6 +82,12 @@ export async function generateMealPlan(req, res, next) {
 
     const user = await User.findById(req.user.id);
     const userDietType = preferences?.dietType || user?.profile?.dietType || 'veg';
+    if (preferences?.allergies?.length || user?.profile?.allergies?.length) {
+      return res.status(422).json({
+        success: false,
+        error: { code: 'ALLERGY_FILTER_UNAVAILABLE', message: 'Meal plans cannot be generated safely for profiles with listed allergies yet.' },
+      });
+    }
 
     const deficienciesToTarget = [...(targetDeficiencies || [])];
 
@@ -123,7 +129,7 @@ export async function generateMealPlan(req, res, next) {
     }
 
     const duration = planDurationDays || 7;
-    const generatedMeals = buildDefaultIndianMeals(duration, userDietType, deficienciesToTarget);
+    const generatedMeals = buildDefaultIndianMeals(duration, userDietType);
 
     const mealPlan = await MealPlan.create({
       userId: req.user.id,
@@ -131,11 +137,8 @@ export async function generateMealPlan(req, res, next) {
       targetDeficiencies: deficienciesToTarget,
       planDurationDays: duration,
       meals: generatedMeals,
-      aiModelUsed: 'gemini-1.5-flash',
-      ragSourcesUsed: [
-        'IFCT 2017 (Indian Food Composition Tables - ICMR-NIN)',
-        'Dietary Guidelines for Indians (ICMR 2024)',
-      ],
+      aiModelUsed: 'curated-template-v1',
+      ragSourcesUsed: [],
       status: 'draft',
       generatedAt: new Date(),
     });
@@ -144,7 +147,6 @@ export async function generateMealPlan(req, res, next) {
       mealPlanId: mealPlan.id,
       userId: req.user.id,
       duration,
-      targetDeficiencies: deficienciesToTarget,
     });
 
     return res.status(201).json({

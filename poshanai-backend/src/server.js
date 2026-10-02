@@ -4,13 +4,8 @@ import { env } from './config/env.js';
 import logger from './utils/logger.js';
 
 try {
-  if (env.isAtlasPlaceholder) {
-    logger.warn(
-      'MONGODB_URI in .env contains a credentials placeholder (<password>). Using local MongoDB (mongodb://127.0.0.1:27017/poshanai) for development.',
-    );
-  }
   await mongoose.connect(env.mongoUri, { serverSelectionTimeoutMS: 5000 });
-  logger.info('Connected to MongoDB');
+  logger.info(`MongoDB Connected: ${mongoose.connection.host}`);
   const server = app.listen(env.port, '0.0.0.0', () => logger.info(`PoshanAI API listening on port ${env.port}`));
   server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {

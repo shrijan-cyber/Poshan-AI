@@ -3,6 +3,7 @@ import { verifyToken } from '../middleware/authMiddleware.js';
 import {
   uploadReportMiddleware,
   uploadReport,
+  downloadReportFile,
   listReports,
   getReportById,
   deleteReport,
@@ -17,11 +18,12 @@ router.post(
   (req, res, next) => {
     uploadReportMiddleware(req, res, (err) => {
       if (err) {
+        const isTooLarge = err.code === 'LIMIT_FILE_SIZE';
         return res.status(400).json({
           success: false,
           error: {
-            code: 'FILE_UPLOAD_ERROR',
-            message: err.message || 'File upload failed.',
+            code: isTooLarge ? 'FILE_TOO_LARGE' : 'FILE_UPLOAD_ERROR',
+            message: isTooLarge ? 'Report files must be 10 MB or smaller.' : 'The report file could not be uploaded.',
           },
         });
       }
@@ -32,6 +34,7 @@ router.post(
 );
 
 router.get('/', listReports);
+router.get('/:id/file', downloadReportFile);
 router.get('/:id', getReportById);
 router.delete('/:id', deleteReport);
 

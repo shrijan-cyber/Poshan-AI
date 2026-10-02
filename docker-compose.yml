@@ -16,6 +16,7 @@ services:
   api:
     build: ./poshanai-backend
     env_file: .env
+    volumes: ["uploads_data:/app/uploads"]
     environment:
       MONGODB_URI: mongodb://mongo:27017/poshanai
       REDIS_URL: redis://redis:6379
@@ -32,3 +33,4 @@ services:
 volumes:
   mongo_data:
   redis_data:
+  uploads_data:

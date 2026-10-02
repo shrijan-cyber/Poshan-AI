@@ -1,28 +1,31 @@
 {
   "meta": {
     "file": "AI_CONTEXT.json",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "project": "PoshanAI",
-    "purpose": "Single source of truth for AI agents. Read this BEFORE generating any code. Do not ask for context that is already here.",
-    "usage_instruction": "AI Agent: Read this entire file first. Then follow team_member_roles to know which folder you are allowed to edit. Follow coding_conventions, security_rules, and do_not rules strictly. Use quick_prompts as templates. Minimize token usage by not repeating what is here.",
-    "last_updated": "2025-01-01"
+    "purpose": "SINGLE SOURCE OF TRUTH for any AI agent working on PoshanAI. Read this ENTIRE file BEFORE generating any code, fixing any error, or making any decision. Do NOT ask for info already here.",
+    "last_updated": "2025-10-02",
+    "instruction_to_ai": "You are a Senior Full-Stack Engineer, Software Architect, UI/UX Designer, and Security Engineer. Read this file top-to-bottom. Follow coding_conventions, security_rules, and do_not rules strictly. Use quick_prompts as templates. Minimize token usage by not repeating what is here. If something is not in this file, ask SPECIFIC questions instead of guessing."
   },
 
   "project": {
     "name": "PoshanAI",
     "tagline": "AI-Powered Micronutrient Deficiency Diet Planner for Indian Context",
-    "course": "Project Seminar (CSP-018)",
+    "type": "Final Year B.Tech CSE Project + Project Seminar (CSP-018)",
     "institution": "JB Institute of Technology, Veer Madho Singh Bhandari Uttarakhand Technical University",
-    "problem": "50%+ Indian women are anemic, 70-90% have Vitamin D deficiency, 47% urban population has B12 deficiency. Blood reports are hard to understand, generic diet apps use Western food data, and Indian thali/local food/medical conditions are not considered.",
-    "solution": "Web app that takes user profile + blood report (OCR) + diet + routine, detects micronutrient deficiencies, and generates personalized Indian meal plans using IFCT 2017 database + Gemini API (RAG). Suggests blood tests with medical disclaimers.",
+    "team_size": 4,
+    "team_names": ["Member 1 (Frontend)", "Member 2 (Backend)", "Member 3 (AI/ML)", "Member 4 (DevOps)"],
+    "goal": "Build a production-ready, scalable, secure web app that detects micronutrient deficiencies from blood reports and generates personalized Indian meal plans using AI.",
+    "problem_statement": "India me 50%+ women anemia se peedit hain, 70-90% Indians me Vitamin D deficiency hai, 47% urban population me B12 deficiency hai. Blood reports samajhna aam aadmi ke liye mushkil hai, generic diet apps Western food pe focus karte hain, aur Indian thali + medical conditions ignore karte hain.",
+    "solution": "AI-powered web app jo user profile, blood report (OCR), diet, aur routine analyze karke micronutrient deficiencies detect karta hai aur IFCT 2017 (Indian Food Composition Table) + Gemini API (RAG) se personalized Indian meal plan banata hai. Blood test suggestion bhi deta hai with medical disclaimers.",
     "core_innovation": [
       "Blood report OCR + nutrient extraction",
-      "IFCT 2017 (Indian Food Composition Table) integration",
+      "IFCT 2017 integration (Indian Food Composition Table)",
       "LLM + RAG for personalized meal planning",
       "Multi-input personalization (age, weight, height, condition, diet, routine)",
       "Medical safety: AI never diagnoses, only awareness + suggestion with disclaimers"
     ],
-    "target_users": ["Anemia patients", "Women 15-45", "Elderly", "Dietitians", "Diagnostic labs", "Corporate wellness"],
+    "target_users": ["Anemia patients", "Women 15-45", "Elderly", "Dietitians", "Diagnostic labs", "Corporate wellness programs"],
     "phase_plan": {
       "phase_1_mvp": "Profile intake, diet analysis, IFCT meal plan, basic deficiency risk",
       "phase_2": "Blood report OCR, deficiency detection, blood test suggestion",
@@ -36,7 +39,7 @@
       "framework": "React 18",
       "build_tool": "Vite",
       "styling": "Tailwind CSS",
-      "animations": ["Framer Motion", "GSAP"],
+      "animations": ["Framer Motion", "GSAP", "Motion Primitives (https://github.com/ibelick/motion-primitives.git)"],
       "state": "Redux Toolkit",
       "routing": "React Router v6",
       "http": "Axios",
@@ -44,152 +47,297 @@
       "forms": "React Hook Form"
     },
     "backend": {
-      "runtime": "Node.js 20",
+      "runtime": "Node.js (MUST BE v22.14.0 LTS — NOT v24)",
       "framework": "Express.js",
-      "database": "MongoDB (Atlas)",
+      "database": "MongoDB Atlas",
+      "cluster_url": "poshanai.3gl2pq1.mongodb.net",
+      "cluster_shards": [
+        "ac-ikd9izm-shard-00-00.3gl2pq1.mongodb.net:27017",
+        "ac-ikd9izm-shard-00-01.3gl2pq1.mongodb.net:27017",
+        "ac-ikd9izm-shard-00-02.3gl2pq1.mongodb.net:27017"
+      ],
+      "replica_set": "atlas-mhj4jk-shard-0",
       "odm": "Mongoose",
-      "cache": "Redis",
-      "queue": "BullMQ",
-      "auth": ["Firebase Auth", "JWT"],
+      "auth": "JWT (15m access + 7d refresh httpOnly cookie)",
       "validation": "Joi",
       "logging": "Winston",
       "file_upload": "Multer"
     },
     "ai_layer": {
-      "llm": "Gemini API",
+      "llm_gateway": "OmniRoute (local, http://localhost:20128/v1)",
+      "omni_route_dashboard": "http://localhost:20128",
+      "omni_route_port": 20128,
+      "underlying_models": ["Gemini 2.5 Flash", "Gemini 3.8", "Gemini Deep Research"],
       "rag_framework": "LangChain",
-      "vector_db": "Chroma / Pinecone",
-      "embeddings": "Gemini Embeddings",
-      "ocr": ["Tesseract.js", "PaddleOCR"],
-      "pose_estimation": "MediaPipe"
+      "vector_db": "Chroma/Pinecone (planned)",
+      "ocr": "Tesseract/PaddleOCR (planned)",
+      "pose_estimation": "MediaPipe (planned)"
     },
     "devops": {
       "containerization": "Docker + Docker Compose",
       "reverse_proxy": "Nginx",
-      "ci_cd": "GitHub Actions",
-      "hosting": ["Vercel (frontend)", "Render (backend)", "MongoDB Atlas"],
-      "monitoring": "Winston + Prometheus (future)"
+      "ci_cd": "GitHub Actions (planned)",
+      "hosting_planned": "Vercel (frontend), Render (backend), MongoDB Atlas (DB)"
     },
-    "tools": ["Git", "GitHub", "Postman", "VS Code"]
+    "tools": ["Git", "GitHub", "Postman", "VS Code", "Antigravity IDE (fork of VS Code)", "MongoDB Compass"]
   },
 
-  "folder_structure": {
-    "root": {
-      "nginx/": "Nginx reverse proxy config",
-      "poshanai-backend/": "Express + MongoDB backend",
-      "poshanai-frontend/": "React + Vite frontend",
-      "docker-compose.yml": "Dev orchestration",
-      "docker-compose.prod.yml": "Prod orchestration",
-      ".env.example": "Environment variable template",
-      "AI_CONTEXT.json": "This file — AI agent context",
-      "README.md": "Project overview"
+  "brand_assets": {
+    "logo": {
+      "file": "poshanai-frontend/src/assets/logo.png",
+      "icon": "poshanai-frontend/src/assets/logo-icon.png",
+      "description": "Woman face profile + leafy green elements + AI brain circuit + Indian thali (rice, dal, roti, veggies)",
+      "colors": {
+        "primary_green": "#1E5631",
+        "secondary_green": "#4CAF50",
+        "accent_orange": "#F57C00",
+        "background_white": "#FFFFFF",
+        "background_light": "#F9FBF9",
+        "background_dark": "#0F172A",
+        "text_primary": "#1E293B",
+        "text_secondary": "#64748B",
+        "success": "#16A34A",
+        "warning": "#F59E0B",
+        "error": "#DC2626"
+      },
+      "usage": ["Navbar (left, 40px height)", "Login/Register (centered, 180px)", "Favicon (logo-icon.png)", "PPT cover", "Loading screen"]
     },
-    "frontend": {
-      "src/api/": "Axios instances + endpoint wrappers (client.js, authApi.js, reportApi.js, mealPlanApi.js)",
-      "src/assets/": "Images, fonts, static files",
-      "src/components/common/": "Button, Modal, Loader, Toast",
-      "src/components/upload/": "ReportUploader, OCRPreview",
-      "src/components/profile/": "ProfileForm, ProfileCard",
-      "src/components/mealplan/": "MealCard, NutrientChart",
-      "src/context/": "AuthContext, ThemeContext",
-      "src/hooks/": "useAuth, useFetch, useDebounce",
-      "src/pages/": "Dashboard, UploadReport, Profile, MealPlanView, AdminPanel",
-      "src/routes/": "ProtectedRoute, RoleBasedRoute",
-      "src/store/": "Redux slices",
-      "src/utils/": "validators, formatters",
-      "src/App.jsx": "Root component",
-      "src/main.jsx": "Entry point"
-    },
-    "backend": {
-      "src/config/": "db.js, firebase.js, redis.js, env.js",
-      "src/modules/auth/": "auth.controller.js, auth.routes.js, auth.middleware.js, auth.service.js",
-      "src/modules/users/": "user.model.js, user.controller.js, user.routes.js",
-      "src/modules/reports/": "report.model.js, report.controller.js, report.routes.js, ocr.service.js",
-      "src/modules/mealplans/": "mealplan.model.js, mealplan.controller.js, mealplan.routes.js, ai.service.js",
-      "src/modules/deficiencylogs/": "deficiencylog.model.js, deficiencylog.controller.js, deficiencylog.routes.js",
-      "src/rag/": "ifctLoader.js, embedder.js, vectorStore.js, promptBuilder.js",
-      "src/jobs/": "queue.js, ocr.worker.js, aiPlan.worker.js",
-      "src/middleware/": "errorHandler.js, rateLimiter.js, validateRequest.js, sanitize.js",
-      "src/utils/": "logger.js, apiResponse.js",
-      "src/app.js": "Express app setup",
-      "src/server.js": "Server entry point"
+    "typography": {
+      "headings": "Poppins (600, 700)",
+      "body": "Inter (400, 500)",
+      "mono": "JetBrains Mono"
     }
   },
 
-  "coding_conventions": {
-    "language": "JavaScript (ES2022+), no TypeScript for now",
-    "modules": "ES Modules (import/export), not CommonJS",
-    "naming": {
-      "files": "camelCase for JS files, PascalCase for React components",
-      "variables": "camelCase",
-      "constants": "UPPER_SNAKE_CASE",
-      "classes": "PascalCase",
-      "database_collections": "PascalCase (User, Report, MealPlan)",
-      "api_routes": "kebab-case (/api/meal-plans, /api/deficiency-logs)"
+  "folder_structure": {
+    "root": "D:\\FinalYearProject\\",
+    "files": {
+      "AI_CONTEXT.json": "This file",
+      "AGENTS.md": "AI agent rules (ponytail-style)",
+      "docker-compose.yml": "Dev orchestration",
+      "docker-compose.prod.yml": "Prod orchestration",
+      "start-all.bat": "One-click start script for all services",
+      "package.json": "Root scripts (dev, start)",
+      "README.md": "Project overview",
+      "nginx/nginx.conf": "Reverse proxy config"
     },
-    "async": "Always use async/await, never raw promises with .then()",
-    "error_handling": "Always try/catch in async functions. Pass errors to next() in Express.",
-    "comments": "Only for complex logic. Do not comment obvious code.",
-    "formatting": "Prettier defaults (2 spaces, single quotes, semicolons)",
-    "imports": "Absolute imports from src/ where possible. Order: built-in → external → internal.",
-    "functions": "Small, single responsibility. Max 50 lines. Use arrow functions for callbacks.",
-    "react": {
-      "components": "Functional components only. No class components.",
-      "hooks": "Custom hooks for reusable logic. Prefix with 'use'.",
-      "props": "Destructure props in function signature.",
-      "styling": "Tailwind classes only. No inline styles. No CSS modules unless necessary.",
-      "state": "Redux Toolkit for global state, useState for local, React Query for server state"
+    "frontend": {
+      "path": "poshanai-frontend/",
+      "src": {
+        "api/": "client.js, authApi.js, userApi.js, reportApi.js, mealPlanApi.js",
+        "assets/": "images, logo.png, logo-icon.png",
+        "components/": {
+          "common/": "Button, Input, Modal, Loader, Toast, Card, Badge, index.js",
+          "layout/": "Navbar, Sidebar, Footer, Layout",
+          "profile/": "ProfileForm, ProfileCard, DeficiencyReport",
+          "upload/": "ReportUploader, OCRPreview",
+          "mealplan/": "MealCard, NutrientChart",
+          "motion/": "Motion Primitives components"
+        },
+        "context/": "AuthContext.jsx, ThemeContext.jsx",
+        "hooks/": "useAuth.js, useFetch.js, useDebounce.js, useReportStatus.js",
+        "pages/": "Dashboard.jsx, Login.jsx, Register.jsx, Profile.jsx, UploadReport.jsx, MealPlanView.jsx, NotFound.jsx",
+        "routes/": "ProtectedRoute.jsx, RoleBasedRoute.jsx",
+        "store/": "index.js, hooks.js, slices/userSlice.js, slices/reportSlice.js, slices/mealPlanSlice.js",
+        "utils/": "validators.js, formatters.js, constants.js",
+        "App.jsx": "Root component",
+        "main.jsx": "Entry point",
+        "index.css": "Tailwind directives"
+      }
     },
-    "api_response_format": {
-      "success": "{ success: true, data: {...}, message: 'optional' }",
-      "error": "{ success: false, error: { code: 'ERROR_CODE', message: 'Human readable' } }"
+    "backend": {
+      "path": "poshanai-backend/",
+      "src": {
+        "config/": "db.js (Mongoose connection), env.js (env validation)",
+        "controllers/": "authController.js, userController.js, reportController.js, mealPlanController.js, deficiencyLogController.js",
+        "middleware/": "authMiddleware.js (verifyToken, requireRole), validateRequest.js, errorHandler.js, rateLimiter.js, sanitize.js",
+        "models/": "User.js, Report.js, MealPlan.js, DeficiencyLog.js",
+        "routes/": "authRoutes.js, userRoutes.js, reportRoutes.js, mealPlanRoutes.js, deficiencyLogRoutes.js",
+        "rag/": "ifctLoader.js, embedder.js, vectorStore.js, promptBuilder.js, geminiClient.js",
+        "services/": "(planned for business logic)",
+        "utils/": "logger.js (Winston), apiResponse.js",
+        "app.js": "Express app with security middleware",
+        "server.js": "Server entry point (Mongoose connect + listen)"
+      }
+    }
+  },
+
+  "current_project_status": {
+    "backend_completed": [
+      "Express app with Helmet, CORS, rate limiting, mongo-sanitize, cookie-parser",
+      "MongoDB connection (Atlas) with Mongoose (BLOCKED by Node v24 DNS bug — see errors section)",
+      "Winston logger with PII redaction",
+      "Auth module: register, login, refresh, logout — TESTED end-to-end",
+      "User module: GET /me, PUT /me, GET / (admin), PATCH /:id/role (admin) — TESTED",
+      "JWT: 15m access + 7d refresh cookie + rotation",
+      "Joi validation on auth + user routes",
+      "Auth middleware: verifyToken, requireRole",
+      "Placeholder models/controllers/routes for Reports, MealPlans, DeficiencyLogs",
+      "RAG skeleton files: ifctLoader.js, embedder.js, vectorStore.js, promptBuilder.js, geminiClient.js",
+      "Health check endpoints: GET /health, GET /ready",
+      "Docker + Docker Compose + Nginx config ready"
+    ],
+    "backend_pending": [
+      "Reports module: real implementation (currently placeholder)",
+      "MealPlans module: real implementation with AI (currently placeholder)",
+      "DeficiencyLogs module: real implementation (currently placeholder)",
+      "OCR pipeline (Tesseract/PaddleOCR) — Phase 2",
+      "IFCT 2017 data loading into vector DB — Phase 2",
+      "OmniRoute integration in geminiClient.js",
+      "Actual meal plan generation logic"
+    ],
+    "frontend_completed": [
+      "React + Vite + Tailwind scaffold ready",
+      "Login.jsx created (React Hook Form, Zod, Framer Motion)",
+      "Folder structure: components/, pages/, hooks/, services/, store/, utils/, api/, context/"
+    ],
+    "frontend_pending": [
+      "Common components (Button, Input, Modal, Loader, Toast, Card, Badge) with forwardRef",
+      "API client with Axios interceptors",
+      "AuthContext with useAuth hook",
+      "Redux store with slices",
+      "Layout (Navbar with logo + Sidebar + Footer)",
+      "React Router v6 with protected routes",
+      "Register page",
+      "Dashboard page",
+      "ProfileForm (multi-step)",
+      "ReportUploader component",
+      "MealPlanView page",
+      "DeficiencyReport component",
+      "Motion Primitives integration",
+      "Tailwind theme with logo colors",
+      "Dark/light mode toggle"
+    ],
+    "ai_service_status": "Only skeleton exists. No actual Gemini integration, no RAG pipeline, no vector DB operations."
+  },
+
+  "critical_current_error": {
+    "title": "BLOCKER — Backend cannot connect to MongoDB Atlas",
+    "node_version": "v24.21.0 (BUGGY — MUST DOWNGRADE)",
+    "root_cause": "Node.js v24.13.0+ has a confirmed DNS resolver bug (c-ares) on Windows. It fails to resolve both SRV records and A records for Atlas hostnames. Even legacy (non-SRV) connection strings fail with 'queryA ENOTFOUND'.",
+    "github_issues": ["https://github.com/nodejs/node/issues/62326", "https://github.com/nodejs/node/issues/62703"],
+    "why_compass_works": "MongoDB Compass uses a different driver/library that does not use Node.js c-ares. It resolves fine.",
+    "symptoms": [
+      "querySrv ENOTFOUND _mongodb._tcp.poshanai.3gl2pq1.mongodb.net",
+      "queryA ENOTFOUND ac-ikd9izm-shard-00-00.3gl2pq1.mongodb.net",
+      "getaddrinfo ENOTFOUND ac-ikd9izm-shard-00-00.3gl2pq1.mongodb.net",
+      "MongooseServerSelectionError: Could not connect to any servers"
+    ],
+    "what_has_been_tried_and_failed": [
+      "dns.setServers(['8.8.8.8', '8.8.4.4']) in server.js — FAILED",
+      "dns.setServers(['1.1.1.1', '1.0.0.1']) in server.js — FAILED",
+      "Switching to Legacy (non-SRV) connection string — FAILED (queryA ENOTFOUND)",
+      "Increasing serverSelectionTimeoutMS, connectTimeoutMS — FAILED",
+      "Adding 0.0.0.0/0 to Atlas IP whitelist — DONE (Active) but not enough",
+      "Removing dns.setServers and using raw URI — FAILED",
+      "nslookup works at OS level — but Node.js internal resolver fails"
+    ],
+    "solution": {
+      "action": "Downgrade Node.js to v22.14.0 LTS",
+      "steps": [
+        "1. Install nvm-windows from https://github.com/coreybutler/nvm-windows/releases (nvm-setup.exe, run as admin)",
+        "2. In new terminal: nvm install 22.14.0",
+        "3. nvm use 22.14.0",
+        "4. Verify: node --version (must show v22.14.0)",
+        "5. cd poshanai-backend",
+        "6. rmdir /s /q node_modules",
+        "7. npm install",
+        "8. npm.cmd run dev",
+        "9. Expected: 'MongoDB Connected' + 'PoshanAI API listening on port 5000'"
+      ],
+      "why_works": "Node.js v22 LTS does not have the c-ares DNS regression. It is stable and tested with MongoDB Atlas."
+    },
+    "secondary_error_fixed": {
+      "error": "nodemon spawn EPERM on Windows (pstree.remy issue)",
+      "fix_applied": "Changed package.json dev script to 'node src/server.js' (bypasses nodemon entirely). Optionally use --legacy-watch flag.",
+      "status": "RESOLVED"
+    },
+    "powershell_error_fixed": {
+      "error": "npm.ps1 cannot be loaded. The file is not digitally signed.",
+      "quick_fix": "Use npm.cmd instead of npm (in PowerShell)",
+      "permanent_fix": "Admin PowerShell: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser",
+      "status": "WORKAROUND IN PLACE"
+    }
+  },
+
+  "environment_variables": {
+    "backend_env_file": "poshanai-backend/.env",
+    "backend_env": {
+      "PORT": "5000",
+      "NODE_ENV": "development",
+      "MONGODB_URI": "mongodb://shrijanchhetri31_db_user:PoshanAI2025Secure@ac-ikd9izm-shard-00-00.3gl2pq1.mongodb.net:27017,ac-ikd9izm-shard-00-01.3gl2pq1.mongodb.net:27017,ac-ikd9izm-shard-00-02.3gl2pq1.mongodb.net:27017/poshanai?ssl=true&replicaSet=atlas-mhj4jk-shard-0&authSource=admin&retryWrites=true&w=majority",
+      "JWT_ACCESS_SECRET": "88f56d647098ddc96aff626c0b3a0a159fb73d0e76cbb17d4a5f9b2e3a1c8d6f (64-char)",
+      "JWT_REFRESH_SECRET": "dfcadc6cd93092b23db4bd6576740adf5b7f93fa22685b951a9b6e3c8a5d7f2e (64-char)",
+      "JWT_ACCESS_EXPIRY": "15m",
+      "JWT_REFRESH_EXPIRY": "7d",
+      "GEMINI_API_KEY": "your_gemini_api_key_here (get from https://aistudio.google.com/app/apikey)",
+      "CLIENT_URL": "http://localhost:5173",
+      "OMNIROUTE_BASE_URL": "http://localhost:20128/v1",
+      "OMNIROUTE_API_KEY": "sk-fafbf310c5750db6-cf66d2-936a97e5",
+      "OMNIROUTE_MODEL": "auto/best-free"
+    },
+    "frontend_env_file": "poshanai-frontend/.env",
+    "frontend_env": {
+      "VITE_API_URL": "http://localhost:5000/api"
+    }
+  },
+
+  "atlas_credentials": {
+    "cluster": "poshanai.3gl2pq1.mongodb.net",
+    "username": "shrijanchhetri31_db_user",
+    "password": "PoshanAI2025Secure",
+    "database": "poshanai",
+    "ip_whitelist": "0.0.0.0/0 (Active — for development only, remove in production)",
+    "compass_verified": true,
+    "connection_strings": {
+      "srv": "mongodb+srv://shrijanchhetri31_db_user:PoshanAI2025Secure@poshanai.3gl2pq1.mongodb.net/poshanai?retryWrites=true&w=majority",
+      "standard_legacy": "mongodb://shrijanchhetri31_db_user:PoshanAI2025Secure@ac-ikd9izm-shard-00-00.3gl2pq1.mongodb.net:27017,ac-ikd9izm-shard-00-01.3gl2pq1.mongodb.net:27017,ac-ikd9izm-shard-00-02.3gl2pq1.mongodb.net:27017/poshanai?ssl=true&replicaSet=atlas-mhj4jk-shard-0&authSource=admin&retryWrites=true&w=majority",
+      "recommended": "Use standard_legacy with Node.js v22.14.0"
     }
   },
 
   "api_contract": {
-    "base_url": "/api",
+    "base_url": "http://localhost:5000/api",
     "auth": {
-      "POST /api/auth/register": "Register user (public)",
-      "POST /api/auth/login": "Login, issue JWT (public)",
-      "POST /api/auth/refresh": "Refresh access token (public)",
-      "POST /api/auth/logout": "Invalidate session (auth)"
+      "POST /api/auth/register": "Register user (public) — DONE",
+      "POST /api/auth/login": "Login, issue JWT (public) — DONE",
+      "POST /api/auth/refresh": "Refresh access token (public) — DONE",
+      "POST /api/auth/logout": "Invalidate session (auth) — DONE"
     },
     "users": {
-      "GET /api/users/me": "Get own profile (auth)",
-      "PUT /api/users/me": "Update profile (auth)",
-      "GET /api/users": "List all users (admin)",
-      "PATCH /api/users/:id/role": "Change user role (admin)"
+      "GET /api/users/me": "Get own profile (auth) — DONE",
+      "PUT /api/users/me": "Update profile (auth) — DONE",
+      "GET /api/users": "List all users (admin) — DONE",
+      "PATCH /api/users/:id/role": "Change user role (admin) — DONE"
     },
     "reports": {
-      "POST /api/reports/upload": "Upload blood report (auth, multipart)",
-      "GET /api/reports/:id": "Get report + OCR results (owner/admin)",
-      "GET /api/reports": "List own reports (auth)",
-      "DELETE /api/reports/:id": "Delete report (owner/admin)",
-      "GET /api/reports/:id/status": "Poll OCR status (owner)"
+      "POST /api/reports/upload": "Upload blood report (auth, multipart) — PLACEHOLDER",
+      "GET /api/reports/:id": "Get report + OCR results (owner/admin) — PLACEHOLDER",
+      "GET /api/reports": "List own reports (auth) — PLACEHOLDER",
+      "DELETE /api/reports/:id": "Delete report (owner/admin) — PLACEHOLDER",
+      "GET /api/reports/:id/status": "Poll OCR status (owner) — PLACEHOLDER"
     },
     "mealplans": {
-      "POST /api/mealplans/generate": "Trigger AI meal plan generation (auth)",
-      "GET /api/mealplans/:id": "Fetch meal plan (owner/admin)",
-      "GET /api/mealplans": "List user meal plans (auth)",
-      "PATCH /api/mealplans/:id/status": "Mark active/completed (owner)"
+      "POST /api/mealplans/generate": "Trigger AI meal plan generation (auth) — PLACEHOLDER",
+      "GET /api/mealplans/:id": "Fetch meal plan (owner/admin) — PLACEHOLDER",
+      "GET /api/mealplans": "List user meal plans (auth) — PLACEHOLDER",
+      "PATCH /api/mealplans/:id/status": "Mark active/completed (owner) — PLACEHOLDER"
     },
     "deficiency_logs": {
-      "GET /api/deficiency-logs": "Get deficiency history (auth)",
-      "GET /api/deficiency-logs/trends": "Get trend chart data (auth)"
+      "GET /api/deficiency-logs": "Get deficiency history (auth) — PLACEHOLDER",
+      "GET /api/deficiency-logs/trends": "Get trend chart data (auth) — PLACEHOLDER"
     },
-    "admin_dietitian": {
-      "GET /api/admin/analytics": "Platform stats (admin)",
-      "GET /api/dietitian/reviews/:userId": "Review AI plans (dietitian)",
-      "POST /api/dietitian/reviews/:planId/approve": "Approve/edit plan (dietitian)"
+    "health": {
+      "GET /health": "Health check — returns { status: 'ok', service: 'poshanai-api' }",
+      "GET /ready": "Readiness check"
     }
   },
 
   "database_schema": {
     "User": {
-      "_id": "ObjectId",
       "firebaseUid": "String | null",
-      "email": "String (unique)",
-      "passwordHash": "String (if not Firebase)",
+      "email": "String (unique, indexed)",
+      "passwordHash": "String (bcrypt 12 rounds)",
       "role": "String (user | dietitian | admin)",
       "profile": {
         "name": "String",
@@ -202,12 +350,11 @@
         "region": "String",
         "activityLevel": "String"
       },
+      "isActive": "Boolean",
       "createdAt": "Date",
-      "updatedAt": "Date",
-      "isActive": "Boolean"
+      "updatedAt": "Date"
     },
     "Report": {
-      "_id": "ObjectId",
       "userId": "ObjectId (ref User, indexed)",
       "fileUrl": "String (S3/GCS)",
       "fileType": "String (pdf | image)",
@@ -226,7 +373,6 @@
       "processedAt": "Date"
     },
     "MealPlan": {
-      "_id": "ObjectId",
       "userId": "ObjectId (ref User, indexed)",
       "reportId": "ObjectId (ref Report)",
       "targetDeficiencies": "[String]",
@@ -251,7 +397,6 @@
       "generatedAt": "Date"
     },
     "DeficiencyLog": {
-      "_id": "ObjectId",
       "userId": "ObjectId (ref User, indexed)",
       "reportId": "ObjectId (ref Report)",
       "nutrient": "String",
@@ -263,99 +408,185 @@
     }
   },
 
+  "coding_conventions": {
+    "language": "JavaScript ES2022+ (ES Modules: import/export)",
+    "no_typescript": true,
+    "naming": {
+      "files": "camelCase for .js, PascalCase for React components",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE",
+      "classes": "PascalCase",
+      "database_collections": "PascalCase (User, Report, MealPlan, DeficiencyLog)",
+      "api_routes": "kebab-case (/api/meal-plans, /api/deficiency-logs)"
+    },
+    "async": "Always async/await, never .then()",
+    "error_handling": "try/catch in async functions, next(err) in Express",
+    "comments": "Only for complex logic",
+    "formatting": "Prettier defaults (2 spaces, single quotes, semicolons)",
+    "imports": "Built-in → external → internal (in that order)",
+    "functions": "Max 50 lines, single responsibility, arrow functions for callbacks",
+    "react": {
+      "components": "Functional components only, no class components",
+      "hooks": "Custom hooks prefixed with 'use'",
+      "props": "Destructured in function signature",
+      "styling": "Tailwind classes only, no inline styles, no CSS modules",
+      "animations": "Prefer Motion Primitives; fallback to Framer Motion; GSAP only for complex scroll timelines",
+      "state": "Redux Toolkit for global, useState for local"
+    },
+    "api_response_format": {
+      "success": "{ success: true, data: {...}, message: 'optional' }",
+      "error": "{ success: false, error: { code: 'ERROR_CODE', message: 'Human readable' } }"
+    }
+  },
+
   "security_rules": {
     "mandatory_middleware": ["helmet", "cors (whitelist only)", "express-rate-limit", "express-mongo-sanitize", "cookie-parser"],
-    "input_validation": "Joi on every POST/PUT/PATCH route. Reject unknown fields.",
+    "input_validation": "Joi on every POST/PUT/PATCH route",
     "auth": "JWT access token (15min) + refresh token (7d, httpOnly, Secure, SameSite=Strict cookie). Rotate refresh tokens.",
-    "password": "bcrypt with 12 rounds. Never log passwords.",
-    "rbac": "requireRole(['admin']) middleware on all admin routes. Check ownership on every resource access (BOLA prevention).",
-    "secrets": "ALL secrets in .env. Never in code, never in Git. Use .env.example as template.",
-    "error_handling": "Never expose stack traces to client. Log full error server-side, send generic message to client.",
-    "rate_limiting": "100 requests / 15 min per IP on general routes. 5 requests / 15 min on auth routes.",
-    "file_upload": "Validate MIME type, max size 10MB, scan for malware if possible. Store with random UUID name.",
+    "password": "bcrypt 12 rounds. Never log passwords.",
+    "rbac": "requireRole(['admin']) middleware on admin routes. Check ownership on every resource access.",
+    "secrets": "ALL secrets in .env. Never in code, never in Git. Use .env.example as template. Add .env to .gitignore.",
+    "error_handling": "Never expose stack traces to client. Log server-side, send generic message.",
+    "rate_limiting": "100 req/15min general, 5 req/15min on auth routes.",
     "ai_safety": [
-      "Sanitize OCR text before sending to LLM (prompt injection prevention)",
-      "Validate AI output against nutrient bounds (no dangerous dosages)",
+      "Sanitize OCR text before sending to LLM (prompt injection)",
+      "Validate AI output against nutrient bounds",
       "RAG grounding restricted to verified IFCT dataset only",
       "Always include medical disclaimer in AI responses"
     ],
-    "logging": "Winston with PII redaction. Never log passwords, tokens, blood report contents, or personal health data.",
-    "compliance": ["India DPDP Act", "Explicit user consent for health data", "Data retention + deletion policy"]
+    "frontend_security": [
+      "Access token in memory only (NOT localStorage)",
+      "Refresh token in httpOnly cookie",
+      "No secrets in frontend code",
+      "Sanitize all user inputs"
+    ]
   },
 
-  "team": {
-    "total_members": 4,
-    "members": {
-      "member_1": {
-        "role": "Frontend + UI/UX",
-        "branch": "feature/frontend-ui",
-        "allowed_folders": ["poshanai-frontend/src/**"],
-        "forbidden_folders": ["poshanai-backend/**", "nginx/**"],
-        "primary_ai_tools": ["v0 (Vercel)", "Cursor"],
-        "deliverables": ["All React pages", "Responsive UI", "Framer Motion animations", "Figma designs"]
-      },
-      "member_2": {
-        "role": "Backend + OCR",
-        "branch": "feature/backend-api",
-        "allowed_folders": ["poshanai-backend/src/modules/**", "poshanai-backend/src/config/**", "poshanai-backend/src/middleware/**"],
-        "forbidden_folders": ["poshanai-frontend/**", "poshanai-backend/src/rag/**"],
-        "primary_ai_tools": ["Cursor", "Windsurf"],
-        "deliverables": ["REST APIs", "MongoDB models", "Auth + RBAC", "OCR pipeline"]
-      },
-      "member_3": {
-        "role": "AI/ML + RAG",
-        "branch": "feature/ai-rag-ocr",
-        "allowed_folders": ["poshanai-backend/src/rag/**", "poshanai-backend/src/jobs/**", "poshanai-backend/src/modules/reports/ocr.service.js", "poshanai-backend/src/modules/mealplans/ai.service.js"],
-        "forbidden_folders": ["poshanai-frontend/**", "nginx/**"],
-        "primary_ai_tools": ["Claude Code", "Cursor"],
-        "deliverables": ["RAG pipeline", "Gemini integration", "IFCT data loading", "OCR extraction"]
-      },
-      "member_4": {
-        "role": "DevOps + Security + Testing + Business",
-        "branch": "feature/devops-security",
-        "allowed_folders": ["nginx/**", "docker-compose*.yml", ".github/workflows/**", "poshanai-backend/src/utils/logger.js", "docs/**"],
-        "forbidden_folders": ["poshanai-frontend/src/**", "poshanai-backend/src/modules/**"],
-        "primary_ai_tools": ["Warp", "Cursor", "CodeRabbit"],
-        "deliverables": ["Docker setup", "CI/CD pipeline", "Security audit", "Business plan", "PPT"]
-      }
+  "team_roles": {
+    "member_1": {
+      "role": "Frontend + UI/UX",
+      "branch": "feature/frontend-ui",
+      "allowed_folders": ["poshanai-frontend/src/**"],
+      "deliverables": ["All React pages", "Responsive UI", "Animations", "Figma designs", "Base structure for team", "Logo integration", "Motion Primitives"]
     },
-    "workflow": {
-      "main_branch": "production-ready, protected, no direct push",
-      "feature_branches": "feature/member-name-task (short-lived, 1-3 days)",
-      "commit_format": "type: short description (feat, fix, docs, refactor, test, chore)",
-      "pr_required": true,
-      "approvals_required": 1,
-      "ci_must_pass": true,
-      "merge_strategy": "squash merge"
+    "member_2": {
+      "role": "Backend + OCR",
+      "branch": "feature/backend-api",
+      "allowed_folders": ["poshanai-backend/src/controllers/**", "poshanai-backend/src/models/**", "poshanai-backend/src/routes/**"],
+      "deliverables": ["REST APIs", "MongoDB models", "Auth + RBAC", "OCR pipeline"]
+    },
+    "member_3": {
+      "role": "AI/ML + RAG",
+      "branch": "feature/ai-rag",
+      "allowed_folders": ["poshanai-backend/src/rag/**", "poshanai-backend/src/services/**"],
+      "deliverables": ["RAG pipeline", "Gemini via OmniRoute", "IFCT data loading", "OCR extraction"]
+    },
+    "member_4": {
+      "role": "DevOps + Security + Testing + Business",
+      "branch": "feature/devops-security",
+      "allowed_folders": ["nginx/**", "docker-compose*.yml", ".github/workflows/**", "docs/**"],
+      "deliverables": ["Docker setup", "CI/CD", "Security audit", "Business plan", "PPT", "Postman collection"]
     }
+  },
+
+  "git_workflow": {
+    "main_branch": "production-ready, protected, no direct push",
+    "feature_branches": "feature/member-name-task",
+    "commit_format": "type: short description (feat, fix, docs, refactor, test, chore)",
+    "pr_required": true,
+    "approvals_required": 1,
+    "merge_strategy": "squash merge"
+  },
+
+  "how_to_start_project": {
+    "step_1_omniroute": {
+      "terminal": "Terminal 1",
+      "command": "set OMNIROUTE_SERVER_HOST=127.0.0.1 && omniroute.cmd",
+      "port": 20128,
+      "note": "Chalta rehne do, Ctrl+C mat dabana. Dashboard: http://localhost:20128"
+    },
+    "step_2_backend": {
+      "terminal": "Terminal 2",
+      "command": "cd poshanai-backend && npm.cmd run dev",
+      "port": 5000,
+      "note": "npm.cmd use karo (PowerShell policy issue se bachne ke liye). Requires Node.js v22.14.0"
+    },
+    "step_3_frontend": {
+      "terminal": "Terminal 3",
+      "command": "cd poshanai-frontend && npm run dev",
+      "port": 5173,
+      "note": "Browser me http://localhost:5173 kholo"
+    },
+    "quick_start": "start-all.bat pe double-click karo (root folder me)"
   },
 
   "ai_prompt_guidelines": {
     "token_saving_rules": [
       "Always start prompt with: 'Read AI_CONTEXT.json first. Do not ask for info already there.'",
-      "Reference file paths instead of pasting file contents.",
-      "Ask for ONE feature at a time, not the whole project.",
-      "Specify exact output file path.",
-      "Say 'follow coding_conventions and security_rules from AI_CONTEXT.json' instead of re-explaining.",
-      "Do not paste database schema in prompt — say 'use User schema from AI_CONTEXT.json'."
+      "Reference file paths instead of pasting file contents",
+      "Ask for ONE feature at a time",
+      "Specify exact output file path",
+      "Say 'follow coding_conventions and security_rules from AI_CONTEXT.json' instead of re-explaining"
     ],
-    "prompt_template": "Act as a [ROLE]. Read AI_CONTEXT.json. Build [SPECIFIC FEATURE] at [FILE PATH]. Follow coding_conventions, security_rules, and do_not from AI_CONTEXT.json. Output: complete code with comments only for complex logic.",
+    "prompt_template": "Act as a [ROLE]. Read AI_CONTEXT.json first. Build [SPECIFIC FEATURE] at [FILE PATH]. Follow coding_conventions, security_rules, and do_not from AI_CONTEXT.json. Output: complete code with comments only for complex logic.",
+    "don_t_fool_me_prompt": "Before you say this is done: (1) Run lint, typecheck and full test suite, show output. (2) List every file changed and why. (3) List anything skipped, stubbed, mocked, or hard-coded. (4) List assumptions to confirm. Do not describe work as complete if any test is failing or skipped.",
     "role_map": {
-      "frontend_task": "Senior Frontend Engineer (React + Tailwind + Framer Motion)",
-      "backend_task": "Senior Backend Engineer (Node + Express + MongoDB)",
-      "ai_task": "Senior AI Engineer (Gemini + LangChain + RAG)",
-      "devops_task": "Senior DevOps Engineer (Docker + Nginx + GitHub Actions)",
-      "security_task": "Senior Security Engineer (OWASP API Top 10)"
+      "frontend": "Senior Frontend Engineer (React + Tailwind + Framer Motion)",
+      "backend": "Senior Backend Engineer (Node + Express + MongoDB)",
+      "ai": "Senior AI Engineer (Gemini + LangChain + RAG)",
+      "devops": "Senior DevOps Engineer (Docker + Nginx + GitHub Actions)",
+      "security": "Senior Security Engineer (OWASP API Top 10)"
     }
   },
 
-  "common_patterns": {
-    "express_controller": "async (req, res, next) => { try { ... res.json({ success: true, data }); } catch (err) { next(err); } }",
-    "mongoose_model": "const schema = new mongoose.Schema({...}, { timestamps: true }); export default mongoose.model('Name', schema);",
-    "react_component": "export default function ComponentName({ prop1, prop2 }) { ... return (...); }",
-    "api_call_frontend": "const { data } = await apiClient.post('/endpoint', payload); return data.data;",
-    "validation_schema_joi": "const schema = Joi.object({ field: Joi.string().required() }); const { error, value } = schema.validate(req.body);",
-    "error_middleware": "app.use((err, req, res, next) => { logger.error(err); res.status(err.status || 500).json({ success: false, error: { code: err.code || 'SERVER_ERROR', message: err.message || 'Something went wrong' } }); });"
+  "immediate_next_tasks": {
+    "task_1_CRITICAL": {
+      "priority": "P0 — BLOCKER",
+      "title": "Downgrade Node.js to v22.14.0 to fix Atlas DNS connection",
+      "steps": [
+        "Install nvm-windows (https://github.com/coreybutler/nvm-windows/releases)",
+        "nvm install 22.14.0",
+        "nvm use 22.14.0",
+        "node --version (verify v22.14.0)",
+        "cd poshanai-backend && rmdir /s /q node_modules && npm install",
+        "npm.cmd run dev",
+        "Verify: 'MongoDB Connected' + 'PoshanAI API listening on port 5000'"
+      ]
+    },
+    "task_2_HIGH": {
+      "priority": "P1",
+      "title": "Build frontend base structure for team",
+      "details": [
+        "Common components (Button, Input, Modal, Loader, Toast, Card, Badge) with forwardRef",
+        "API client with Axios interceptors (401 → refresh → retry)",
+        "AuthContext with useAuth hook (access token in memory, NOT localStorage)",
+        "Redux store with slices (user, report, mealPlan)",
+        "Layout with Navbar (logo) + Sidebar + Footer",
+        "React Router v6 with protected routes",
+        "Tailwind config with logo colors",
+        "Motion Primitives integration"
+      ]
+    },
+    "task_3_HIGH": {
+      "priority": "P1",
+      "title": "Implement real Reports/MealPlans/DeficiencyLogs modules",
+      "details": [
+        "Replace placeholder routes with real implementations",
+        "Integrate OmniRoute in geminiClient.js",
+        "Load IFCT 2017 data into vector DB",
+        "Implement meal plan generation logic"
+      ]
+    },
+    "task_4_MEDIUM": {
+      "priority": "P2",
+      "title": "PPT submission (deadline approaching)",
+      "details": [
+        "10-11 slides",
+        "Use logo + green/orange color scheme",
+        "Cover: problem, solution, innovation, tech stack, architecture, market, business model, feasibility (CO1+CO2), conclusion",
+        "Export to PDF"
+      ]
+    }
   },
 
   "do_not": [
@@ -369,41 +600,68 @@
     "Do NOT log sensitive data (passwords, tokens, health data)",
     "Do NOT write AI prompts that diagnose medical conditions",
     "Do NOT modify another member's folder without PR",
-    "Do NOT use CommonJS require() — use ES modules import",
+    "Do NOT use CommonJS require() — use ES modules",
     "Do NOT write fake/placeholder functions — implement real functionality",
     "Do NOT skip input validation on any route",
-    "Do NOT use console.log — use Winston logger"
+    "Do NOT use console.log — use Winston logger in backend",
+    "Do NOT use generic placeholder logos — use the provided PoshanAI logo",
+    "Do NOT use Node.js v24.x — MUST use v22.14.0 LTS (see critical_current_error)"
   ],
 
-  "quick_prompts": {
-    "frontend_form": "Act as Senior Frontend Engineer. Read AI_CONTEXT.json. Build a [FORM NAME] at poshanai-frontend/src/components/[path].jsx. Fields: [list]. Use React Hook Form + Zod. Tailwind for styling. Framer Motion for animations. Responsive + accessible. Follow coding_conventions from AI_CONTEXT.json.",
-    "backend_endpoint": "Act as Senior Backend Engineer. Read AI_CONTEXT.json. Build [METHOD] [ROUTE] at poshanai-backend/src/modules/[module]/[file].controller.js. Follow api_response_format. Use Joi validation + auth middleware + rate limiter. Use [Model] schema from AI_CONTEXT.json. Follow security_rules.",
-    "ai_service": "Act as Senior AI Engineer. Read AI_CONTEXT.json. Build [AI FEATURE] at poshanai-backend/src/rag/[file].js. Use Gemini API + LangChain. Follow ai_safety rules. Include medical disclaimers. Handle API failures gracefully.",
-    "dockerfile": "Act as Senior DevOps Engineer. Read AI_CONTEXT.json. Create production Dockerfile for [service]. Multi-stage build. Non-root user. Health check. Follow devops rules from AI_CONTEXT.json."
-  },
-
-  "phase_1_mvp_scope": {
-    "must_have": [
-      "User registration + login (JWT + Firebase)",
-      "Profile form (age, weight, height, condition, diet, routine)",
-      "Diet analysis using IFCT 2017 data",
-      "Basic deficiency risk scoring",
-      "Deficiency report UI",
-      "Basic meal plan generation (Gemini API)"
+  "troubleshooting_history": {
+    "resolved_issues": [
+      {
+        "issue": "Backend package.json missing",
+        "fix": "npm init -y + manual scripts addition",
+        "date": "2025-09"
+      },
+      {
+        "issue": "nodemon 'Cannot find module index.js' error",
+        "fix": "Changed package.json main to src/server.js",
+        "date": "2025-09"
+      },
+      {
+        "issue": "nodemon spawn EPERM (pstree.remy)",
+        "fix": "Changed dev script to 'node src/server.js' (bypass nodemon)",
+        "date": "2025-10"
+      },
+      {
+        "issue": "PowerShell npm.ps1 not digitally signed",
+        "fix": "Use npm.cmd OR Set-ExecutionPolicy RemoteSigned",
+        "date": "2025-10"
+      },
+      {
+        "issue": "Port 5000 EADDRINUSE",
+        "fix": "Kill process via netstat + taskkill, or restart terminals",
+        "date": "2025-10"
+      },
+      {
+        "issue": "MongoDB URI placeholder password warning",
+        "fix": "Set actual password PoshanAI2025Secure in .env",
+        "date": "2025-10"
+      }
     ],
-    "out_of_scope_for_phase_1": [
-      "Blood report OCR (Phase 2)",
-      "Body picture analysis (Phase 3)",
-      "Progress tracking dashboard (Phase 4)",
-      "Dietitian review panel (Phase 4)"
+    "unresolved_issues": [
+      {
+        "issue": "querySrv ENOTFOUND (Node.js v24.13+ DNS bug)",
+        "attempted_fixes": ["dns.setServers Google DNS", "dns.setServers Cloudflare DNS", "Legacy connection string", "IP whitelist 0.0.0.0/0", "Timeout increases"],
+        "pending_fix": "Downgrade to Node.js v22.14.0 (nvm-windows install required)",
+        "status": "BLOCKING"
+      }
     ]
   },
 
   "external_resources": {
     "ifct_dataset": "IFCT 2017 — Indian Food Composition Tables (publicly available)",
-    "gemini_api_docs": "https://ai.google.dev/docs",
-    "langchain_docs": "https://js.langchain.com/docs",
-    "owasp_api_top_10": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
-    "dpdp_act": "India Digital Personal Data Protection Act 2023"
+    "gemini_api": "https://ai.google.dev/docs",
+    "gemini_api_key": "https://aistudio.google.com/app/apikey",
+    "langchain": "https://js.langchain.com/docs",
+    "owasp_api_top10": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
+    "dpdp_act": "India Digital Personal Data Protection Act 2023",
+    "omniroute": "https://github.com/diegosouzapw/OmniRoute",
+    "motion_primitives": "https://github.com/ibelick/motion-primitives",
+    "nvm_windows": "https://github.com/coreybutler/nvm-windows/releases",
+    "playbook_reference": "Vibe Coding Real SaaS Playbook (15-layer production checklist)",
+    "nodejs_bug_reference": "https://github.com/nodejs/node/issues/62326"
   }
 }

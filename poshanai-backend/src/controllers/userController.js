@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import logger from '../utils/logger.js';
 
@@ -48,7 +49,7 @@ export async function updateCurrentUser(req, res, next) {
     const { error, value } = updateProfileSchema.validate(req.body, {
       abortEarly: false,
       convert: true,
-      stripUnknown: true,
+      allowUnknown: false,
     });
     if (error) {
       return res.status(400).json({
@@ -113,9 +114,15 @@ const changeRoleSchema = Joi.object({
 
 export async function changeUserRole(req, res, next) {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ID', message: 'Invalid user ID format.' },
+      });
+    }
     const { error, value } = changeRoleSchema.validate(req.body, {
       abortEarly: false,
-      stripUnknown: true,
+      allowUnknown: false,
     });
     if (error) {
       return res.status(400).json({

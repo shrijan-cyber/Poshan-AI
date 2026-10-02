@@ -8,5 +8,8 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react()],
   resolve: { alias: { '@': path.resolve(projectRoot, 'src') } },
-  server: { port: 5173 },
+  server: {
+    port: 5173,
+    proxy: { '/api': { target: 'http://localhost:5000', changeOrigin: true } },
+  },
 });

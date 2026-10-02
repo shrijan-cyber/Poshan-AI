@@ -24,6 +24,7 @@ const reportSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    storageKey: { type: String, required: true, select: false },
     fileType: {
       type: String,
       enum: ['pdf', 'image'],
@@ -56,6 +57,12 @@ const reportSchema = new mongoose.Schema(
   {
     timestamps: true,
     versionKey: false,
+    toJSON: {
+      transform: (_document, report) => {
+        delete report.storageKey;
+        return report;
+      },
+    },
   },
 );
 
