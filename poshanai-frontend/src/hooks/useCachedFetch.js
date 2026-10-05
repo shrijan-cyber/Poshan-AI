@@ -1,25 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import client, { payloadFrom } from '../api/client.js';
+import apiClient, { payloadFrom } from '../api/client.js';
 import memoryCache from '../utils/memoryCache.js';
 
 const DEFAULT_TTL = 5 * 60 * 1000;
-const CACHEABLE_PATHS = new Set(['/foods', '/dashboard/stats']);
-
-function serialize(value) {
-  if (Array.isArray(value)) return `[${value.map(serialize).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${serialize(value[key])}`)
-      .join(',')}}`;
-  }
-  return JSON.stringify(value);
-}
+const CACHEABLE_PATHS = new Set(['foods', 'dashboard/stats']);
 
 function getRequestUrl(url) {
   if (!url) return null;
   const origin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
-  const baseUrl = new URL(client.defaults.baseURL || '/', origin);
+  const baseUrl = new URL(apiClient.defaults.baseURL || '/', origin);
   if (/^[a-z][a-z\d+.-]*:/i.test(url)) return new URL(url);
   const basePath = `${baseUrl.pathname.replace(/\/+$/, '')}/`;
   return new URL(url.replace(/^\/+/, ''), `${baseUrl.origin}${basePath}`);
@@ -27,8 +16,8 @@ function getRequestUrl(url) {
 
 function canCacheUrl(requestUrl) {
   if (!requestUrl) return false;
-  const baseUrl = getRequestUrl('');
-  if (!baseUrl || requestUrl.origin !== baseUrl.origin) return false;
+  const baseUrl = new URL(apiClient.defaults.baseURL || '/', requestUrl.origin);
+  if (requestUrl.origin !== baseUrl.origin) return false;
   const basePath = baseUrl.pathname.replace(/\/+$/, '');
   const path = requestUrl.pathname.slice(basePath.length).replace(/^\/+|\/$/g, '');
   return CACHEABLE_PATHS.has(path);
@@ -46,8 +35,8 @@ function canCacheResponse(requestUrl, data) {
   );
 }
 
-function createCacheKey(requestUrl, paramsKey) {
-  return `${requestUrl?.toString() ?? ''}::${paramsKey}`;
+function createCacheKey(url, paramsKey) {
+  return `${url}::${paramsKey}`;
 }
 
 /**
@@ -62,18 +51,16 @@ function createCacheKey(requestUrl, paramsKey) {
  * @returns {{ data: unknown, isLoading: boolean, error: Error|null, refetch: Function, invalidateCache: Function }}
  */
 export function useCachedFetch(url, { ttl = DEFAULT_TTL, enabled = true, params } = {}) {
-  const paramsKey = useMemo(() => serialize(params ?? {}), [params]);
+  const paramsKey = JSON.stringify(params ?? {});
   const requestUrl = useMemo(() => getRequestUrl(url), [url]);
-  const cacheKey = useMemo(() => createCacheKey(requestUrl, paramsKey), [requestUrl, paramsKey]);
+  const cacheKey = useMemo(() => createCacheKey(url, paramsKey), [url, paramsKey]);
   const shouldCache = useMemo(() => canCacheUrl(requestUrl), [requestUrl]);
-  const paramsRef = useRef(params);
   const controllerRef = useRef(null);
   const requestIdRef = useRef(0);
-  paramsRef.current = params;
 
   const [state, setState] = useState({
-    data: undefined,
-    isLoading: Boolean(enabled && url),
+    data: enabled && shouldCache && memoryCache.has(cacheKey) ? memoryCache.get(cacheKey) : undefined,
+    isLoading: Boolean(enabled && url && !(shouldCache && memoryCache.has(cacheKey))),
     error: null,
   });
 
@@ -91,7 +78,7 @@ export function useCachedFetch(url, { ttl = DEFAULT_TTL, enabled = true, params 
     }
 
     try {
-      const response = await client.get(url, { params: paramsRef.current, signal });
+      const response = await apiClient.get(url, { params: JSON.parse(paramsKey), signal });
       const data = payloadFrom(response);
       if (requestId === requestIdRef.current) {
         if (shouldCache && canCacheResponse(requestUrl, data)) {
@@ -111,7 +98,7 @@ export function useCachedFetch(url, { ttl = DEFAULT_TTL, enabled = true, params 
       if (error.name !== 'CanceledError') throw error;
       return undefined;
     }
-  }, [cacheKey, enabled, requestUrl, shouldCache, ttl, url]);
+  }, [cacheKey, enabled, paramsKey, requestUrl, shouldCache, ttl, url]);
 
   useEffect(() => {
     if (!url || !enabled) {

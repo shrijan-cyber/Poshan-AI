@@ -6,7 +6,7 @@ import {
   register as apiRegister,
 } from '../api/authApi.js';
 import { setAccessToken, subscribeAccessToken } from '../api/client.js';
-import memoryCache from '../utils/memoryCache.js';
+import { clearAllCache } from '../utils/memoryCache.js';
 
 export const AuthContext = createContext(null);
 
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const refreshTimer = useRef(null);
   const setSession = useCallback(({ accessToken: nextToken, user: nextUser }) => {
-    if (!nextToken) memoryCache.clear();
+    if (!nextToken) clearAllCache();
     setAccessToken(nextToken);
     setToken(nextToken || null);
     setUser(nextToken ? nextUser : null);
@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
     async (credentials) => {
       const session = await apiLogin(credentials);
       if (!session.accessToken) throw new Error('Login response did not include an access token.');
-      memoryCache.clear();
+      clearAllCache();
       setSession(session);
       return session.user;
     },
@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
     async (details) => {
       const session = await apiRegister(details);
       if (session.accessToken) {
-        memoryCache.clear();
+        clearAllCache();
         setSession(session);
       }
       return { user: session.user, isAuthenticated: Boolean(session.accessToken) };
@@ -80,7 +80,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = subscribeAccessToken((token) => {
       setToken(token);
-      if (!token) memoryCache.clear();
+      if (!token) clearAllCache();
     });
     let active = true;
     apiRefresh()
