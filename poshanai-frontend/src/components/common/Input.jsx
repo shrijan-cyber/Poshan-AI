@@ -1,6 +1,9 @@
-import { useId } from 'react';
+import { forwardRef, useId } from 'react';
 
-export default function Input({ label, error, helperText, icon, id, className = '', ...props }) {
+const Input = forwardRef(function Input(
+  { label, error, helperText, icon, id, className = '', ...props },
+  ref,
+) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const messageId = `${inputId}-message`;
@@ -24,6 +27,7 @@ export default function Input({ label, error, helperText, icon, id, className = 
           </span>
         )}
         <input
+          ref={ref}
           id={inputId}
           aria-invalid={Boolean(error)}
           aria-describedby={error || helperText ? messageId : undefined}
@@ -42,4 +46,6 @@ export default function Input({ label, error, helperText, icon, id, className = 
       )}
     </div>
   );
-}
+});
+
+export default Input;

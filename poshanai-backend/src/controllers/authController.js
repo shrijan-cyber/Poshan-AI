@@ -68,6 +68,16 @@ function issueSession(user, res) {
   return { accessToken: createAccessToken(user), user: userPayload(user) };
 }
 
+async function persistRefreshTokenHash(user) {
+  const result = await User.updateOne(
+    { _id: user._id },
+    { $set: { refreshTokenHash: user.refreshTokenHash } },
+  );
+  if (result.matchedCount !== 1) {
+    throw new Error('User session could not be updated.');
+  }
+}
+
 export const register = asyncHandler(async (req, res) => {
   const email = req.body.email.toLowerCase();
   if (await User.exists({ email })) {
@@ -89,7 +99,7 @@ export const login = asyncHandler(async (req, res) => {
   }
 
   const session = issueSession(user, res);
-  await user.save();
+  await persistRefreshTokenHash(user);
   return res.json({ success: true, data: session });
 });
 
@@ -117,7 +127,7 @@ export const refresh = asyncHandler(async (req, res) => {
   }
 
   const session = issueSession(user, res);
-  await user.save();
+  await persistRefreshTokenHash(user);
   return res.json({ success: true, data: session });
 });
 
@@ -129,7 +139,7 @@ export const logout = asyncHandler(async (req, res) => {
       const user = await User.findById(payload.sub).select('+refreshTokenHash');
       if (user?.refreshTokenHash === hashToken(token)) {
         user.refreshTokenHash = null;
-        await user.save();
+        await persistRefreshTokenHash(user);
       }
     } catch {
       // Clear invalid or expired cookies without disclosing token details.
