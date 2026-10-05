@@ -1,3 +1,5 @@
+// While the profile request is pending, render <Loader variant="skeleton" width="twoThirds" height="5" />.
+// Replace the profile placeholder only when the authenticated profile query is implemented.
 export default function Profile() {
   return (
     <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">

@@ -1,3 +1,6 @@
+// While an existing meal-plan request is pending:
+// <div className="grid gap-4 md:grid-cols-2">{[0, 1, 2, 3].map((key) => <Loader key={key} variant="card" />)}</div>
+// Import Loader from '../components/common/index.js' when the meal-plan API is wired.
 export default function MealPlanView() {
   return (
     <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">

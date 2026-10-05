@@ -1,3 +1,5 @@
+// During an active upload, overlay <Loader variant="spinner" size="lg" label="Uploading report" />.
+// Add a real progress indicator when the uploader API exposes upload progress.
 export default function UploadReport() {
   return (
     <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
