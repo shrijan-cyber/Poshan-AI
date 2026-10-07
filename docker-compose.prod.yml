@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: always
+    volumes: ["mongo_data:/data/db"]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis_data:/data"]
+  api:
+    build: ./poshanai-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:?Set CLIENT_ORIGIN in the production environment}
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI in the production environment}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_started }
+  web:
+    build:
+      context: .
+      dockerfile: poshanai-frontend/Dockerfile
+    restart: always
+    ports: ["80:80"]
+    depends_on: [api]
+volumes:
+  mongo_data:
+  redis_data:

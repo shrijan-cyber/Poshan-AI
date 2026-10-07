@@ -1,0 +1,14 @@
+import { configureStore } from '@reduxjs/toolkit';
+import userReducer from './slices/userSlice.js';
+import reportReducer from './slices/reportSlice.js';
+import mealPlanReducer from './slices/mealPlanSlice.js';
+
+export const store = configureStore({
+  reducer: {
+    user: userReducer,
+    reports: reportReducer,
+    mealPlans: mealPlanReducer,
+  },
+});
+
+export default store;

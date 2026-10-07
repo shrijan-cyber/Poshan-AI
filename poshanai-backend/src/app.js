@@ -1,26 +1,51 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
 import { rateLimit } from 'express-rate-limit';
 import { env } from './config/env.js';
+import authRoutes from './routes/authRoutes.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  handler: (_req, res) => res.status(429).json({
+    success: false,
+    error: { code: 'RATE_LIMITED', message: 'Too many requests. Try again later.' },
+  }),
+});
+
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(cors({ origin: env.clientOrigin, credentials: true }));
 app.use(express.json({ limit: '32kb' }));
+app.use(cookieParser());
 app.use(mongoSanitize());
-app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 100, standardHeaders: 'draft-7', legacyHeaders: false }));
+app.use('/api', apiLimiter);
 
-app.get('/health', (_req, res) => res.json({ status: 'ok', service: 'poshanai-api' }));
-app.get('/ready', (_req, res) => res.json({ status: 'ready' }));
-app.get('/api/v1', (_req, res) => res.json({ name: 'PoshanAI API', version: 'v1' }));
-
-app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
-app.use((err, _req, res, _next) => {
-  console.error(err.message);
-  res.status(err.status ?? 500).json({ error: err.status ? err.message : 'Internal server error' });
+app.get('/health', (_req, res) => {
+  res.json({ success: true, data: { status: 'ok', service: 'poshanai-api' } });
 });
+
+app.use('/api/auth', authRoutes);
+
+const placeholderRouter = express.Router();
+placeholderRouter.use((_req, res) => {
+  res.status(501).json({
+    success: false,
+    error: { code: 'NOT_IMPLEMENTED', message: 'This endpoint is not implemented yet.' },
+  });
+});
+app.use('/api/users', placeholderRouter);
+app.use('/api/reports', placeholderRouter);
+app.use('/api/mealplans', placeholderRouter);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
