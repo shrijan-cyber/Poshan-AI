@@ -29,14 +29,16 @@ async function createAuthenticatedUser(name, email) {
 
 function mockAiCompletion() {
   const foods = retrieveFoodsForDeficiencies([{ nutrient: 'Iron' }], { dietType: 'veg' });
-  const chosenCode = foods[0]?.ifctCode || 'G033';
+  const chosenFood = foods[0] || { ifctCode: 'G033', foodName: 'Turmeric powder' };
 
   return {
     meals: Array.from({ length: 7 }, (_, index) => ({
       day: index + 1,
       mealType: 'breakfast',
-      items: [{ ifctCode: chosenCode, quantityGrams: 100 }],
+      items: [{ ifctCode: chosenFood.ifctCode, foodName: chosenFood.foodName, quantityGrams: 100 }],
     })),
+    disclaimer:
+      'These food suggestions are for nutrition awareness and do not replace professional medical advice.',
   };
 }
 
@@ -268,7 +270,10 @@ describe('Meal Plan API (/api/mealplans)', () => {
 
   describe('PATCH /api/mealplans/:id/status', () => {
     it('allows valid status transition to active and completed', async () => {
-      const { token, user, ip } = await createAuthenticatedUser('Status User', 'status_user@example.com');
+      const { token, user, ip } = await createAuthenticatedUser(
+        'Status User',
+        'status_user@example.com',
+      );
 
       const plan = await createSampleMealPlan(user.id);
 
@@ -300,7 +305,10 @@ describe('Meal Plan API (/api/mealplans)', () => {
     });
 
     it('rejects invalid status transitions with 400 VALIDATION_ERROR', async () => {
-      const { token, user, ip } = await createAuthenticatedUser('Invalid Status User', 'inv_status@example.com');
+      const { token, user, ip } = await createAuthenticatedUser(
+        'Invalid Status User',
+        'inv_status@example.com',
+      );
 
       const plan = await createSampleMealPlan(user.id);
 

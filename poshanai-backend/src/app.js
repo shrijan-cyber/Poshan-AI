@@ -10,10 +10,15 @@ import reportRoutes from './routes/reportRoutes.js';
 import mealPlanRoutes from './routes/mealPlanRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import lifestyleRoutes from './routes/lifestyleRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import requestLogger from './middleware/requestLogger.js';
 import { getHealthStatus } from './services/healthService.js';
 import { RATE_LIMITS } from './config/constants.js';
+import { loadTestRules } from './services/testRules.js';
+
+loadTestRules();
 
 const app = express();
 app.set('trust proxy', 1);
@@ -23,10 +28,11 @@ const apiLimiter = rateLimit({
   limit: RATE_LIMITS.apiRequests,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  handler: (_req, res) => res.status(429).json({
-    success: false,
-    error: { code: 'RATE_LIMITED', message: 'Too many requests. Try again later.' },
-  }),
+  handler: (_req, res) =>
+    res.status(429).json({
+      success: false,
+      error: { code: 'RATE_LIMITED', message: 'Too many requests. Try again later.' },
+    }),
 });
 
 app.disable('x-powered-by');
@@ -51,6 +57,8 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/mealplans', mealPlanRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/lifestyle', lifestyleRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

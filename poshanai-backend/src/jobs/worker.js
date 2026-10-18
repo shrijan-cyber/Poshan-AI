@@ -13,6 +13,7 @@ import Report from '../models/Report.js';
 import { processReportOcr } from '../services/ocrProcessor.js';
 import logger from '../utils/logger.js';
 import { OCR_SETTINGS } from '../config/constants.js';
+import { startRetestReminderWorker, closeRetestReminderWorker } from './retestReminderQueue.js';
 
 let worker;
 let sweepTimer;
@@ -79,6 +80,7 @@ async function startWorker() {
     connection: redisConnection(null),
     concurrency: OCR_SETTINGS.workerConcurrency,
   });
+  await startRetestReminderWorker();
   worker.on('completed', () => logger.info('A report OCR job completed.'));
   worker.on('failed', (job, error) => {
     logger.error('A report OCR job attempt failed.');
@@ -97,21 +99,28 @@ async function startWorker() {
     });
   }, OCR_SETTINGS.sweepIntervalMs);
   sweepTimer.unref();
-  logger.info(`OCR worker listening to the ocr-processing queue with concurrency ${OCR_SETTINGS.workerConcurrency}.`);
+  logger.info(
+    `OCR worker listening to the ocr-processing queue with concurrency ${OCR_SETTINGS.workerConcurrency}.`,
+  );
 }
 
 async function stopWorker() {
   if (sweepTimer) clearInterval(sweepTimer);
   await worker?.close();
+  await closeRetestReminderWorker();
   await closeOcrQueue();
   await mongoose.disconnect();
 }
 
 process.once('SIGINT', () => {
-  void stopWorker().then(() => process.exit(0)).catch(() => process.exit(1));
+  void stopWorker()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 });
 process.once('SIGTERM', () => {
-  void stopWorker().then(() => process.exit(0)).catch(() => process.exit(1));
+  void stopWorker()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
 });
 
 startWorker().catch((error) => {
