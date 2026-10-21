@@ -1,4 +1,4 @@
-/* RetroUI styles are available globally, but its pixel look is opted into onboarding and auth flows only. */
+/* RetroUI styles and fonts are used throughout the frontend. */
 @import 'pixel-retroui/dist/index.css';
 @import 'pixel-retroui/dist/fonts.css';
 
@@ -1012,4 +1012,81 @@ body {
   .shimmer {
     animation: none;
   }
+}
+
+/* App-wide pixel styling for native controls and shared components. */
+body,
+body * {
+  font-family: Minecraft, sans-serif !important;
+}
+
+body input:not([type='checkbox']):not([type='radio']):not([type='file']):not([class*='pixelInput']),
+body select,
+body textarea:not([class*='pixelTextarea']) {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  background-color: #fff !important;
+  color: #111 !important;
+  box-shadow: 3px 3px 0 #000;
+}
+
+body input[type='checkbox'],
+body input[type='radio'] {
+  accent-color: #1e5631;
+  border: 2px solid #000;
+  border-radius: 0 !important;
+}
+
+body button:not([class*='pixelButton']) {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 #000;
+}
+
+body button:not([class*='pixelButton']):active {
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+.app-retro-button {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  background-color: var(--retro-button-bg, #1e5631) !important;
+  color: var(--retro-button-text, #fff) !important;
+  box-shadow: 4px 4px 0 #000;
+  text-decoration: none;
+}
+
+.app-retro-button:active {
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+.app-retro-card {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 5px 5px 0 #000 !important;
+}
+
+.landing-small-cta,
+.hero-primary,
+.hero-secondary,
+.landing-login {
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.landing-small-cta:active,
+.hero-primary:active,
+.hero-secondary:active,
+.landing-login:active {
+  box-shadow: 2px 2px 0 #000;
+  transform: translate(2px, 2px);
+}
+
+body [role='progressbar'] {
+  border: 2px solid #000;
+  border-radius: 0 !important;
 }

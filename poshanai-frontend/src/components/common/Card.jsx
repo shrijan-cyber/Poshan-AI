@@ -12,7 +12,7 @@ export default function Card({
   const roundedStyles = { md: 'rounded-xl', lg: 'rounded-2xl', full: 'rounded-3xl' };
   return (
     <Component
-      className={`border border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900 ${paddingStyles[padding] ?? paddingStyles.md} ${shadowStyles[shadow] ?? shadowStyles.sm} ${roundedStyles[rounded] ?? roundedStyles.lg} ${className}`}
+      className={`app-retro-card border-2 border-black bg-white ${paddingStyles[padding] ?? paddingStyles.md} ${shadowStyles[shadow] ?? shadowStyles.sm} ${roundedStyles[rounded] ?? roundedStyles.lg} ${className}`}
       {...props}
     >
       {children}

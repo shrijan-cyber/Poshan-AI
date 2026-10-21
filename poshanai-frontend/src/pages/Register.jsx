@@ -1,18 +1,19 @@
-import { forwardRef } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { Button as RetroButton, Card as RetroCard, Input as RetroInput } from 'pixel-retroui';
 import logo from '../assets/logo.svg';
-import Button from '../components/common/Button.jsx';
-import SmoothInput from '../components/ui/SmoothInput.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 
 const requiredNumber = (label, min, max, integer = false) =>
   z.preprocess(
     (value) => (value === '' || Number.isNaN(value) ? undefined : Number(value)),
     z
-      .number({ required_error: `${label} is required.`, invalid_type_error: `${label} is required.` })
+      .number({
+        required_error: `${label} is required.`,
+        invalid_type_error: `${label} is required.`,
+      })
       .min(min, `${label} must be at least ${min}.`)
       .max(max, `${label} must be no more than ${max}.`)
       .refine((value) => !integer || Number.isInteger(value), `${label} must be a whole number.`),
@@ -63,37 +64,67 @@ const registerSchema = z
   });
 
 const selectClassName =
-  'mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none transition focus:border-leaf focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:ring-emerald-900';
+  'font-minecraft mt-1.5 w-full rounded-none border-2 border-black bg-white px-3 py-2.5 text-black outline-none focus:ring-2 focus:ring-emerald-700';
 
-const SelectField = forwardRef(function SelectField(
-  { label, error, children, ...props },
-  ref,
-) {
+function RetroInputField({ label, error, helperText, id, ...props }) {
+  const inputId = id ?? props.name;
+  return (
+    <div className="w-full">
+      <label
+        htmlFor={inputId}
+        className="font-minecraft mb-1.5 block text-sm font-medium text-black"
+      >
+        {label}
+      </label>
+      <RetroInput
+        {...props}
+        id={inputId}
+        bg="#FFFFFF"
+        textColor="#000000"
+        borderColor="#000000"
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+        className="w-full"
+      />
+      {error && (
+        <p id={`${inputId}-error`} className="mt-1.5 text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      )}
+      {!error && helperText && (
+        <p id={`${inputId}-helper`} className="mt-1.5 text-sm text-slate-700">
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function SelectField({ label, error, children, ...props }) {
   return (
     <div className="w-full">
       <label
         htmlFor={props.id}
-        className="mb-1.5 block text-sm font-medium text-slate-800 dark:text-slate-100"
+        className="font-minecraft mb-1.5 block text-sm font-medium text-black"
       >
         {label}
       </label>
       <select
-        ref={ref}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${props.id}-error` : undefined}
-        className={`${selectClassName} ${error ? 'border-red-500' : ''}`}
+        className={`${selectClassName} ${error ? '!border-red-600' : ''}`}
         {...props}
       >
         {children}
       </select>
       {error && (
-        <p id={`${props.id}-error`} className="mt-1.5 text-sm text-red-600 dark:text-red-400" role="alert">
+        <p id={`${props.id}-error`} className="mt-1.5 text-sm text-red-600" role="alert">
           {error}
         </p>
       )}
     </div>
   );
-});
+}
 
 export default function Register() {
   const { register: createAccount } = useAuth();
@@ -125,18 +156,8 @@ export default function Register() {
     clearErrors('root.serverError');
 
     try {
-      const {
-        name,
-        email,
-        password,
-        age,
-        gender,
-        weightKg,
-        heightCm,
-        dietType,
-        region,
-        consent,
-      } = values;
+      const { name, email, password, age, gender, weightKg, heightCm, dietType, region, consent } =
+        values;
       const session = await createAccount({
         name,
         email,
@@ -170,19 +191,24 @@ export default function Register() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-cream px-4 py-8 dark:bg-slate-950 sm:px-6">
-      <section
-        aria-labelledby="register-title"
-        className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900 sm:p-8"
+    <main
+      aria-labelledby="register-title"
+      className="font-minecraft flex min-h-screen items-center justify-center bg-cream px-4 py-8 sm:px-6"
+    >
+      <RetroCard
+        bg="#FFFFFF"
+        textColor="#000000"
+        borderColor="#000000"
+        className="w-full border-2 border-black bg-white p-6 sm:p-8"
       >
         <Link to="/" className="mb-6 inline-flex items-center gap-3" aria-label="PoshanAI home">
           <img src={logo} alt="" className="h-12 w-12 rounded-xl object-contain" />
-          <span className="text-xl font-bold text-leaf dark:text-emerald-300">PoshanAI</span>
+          <span className="font-minecraft text-xl font-bold text-leaf">PoshanAI</span>
         </Link>
-        <h1 id="register-title" className="text-3xl font-bold text-slate-900 dark:text-white">
+        <h1 id="register-title" className="text-3xl font-bold text-black">
           Create your account
         </h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">
+        <p className="mt-2 text-slate-700">
           Create an account and tell us a little about your nutrition preferences.
         </p>
 
@@ -193,12 +219,11 @@ export default function Register() {
           aria-label="Create account"
         >
           <fieldset className="space-y-4">
-            <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
-              Account details
-            </legend>
+            <legend className="mb-3 text-lg font-semibold text-black">Account details</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <SmoothInput
+              <RetroInputField
                 label="Name"
+                id="register-name"
                 type="text"
                 autoComplete="name"
                 placeholder="Your name"
@@ -206,8 +231,9 @@ export default function Register() {
                 {...registerField('name')}
                 error={errors.name?.message}
               />
-              <SmoothInput
+              <RetroInputField
                 label="Email"
+                id="register-email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
@@ -215,16 +241,18 @@ export default function Register() {
                 {...registerField('email')}
                 error={errors.email?.message}
               />
-              <SmoothInput
+              <RetroInputField
                 label="Password"
+                id="register-password"
                 type="password"
                 autoComplete="new-password"
                 helperText="Use 8 to 128 characters."
                 {...registerField('password')}
                 error={errors.password?.message}
               />
-              <SmoothInput
+              <RetroInputField
                 label="Confirm password"
+                id="register-confirm-password"
                 type="password"
                 autoComplete="new-password"
                 {...registerField('confirmPassword')}
@@ -234,12 +262,11 @@ export default function Register() {
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
-              About you
-            </legend>
+            <legend className="mb-3 text-lg font-semibold text-black">About you</legend>
             <div className="grid gap-4 sm:grid-cols-2">
-              <SmoothInput
+              <RetroInputField
                 label="Age"
+                id="register-age"
                 type="number"
                 inputMode="numeric"
                 min={13}
@@ -262,8 +289,9 @@ export default function Register() {
                 <option value="male">Male</option>
                 <option value="other">Other</option>
               </SelectField>
-              <SmoothInput
+              <RetroInputField
                 label="Weight (kg)"
+                id="register-weight"
                 type="number"
                 inputMode="decimal"
                 min={20}
@@ -272,8 +300,9 @@ export default function Register() {
                 {...registerField('weightKg', { valueAsNumber: true })}
                 error={errors.weightKg?.message}
               />
-              <SmoothInput
+              <RetroInputField
                 label="Height (cm)"
+                id="register-height"
                 type="number"
                 inputMode="decimal"
                 min={100}
@@ -297,8 +326,9 @@ export default function Register() {
                 <option value="vegan">Vegan</option>
                 <option value="eggetarian">Eggetarian</option>
               </SelectField>
-              <SmoothInput
+              <RetroInputField
                 label="Region or state"
+                id="register-region"
                 type="text"
                 autoComplete="address-level1"
                 placeholder="For example, Uttarakhand"
@@ -312,7 +342,7 @@ export default function Register() {
           <label className="flex items-start gap-3 text-sm leading-6 text-slate-700 dark:text-slate-200">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-slate-300 text-leaf focus:ring-leaf"
+              className="mt-1 h-4 w-4 border-2 border-black text-leaf focus:ring-leaf"
               {...registerField('consent')}
             />
             <span>
@@ -334,23 +364,27 @@ export default function Register() {
             </p>
           )}
 
-          <Button
-            className="w-full"
+          <RetroButton
+            bg="#1E5631"
+            textColor="#FFFFFF"
+            borderColor="#000000"
+            shadow="#000000"
+            className="mx-0 my-0 w-full justify-center px-5 py-3"
             type="submit"
-            loading={isSubmitting}
+            disabled={isSubmitting}
             aria-busy={isSubmitting}
           >
             {isSubmitting ? 'Creating account…' : 'Create account'}
-          </Button>
+          </RetroButton>
         </form>
 
-        <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-5 text-sm text-slate-700">
           Already registered?{' '}
           <Link className="font-medium text-leaf underline dark:text-emerald-300" to="/login">
             Sign in
           </Link>
         </p>
-      </section>
+      </RetroCard>
     </main>
   );
 }
