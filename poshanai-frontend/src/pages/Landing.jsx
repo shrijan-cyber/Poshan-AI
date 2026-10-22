@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth.js';
 import { ReactLenis } from 'lenis/dist/lenis-react.mjs';
 const StickyCards = lazy(() => import('../components/ui/StickyCards.jsx'));
 const KoiStudies = lazy(() => import('../components/ui/KoiStudies.jsx'));
+const WhyPoshanAI = lazy(() => import('../components/landing/WhyPoshanAI.jsx'));
 
 function BalancedPlate() {
   return (
@@ -93,6 +94,7 @@ export default function Landing() {
 
       <Suspense fallback={<section className="ingredient-study" aria-label="Nutrition ingredient cards" />}><KoiStudies /></Suspense>
       <Suspense fallback={<section className="bg-[#F9FBF9] px-5 py-16 sm:px-8 lg:px-12" aria-label="PoshanAI features" />}><StickyCards /></Suspense>
+      <Suspense fallback={<section className="min-h-96 bg-[#1E5631]" aria-label="Why PoshanAI" />}><WhyPoshanAI /></Suspense>
       <footer className="landing-footer">
         <Link to="/" className="footer-brand">poshan<span>ai</span></Link>
         <p>Good food is personal. Your wellness journey should be, too.</p>
