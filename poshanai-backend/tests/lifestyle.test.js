@@ -64,8 +64,9 @@ test('overwrites the authenticated user profile on repeat submissions without du
     .post('/api/lifestyle/onboarding')
     .set('Authorization', `Bearer ${token}`)
     .set('X-Forwarded-For', ip)
-    .send({ ...validOnboarding, age: 30, gender: 'female', weightKg: 62, heightCm: 165, region: 'North' });
+    .send({ ...validOnboarding, dailyDietDescription: '2 rotis, 1 bowl dal, rice and sabzi', age: 30, gender: 'female', weightKg: 62, heightCm: 165, region: 'North' });
   assert.equal(first.status, 200);
+  assert.equal(first.body.data.profile.dailyDietDescription, '2 rotis, 1 bowl dal, rice and sabzi');
 
   const second = await request(app)
     .post('/api/lifestyle/onboarding')

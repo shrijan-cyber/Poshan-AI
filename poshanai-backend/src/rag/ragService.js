@@ -1,18 +1,16 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import logger from '../utils/logger.js';
 import { buildMealPlanPrompt } from './promptBuilder.js';
+import {
+  getHouseholdFoodName,
+  getHouseholdFoodWhitelist,
+  loadIfctDataset,
+} from './ifctLoader.js';
 
 export { buildMealPlanPrompt };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const datasetPath = path.resolve(__dirname, '../../data/ifct_2017.json');
-
 let foodRecords = [];
 try {
-  foodRecords = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+  foodRecords = loadIfctDataset();
   logger.info(`Loaded ${foodRecords.length} IFCT foods from dataset`);
 } catch (error) {
   logger.error('Failed to load IFCT dataset from data/ifct_2017.json', error);
@@ -118,6 +116,7 @@ export function getIfctNutrientAvailability() {
  */
 export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}) {
   const dietType = preferences.dietType ?? 'veg';
+  const householdDiet = String(preferences.householdDiet ?? '');
   const excludedAllergens = new Set(
     (preferences.allergies ?? []).flatMap((allergy) => allergyAliases[allergy.toLowerCase()] ?? [allergy.toLowerCase()]),
   );
@@ -126,10 +125,15 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
     .map((deficiency) => nutrientByDeficiency[deficiency.nutrient])
     .filter(Boolean);
 
-  const filtered = foodRecords
+  const householdFoods = getHouseholdFoodWhitelist(foodRecords, householdDiet);
+  const filtered = householdFoods
     .filter((food) => {
       if (dietType === 'veg') return food.dietTags.includes('veg');
       if (dietType === 'eggetarian') return food.dietTags.includes('eggetarian') || food.dietTags.includes('veg');
+      if (dietType === 'vegan') {
+        return food.dietTags.includes('veg')
+          && !/milk and milk products|egg and egg products|poultry|animal meat|marine fish|marine shellfish|marine mollusks|fresh water fish/i.test(food.category);
+      }
       return true; // nonveg allows all foods
     })
     .filter((food) => !food.allergens.some((allergen) => excludedAllergens.has(allergen)));
@@ -167,11 +171,43 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
 
   scored.sort((a, b) => b.finalScore - a.finalScore || a.food.ifctCode.localeCompare(b.food.ifctCode));
 
-  const limit = Math.max(20, Math.min(30, preferences.limit ?? 25));
+  const limit = Math.max(16, Math.min(20, preferences.limit ?? 18));
 
-  return scored.slice(0, limit).map(({ food }) => ({
+  const selectedFoods = scored.slice(0, limit).map(({ food }) => food);
+  const stapleGroups = [
+    { mention: /roti|chapati|phulka|wheat|atta/i, food: /wheat flour, atta/i },
+    { mention: /rice/i, food: /rice, (?:raw, milled|parboiled, milled|raw, brown)/i },
+    { mention: /dal|dahl|lentil|pulse|gram/i, food: /dal|lentil|pulse|gram/i },
+  ];
+  for (const group of stapleGroups) {
+    if (!group.mention.test(householdDiet)) continue;
+    const staple = filtered.find((food) => group.food.test(food.foodName));
+    if (staple && selectedFoods.length < 30 && !selectedFoods.some((food) => food.ifctCode === staple.ifctCode)) selectedFoods.push(staple);
+  }
+
+  const everydayBaseCodes = ['A011', 'A015', 'B001', 'D036', 'D076', 'C033', 'F006', 'G017'];
+  for (const code of everydayBaseCodes) {
+    const food = filtered.find((candidate) => candidate.ifctCode === code);
+    if (food && selectedFoods.length < 30 && !selectedFoods.some((candidate) => candidate.ifctCode === code)) selectedFoods.push(food);
+  }
+
+  const proteinCodesByDiet = {
+    veg: ['L003', 'B010', 'B013', 'B021', 'B001'],
+    eggetarian: ['M004', 'L003', 'B010', 'B013'],
+    nonveg: ['M004', 'N003', 'L003', 'B010'],
+    vegan: ['B024', 'B025', 'B010', 'B013'],
+  };
+  const proteinFood = (proteinCodesByDiet[dietType] ?? proteinCodesByDiet.veg)
+    .map((code) => filtered.find((food) => food.ifctCode === code))
+    .find((food) => food && Number(food.nutrients?.protein) >= 10);
+  if (proteinFood && !selectedFoods.some((food) => food.ifctCode === proteinFood.ifctCode) && selectedFoods.length < 30) {
+    selectedFoods.push(proteinFood);
+  }
+
+  return selectedFoods.map((food) => ({
     ifctCode: food.ifctCode,
     foodName: food.foodName,
+    householdName: getHouseholdFoodName(food),
     category: food.category,
     nutrients: Object.fromEntries(
       Object.entries(food.nutrients).map(([name, value]) => [name, value === null ? null : round(value)]),

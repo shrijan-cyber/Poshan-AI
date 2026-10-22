@@ -2,12 +2,18 @@ import Joi from 'joi';
 import MealPlan from '../models/MealPlan.js';
 import Report from '../models/Report.js';
 import User from '../models/User.js';
+import LifestyleProfile from '../models/LifestyleProfile.js';
 import { env } from '../config/env.js';
 import {
   getMedicalDisclaimer,
   retrieveFoodsForDeficiencies,
 } from '../rag/ragService.js';
-import { buildMealPlanPrompt, hasSevereB12Deficiency, mealPlanSystemPrompt } from '../rag/promptBuilder.js';
+import {
+  buildMealPlanPrompt,
+  filterHouseholdPlanFoods,
+  hasSevereB12Deficiency,
+  mealPlanSystemPrompt,
+} from '../rag/promptBuilder.js';
 import logger from '../utils/logger.js';
 import httpError from '../utils/httpError.js';
 
@@ -15,6 +21,13 @@ const aiMealSchema = Joi.object({
   day: Joi.number().integer().min(1).max(7).required(),
   mealType: Joi.string().valid('breakfast', 'lunch', 'dinner', 'snack').required(),
   nutrientTargets: Joi.array().items(Joi.string().trim().min(1).max(40)).min(1).max(5).required(),
+  proteinSource: Joi.string().trim().min(1).max(200).required(),
+  cookingInstructions: Joi.string().trim().min(8).max(300).required().custom((instructions, helpers) => {
+    const hasPreparationAction = /\b(boil\w*|steam\w*|pressure[- ]cook\w*|saut[eé]\w*|simmer\w*|roast\w*|grill\w*|bake\w*|cook\w*|stir\w*|mix\w*|wash\w*|soak\w*|heat\w*|toast\w*|mash\w*)\b/i.test(instructions);
+    const recommendsDeepFrying = /deep[- ]fry|deep[- ]fried|deep[- ]frying/i.test(instructions);
+    if (!hasPreparationAction || recommendsDeepFrying) return helpers.error('any.invalid');
+    return instructions;
+  }),
   items: Joi.array()
     .items(Joi.object({
       ifctCode: Joi.string().trim().max(12).required(),
@@ -24,7 +37,12 @@ const aiMealSchema = Joi.object({
     .min(1)
     .max(6)
     .required(),
-}).unknown(false);
+}).unknown(false).custom((meal, helpers) => {
+  if (!meal.items.some((item) => item.foodName.toLowerCase() === meal.proteinSource.toLowerCase())) {
+    return helpers.error('any.invalidProteinSource');
+  }
+  return meal;
+});
 
 const aiResponseSchema = Joi.object({
   meals: Joi.array()
@@ -213,28 +231,72 @@ function round(value) {
   return Math.round(value * 100) / 100;
 }
 
-function buildStoredMeals(generatedMeals, foodByCode) {
-  return generatedMeals.map(({ day, mealType, nutrientTargets, items }) => ({
-    day,
-    mealType,
-    nutrientTargets,
-    items: items.map(({ ifctCode, foodName, quantityGrams }) => {
+const minimumMealProteinGrams = 10;
+
+function getCalculatedItem(food, ifctCode, quantityGrams) {
+  const nutrients = Object.fromEntries(
+    Object.entries(food.nutrients).map(([nutrient, perHundredGrams]) => [
+      nutrient,
+      perHundredGrams === null || perHundredGrams === undefined || !Number.isFinite(Number(perHundredGrams))
+        ? null
+        : round((perHundredGrams * quantityGrams) / 100),
+    ]),
+  );
+  return { foodName: food.foodName, ifctCode, quantityGrams, nutrients };
+}
+
+function getProteinSupplement(foodByCode, dietType) {
+  const candidates = {
+    veg: [['L003', 100], ['B010', 50], ['B013', 50], ['B021', 50], ['B001', 50]],
+    eggetarian: [['M004', 100], ['L003', 100], ['B010', 50], ['B013', 50]],
+    nonveg: [['M004', 100], ['N003', 100], ['L003', 100], ['B010', 50]],
+    vegan: [['B024', 50], ['B025', 50], ['B010', 50], ['B013', 50]],
+  };
+  return (candidates[dietType] ?? candidates.veg)
+    .map(([code, quantityGrams]) => ({ food: foodByCode.get(code), quantityGrams }))
+    .find(({ food }) => food && Number(food.nutrients?.protein) >= 10) ?? null;
+}
+
+export function buildStoredMeals(generatedMeals, foodByCode, dietType = 'veg') {
+  const supplement = getProteinSupplement(foodByCode, dietType);
+
+  return generatedMeals.map(({ day, mealType, nutrientTargets, proteinSource, cookingInstructions, items }) => {
+    const storedItems = items.map(({ ifctCode, foodName, quantityGrams }) => {
       const food = foodByCode.get(ifctCode);
       if (!food || food.foodName !== foodName) {
         throw httpError(502, 'AI_RESPONSE_INVALID', 'OmniRoute selected an IFCT food that was not provided.');
       }
+      return getCalculatedItem(food, ifctCode, quantityGrams);
+    });
+    let verifiedProteinSource = items
+      .map(({ ifctCode }) => foodByCode.get(ifctCode))
+      .find((food) => food?.foodName.toLowerCase() === proteinSource.toLowerCase() && food.nutrients.protein > 0);
+    if (!verifiedProteinSource) {
+      throw httpError(502, 'AI_RESPONSE_INVALID', 'OmniRoute did not select a verified protein food for a meal.');
+    }
 
-      const nutrients = Object.fromEntries(
-        Object.entries(food.nutrients).map(([nutrient, perHundredGrams]) => [
-          nutrient,
-          perHundredGrams === null
-            ? null
-            : round((perHundredGrams * quantityGrams) / 100),
-        ]),
-      );
-      return { foodName: food.foodName, ifctCode, quantityGrams, nutrients };
-    }),
-  }));
+    const proteinTotal = () => storedItems.reduce((total, item) => total + (item.nutrients.protein ?? 0), 0);
+    if (proteinTotal() < minimumMealProteinGrams && supplement) {
+      const existingSupplement = storedItems.find((item) => item.ifctCode === supplement.food.ifctCode);
+      if (existingSupplement) {
+        const adjustedQuantity = Math.min(2000, existingSupplement.quantityGrams + supplement.quantityGrams);
+        existingSupplement.quantityGrams = adjustedQuantity;
+        Object.assign(existingSupplement, getCalculatedItem(supplement.food, existingSupplement.ifctCode, adjustedQuantity));
+      } else {
+        storedItems.push(getCalculatedItem(supplement.food, supplement.food.ifctCode, supplement.quantityGrams));
+      }
+      verifiedProteinSource = supplement.food;
+    }
+
+    return {
+      day,
+      mealType,
+      nutrientTargets,
+      proteinSource: verifiedProteinSource.foodName,
+      cookingInstructions,
+      items: storedItems,
+    };
+  });
 }
 
 /**
@@ -243,6 +305,7 @@ function buildStoredMeals(generatedMeals, foodByCode) {
 export async function generateMealPlan(userId, reportId, preferences = {}) {
   const user = await User.findById(userId).select('_id').lean();
   if (!user) throw httpError(404, 'USER_NOT_FOUND', 'User profile not found.');
+  const lifestyleProfile = await LifestyleProfile.findOne({ userId }).lean();
 
   const report = await Report.findOne({ _id: reportId, userId });
   if (!report) throw httpError(404, 'REPORT_NOT_FOUND', 'Report not found.');
@@ -258,28 +321,49 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
     .map(({ nutrient, value, unit, normalizedValue, normalizedUnit, flag }) => ({
       nutrient, value, unit, normalizedValue, normalizedUnit, flag,
     }));
-  const foods = retrieveFoodsForDeficiencies(deficiencies, preferences);
+  const householdDiet = [
+    ...(lifestyleProfile?.typicalDiet ?? []),
+    lifestyleProfile?.dailyDietDescription ?? '',
+  ].map((value) => String(value).trim()).filter(Boolean).join('; ').slice(0, 600);
+  const effectivePreferences = {
+    ...preferences,
+    dietType: preferences.dietType ?? lifestyleProfile?.dietType ?? 'veg',
+    region: preferences.region ?? lifestyleProfile?.region ?? null,
+    householdDiet,
+  };
+  const foods = filterHouseholdPlanFoods(
+    retrieveFoodsForDeficiencies(deficiencies, effectivePreferences),
+    effectivePreferences.householdDiet,
+  );
   if (foods.length === 0) {
     throw httpError(422, 'NO_IFCT_FOODS_AVAILABLE', 'No IFCT foods match the selected diet, allergies, and region.');
   }
 
   const profile = {
-    dietType: preferences.dietType ?? 'veg',
+    dietType: effectivePreferences.dietType,
     allergies: preferences.allergies ?? [],
-    region: preferences.region ?? null,
-    activityLevel: preferences.activityLevel ?? 'moderate',
+    region: effectivePreferences.region,
+    activityLevel: preferences.activityLevel ?? lifestyleProfile?.activityLevel ?? 'moderate',
+    householdDiet: effectivePreferences.householdDiet,
   };
   const prompt = buildMealPlanPrompt(profile, deficiencies, foods);
   logger.info('Meal-plan generation started.');
   const generated = await requestOmniRoute(prompt);
   const foodByCode = new Map(foods.map((food) => [food.ifctCode, food]));
-  const meals = buildStoredMeals(generated.meals, foodByCode);
+  const meals = buildStoredMeals(generated.meals, foodByCode, effectivePreferences.dietType);
   const ragSourcesUsed = [...new Set(meals.flatMap((meal) => meal.items.map((item) => item.ifctCode)))];
   const disclaimer = getMedicalDisclaimer();
 
   const mealPlan = await MealPlan.create({
     userId,
     reportId,
+    preferences: {
+      dietType: effectivePreferences.dietType,
+      allergies: effectivePreferences.allergies ?? [],
+      region: effectivePreferences.region,
+      activityLevel: profile.activityLevel,
+    },
+    householdDiet: effectivePreferences.householdDiet,
     targetDeficiencies: deficiencies.map(({ nutrient }) => nutrient),
     planDurationDays: 7,
     meals,

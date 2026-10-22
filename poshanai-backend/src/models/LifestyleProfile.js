@@ -15,6 +15,7 @@ const lifestyleProfileSchema = new mongoose.Schema(
     dietType: { type: String, enum: ['veg', 'non-veg', 'eggetarian', 'vegan'], required: true },
     mealsPerDay: { type: Number, min: 1, max: 10, required: true },
     typicalDiet: { type: [String], default: [] },
+    dailyDietDescription: { type: String, trim: true, maxlength: 600, default: '' },
     sleepHours: { type: Number, min: 1, max: 16, required: true },
     sleepTime: { type: String, enum: ['early', 'regular', 'late night'], required: true },
     sunExposure: { type: String, enum: ['high', 'moderate', 'low'], required: true },

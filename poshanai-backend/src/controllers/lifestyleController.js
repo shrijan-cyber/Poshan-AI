@@ -9,7 +9,7 @@ const disclaimer = 'These suggestions are for awareness only. Discuss any test w
 // Include all possible fields from both branches
 const PROFILE_FIELDS = [
   'age', 'gender', 'weightKg', 'heightCm', 'dietType', 'region',
-  'sunExposure', 'symptoms', 'typicalDiet', 'mealsPerDay', 
+  'sunExposure', 'symptoms', 'typicalDiet', 'dailyDietDescription', 'mealsPerDay',
   'sleepHours', 'sleepTime', 'activityLevel', 'habits', 'consent'
 ];
 

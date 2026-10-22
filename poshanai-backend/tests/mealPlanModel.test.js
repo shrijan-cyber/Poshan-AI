@@ -11,6 +11,8 @@ function mealPlanDocument() {
     meals: Array.from({ length: 7 }, (_, index) => ({
       day: index + 1,
       mealType: 'lunch',
+      proteinSource: 'Spinach',
+      cookingInstructions: 'Steam until tender.',
       items: [{
         foodName: 'Spinach',
         ifctCode: 'C033',
@@ -36,7 +38,7 @@ test('defines indexed ownership references, requested meal fields, and status', 
   const indexedFields = MealPlan.schema.indexes().map(([fields]) => fields);
   assert.ok(indexedFields.some((fields) => fields.userId === 1));
   assert.ok(indexedFields.some((fields) => fields.reportId === 1));
-  for (const field of ['userId', 'reportId', 'title', 'meals', 'preferences', 'disclaimer', 'status']) {
+  for (const field of ['userId', 'reportId', 'title', 'meals', 'preferences', 'householdDiet', 'disclaimer', 'status']) {
     assert.ok(MealPlan.schema.path(field), `expected MealPlan schema to define ${field}`);
   }
 });
@@ -46,6 +48,14 @@ test('validates a seven-day plan and keeps unavailable vitamin B12 nullable', ()
   assert.equal(plan.validateSync(), undefined);
   assert.equal(plan.meals[0].items[0].nutrients.vitaminB12, null);
   assert.equal(plan.status, 'active');
+});
+
+test('stores household cooking guidance and allows unavailable IFCT nutrients', () => {
+  const plan = mealPlanDocument();
+  plan.householdDiet = '2 rotis, dal, rice and sabzi';
+  plan.meals[0].items[0].nutrients.calories = null;
+  assert.equal(plan.validateSync(), undefined);
+  assert.equal(plan.meals[0].items[0].nutrients.calories, null);
 });
 
 test('rejects a plan that does not cover all seven days', () => {

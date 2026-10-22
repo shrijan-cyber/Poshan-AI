@@ -2,10 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildMealPlanPrompt,
+  getFoodByIfctCode,
   getMedicalDisclaimer,
   retrieveFoodsForDeficiencies,
 } from '../src/rag/ragService.js';
-import { hasSevereB12Deficiency } from '../src/rag/promptBuilder.js';
+import { getHouseholdFoodWhitelist, loadIfctDataset } from '../src/rag/ifctLoader.js';
+import { hasSevereB12Deficiency, mealPlanSystemPrompt } from '../src/rag/promptBuilder.js';
+import { buildStoredMeals } from '../src/services/aiService.js';
 
 test('provides IFCT records with serving size and preserves unreported vitamin B12 as null', () => {
   const foods = retrieveFoodsForDeficiencies([], { dietType: 'nonveg' });
@@ -13,6 +16,12 @@ test('provides IFCT records with serving size and preserves unreported vitamin B
   assert.ok(foods.every((food) => food.servingSize === 100));
   assert.ok(foods.every((food) => food.nutrients.vitaminB12 === null));
   assert.ok(foods.some((food) => food.ifctCode && food.foodName));
+});
+
+test('marks the known IFCT cooking-oil energy gap as unavailable instead of zero', () => {
+  const ghee = getFoodByIfctCode('T013');
+  assert.equal(ghee.nutrients.calories, null);
+  assert.equal(ghee.nutrients.fat, 100);
 });
 
 test('filters IFCT records by vegetarian diet, allergy, and Uttarakhand region', () => {
@@ -35,6 +44,11 @@ test('builds a prompt from validated preferences and includes the required discl
   assert.match(prompt, /"foodName"/);
   assert.match(prompt, /Generate meals covering each day from 1 through 7/);
   assert.match(prompt, /nutrientTargets/);
+  assert.match(mealPlanSystemPrompt, /Indian Household Nutrition Planner/i);
+  assert.match(mealPlanSystemPrompt, /Do not replace the user's staple diet/i);
+  assert.match(mealPlanSystemPrompt, /backend calculates them from IFCT values/i);
+  assert.match(prompt, /cookingInstructions/);
+  assert.match(prompt, /proteinSource/);
   assert.match(getMedicalDisclaimer(), /does not diagnose, treat, or replace advice/);
 });
 
@@ -56,14 +70,16 @@ test('targets confirmed Iron and severe Vitamin B12 deficiencies without inventi
   assert.ok(foods.every((food) => food.nutrients.vitaminB12 === null));
 });
 
-test('returns vegetarian foods high in Vitamin D or Iron for Vitamin D + Iron deficiency', () => {
+test('returns familiar vegetarian foods for Vitamin D + Iron deficiency', () => {
   const foods = retrieveFoodsForDeficiencies(
     [{ nutrient: 'Vitamin D' }, { nutrient: 'Iron' }],
     { dietType: 'veg' },
   );
 
-  // Verify returns top 20-30 foods
+  // Retrieval ranks a short list only after limiting candidates to the household whitelist.
   assert.ok(foods.length >= 20 && foods.length <= 30);
+  const whitelistCodes = new Set(getHouseholdFoodWhitelist(loadIfctDataset()).map(({ ifctCode }) => ifctCode));
+  assert.ok(foods.every(({ ifctCode }) => whitelistCodes.has(ifctCode)));
 
   // Verify returned foods are all vegetarian
   const nonVegCategories = [
@@ -82,13 +98,44 @@ test('returns vegetarian foods high in Vitamin D or Iron for Vitamin D + Iron de
     );
   }
 
-  // Verify they're high in Vitamin D or Iron
-  for (const food of foods) {
-    const isHighVitD = food.nutrients.vitaminD > 0;
-    const isHighIron = food.nutrients.iron >= 1.5;
-    assert.ok(
-      isHighVitD || isHighIron,
-      `Expected ${food.foodName} to be rich in Vitamin D or Iron (VitD=${food.nutrients.vitaminD}, Iron=${food.nutrients.iron})`,
-    );
-  }
+  assert.ok(foods.some((food) => food.ifctCode === 'A011'), 'Poha should be available as a familiar staple');
+  assert.ok(foods.some((food) => food.ifctCode === 'L003'), 'Paneer should be available as a vegetarian protein');
+  assert.ok(foods.every((food) => !/\b(?:amaranth|agathi|ragi|quinoa|barley)\b/i.test(food.foodName)));
+});
+
+test('allows a user-requested otherwise uncommon IFCT food and keeps it out when rejected', () => {
+  const requested = retrieveFoodsForDeficiencies([], { dietType: 'veg', householdDiet: 'I usually eat ragi with dal.' });
+  const rejected = retrieveFoodsForDeficiencies([], { dietType: 'veg', householdDiet: 'I do not eat ragi.' });
+  const requestedAmaranth = retrieveFoodsForDeficiencies([], { dietType: 'veg', householdDiet: 'Please include amaranth.' });
+  const requestedBarley = retrieveFoodsForDeficiencies([], { dietType: 'veg', householdDiet: 'Please include barley.' });
+  assert.ok(requested.some((food) => food.ifctCode === 'A010'));
+  assert.ok(rejected.every((food) => food.ifctCode !== 'A010'));
+  assert.ok(requestedAmaranth.some((food) => food.ifctCode === 'A001'));
+  assert.ok(requestedBarley.every((food) => !/barley/i.test(food.foodName)));
+});
+
+test('calculates macros from IFCT portions and adds paneer to a low-protein vegetarian meal', () => {
+  const foods = retrieveFoodsForDeficiencies([], { dietType: 'veg' });
+  const byCode = new Map(foods.map((food) => [food.ifctCode, food]));
+  const rice = byCode.get('A015');
+  const paneer = byCode.get('L003');
+  assert.ok(rice && paneer);
+
+  const [meal] = buildStoredMeals([{
+    day: 1,
+    mealType: 'lunch',
+    nutrientTargets: ['Iron'],
+    proteinSource: rice.foodName,
+    cookingInstructions: 'Cook the rice until tender.',
+    items: [{ ifctCode: rice.ifctCode, foodName: rice.foodName, quantityGrams: 100 }],
+  }], byCode, 'veg');
+
+  const paneerItem = meal.items.find((item) => item.ifctCode === paneer.ifctCode);
+  const riceItem = meal.items.find((item) => item.ifctCode === rice.ifctCode);
+  assert.equal(meal.proteinSource, paneer.foodName);
+  assert.equal(paneerItem.quantityGrams, 100);
+  assert.equal(riceItem.nutrients.calories, rice.nutrients.calories);
+  assert.equal(riceItem.nutrients.protein, rice.nutrients.protein);
+  assert.equal(riceItem.nutrients.carbs, rice.nutrients.carbs);
+  assert.equal(paneerItem.nutrients.calories, paneer.nutrients.calories);
 });

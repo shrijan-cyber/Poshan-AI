@@ -9,6 +9,7 @@ import app from '../src/app.js';
 import User from '../src/models/User.js';
 import Report from '../src/models/Report.js';
 import MealPlan from '../src/models/MealPlan.js';
+import LifestyleProfile from '../src/models/LifestyleProfile.js';
 import { retrieveFoodsForDeficiencies } from '../src/rag/ragService.js';
 
 let mongod;
@@ -30,13 +31,16 @@ async function createAuthenticatedUser(name, email) {
 
 function mockAiCompletion() {
   const foods = retrieveFoodsForDeficiencies([{ nutrient: 'Iron' }], { dietType: 'veg' });
-  const chosenCode = foods[0]?.ifctCode || 'G033';
+  const proteinFood = foods.find((food) => food.nutrients.protein > 0) ?? foods[0];
+  const chosenCode = proteinFood?.ifctCode || 'G033';
 
   return {
     meals: Array.from({ length: 7 }, (_, index) => ({
       day: index + 1,
       mealType: 'breakfast',
       nutrientTargets: ['Iron'],
+      proteinSource: proteinFood?.foodName,
+      cookingInstructions: 'Pressure-cook with minimal oil.',
       items: [{
         ifctCode: chosenCode,
         foodName: foods.find((food) => food.ifctCode === chosenCode)?.foodName,
@@ -52,6 +56,8 @@ function createSampleMeals() {
     day: i + 1,
     mealType: 'breakfast',
     nutrientTargets: ['Iron'],
+    proteinSource: 'Turmeric powder',
+    cookingInstructions: 'Add to the meal with minimal oil.',
     items: [
       {
         foodName: 'Turmeric powder',
@@ -116,6 +122,7 @@ after(async () => {
 
 beforeEach(async () => {
   await MealPlan.deleteMany({});
+  await LifestyleProfile.deleteMany({});
   await Report.deleteMany({});
   await User.deleteMany({});
 });
@@ -124,6 +131,20 @@ describe('Meal Plan API (/api/mealplans)', () => {
   describe('POST /api/mealplans/generate', () => {
     it('generates a 7-day meal plan for a valid, confirmed report', async () => {
       const { token, user, ip } = await createAuthenticatedUser('User A', 'user_a@example.com');
+      await LifestyleProfile.create({
+        userId: user.id,
+        dietType: 'veg',
+        mealsPerDay: 3,
+        typicalDiet: ['rice', 'dal'],
+        dailyDietDescription: '2 rotis, 1 bowl dal, rice and sabzi',
+        sleepHours: 7,
+        sleepTime: 'regular',
+        sunExposure: 'moderate',
+        activityLevel: 'moderate',
+        habits: ['none'],
+        symptoms: ['none'],
+        consent: true,
+      });
 
       const report = await Report.create({
         userId: user.id,
@@ -159,6 +180,12 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.equal(res.body.data.status, 'draft');
       assert.equal(res.body.data.planDurationDays, 7);
       assert.equal(res.body.data.meals.length, 7);
+      assert.match(res.body.data.meals[0].cookingInstructions, /minimal oil/i);
+      assert.ok(res.body.data.meals[0].proteinSource);
+      assert.equal(res.body.data.householdDiet, 'rice; dal; 2 rotis, 1 bowl dal, rice and sabzi');
+      assert.ok(res.body.data.meals.every((meal) => meal.items.every((item) => !/\b(?:amaranth|agathi|ragi|quinoa|barley)\b/i.test(item.foodName))));
+      assert.match(lastAiPrompt, /2 rotis, 1 bowl dal, rice and sabzi/);
+      assert.match(lastAiPrompt, /rice; dal; 2 rotis, 1 bowl dal, rice and sabzi/);
       assert.ok(res.body.data.disclaimer);
 
       const inDb = await MealPlan.findById(res.body.data._id);

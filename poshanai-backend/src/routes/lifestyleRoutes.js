@@ -19,6 +19,7 @@ const onboardingSchema = Joi.object({
   dietType: Joi.string().valid('veg', 'non-veg', 'eggetarian', 'vegan'),
   mealsPerDay: Joi.number().integer().min(1).max(10),
   typicalDiet: Joi.array().items(Joi.string().trim().min(1).max(40)).max(30),
+  dailyDietDescription: Joi.string().trim().max(600).allow(''),
   sleepHours: Joi.number().min(1).max(16),
   sleepTime: Joi.string().valid('early', 'regular', 'late night'),
   sunExposure: Joi.string().valid('high', 'moderate', 'low'),

@@ -13,6 +13,7 @@ export const INITIAL_LIFESTYLE_VALUES = {
   dietType: '',
   mealsPerDay: 3,
   typicalDiet: [],
+  dailyDietDescription: '',
   sleepHours: 7,
   sleepTime: '',
   sunExposure: '',
@@ -30,6 +31,7 @@ export const stepSchemas = [
     dietType: choice(DIET_OPTIONS, 'Please choose your diet type.'),
     mealsPerDay: z.number().int().min(1).max(10),
     typicalDiet: z.array(z.string().min(1).max(40)).max(30),
+    dailyDietDescription: z.string().max(600, 'Keep this under 600 characters.'),
   }),
   z.object({
     sleepHours: z.number().min(1).max(16),
@@ -50,7 +52,7 @@ export const onboardingSchema = stepSchemas.reduce(
 
 export const STEP_FIELDS = [
   ['consent'],
-  ['dietType', 'mealsPerDay', 'typicalDiet'],
+  ['dietType', 'mealsPerDay', 'typicalDiet', 'dailyDietDescription'],
   ['sleepHours', 'sleepTime', 'sunExposure', 'activityLevel'],
   ['symptoms', 'habits'],
 ];
@@ -71,6 +73,7 @@ export function buildOnboardingPayload(v) {
     dietType: v.dietType,
     mealsPerDay: v.mealsPerDay,
     typicalDiet: v.typicalDiet,
+    dailyDietDescription: (v.dailyDietDescription ?? '').trim(),
     sleepHours: v.sleepHours,
     sleepTime: v.sleepTime,
     sunExposure: v.sunExposure,
