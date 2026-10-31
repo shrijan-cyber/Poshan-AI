@@ -1,5 +1,55 @@
 {
   "version": 1,
-  "disclaimer": "Any items in this file must be suggestions to discuss with a doctor; they are not a diagnosis or medical advice.",
-  "rules": []
+  "disclaimer": "These are prompts for discussion with a qualified doctor, not a diagnosis or medical advice.",
+  "rules": [
+    {
+      "ruleId": "rule_b12_vegetarian_fatigue_01",
+      "testName": "Vitamin B12",
+      "category": "Nutritional discussion",
+      "conditions": [
+        { "field": "dietType", "operator": "oneOf", "value": ["veg", "vegan"] },
+        { "field": "symptoms", "operator": "includes", "value": "fatigue" }
+      ],
+      "rationale": "Fatigue has many possible causes, and vegetarian diets can provide less vitamin B12 depending on food choices. Ask your doctor whether a vitamin B12 test is appropriate; these answers cannot establish a deficiency."
+    },
+    {
+      "ruleId": "rule_cbc_fatigue_01",
+      "testName": "CBC (Complete Blood Count)",
+      "category": "Symptom-based",
+      "conditions": [
+        { "field": "symptoms", "operator": "includes", "value": "fatigue" }
+      ],
+      "rationale": "Fatigue is nonspecific and can have many causes. A doctor can assess your symptoms and decide whether a CBC or another evaluation is suitable."
+    },
+    {
+      "ruleId": "rule_hba1c_age_family_history_01",
+      "testName": "HbA1c",
+      "category": "Screening",
+      "conditions": [
+        { "field": "age", "operator": "greaterThanOrEqual", "value": 41 },
+        { "field": "familyHistory", "operator": "includes", "value": "diabetes" }
+      ],
+      "rationale": "A family history of diabetes can be one factor in deciding when to screen. Discuss your full risk profile and whether HbA1c or another screening test is appropriate with your doctor."
+    },
+    {
+      "ruleId": "rule_tsh_hairfall_thyroid_history_01",
+      "testName": "TSH (Thyroid-Stimulating Hormone)",
+      "category": "Symptom-based",
+      "conditions": [
+        { "field": "symptoms", "operator": "includes", "value": "hair fall" },
+        { "field": "familyHistory", "operator": "includes", "value": "thyroid disease" }
+      ],
+      "rationale": "Hair fall has many possible causes. Given the reported family history, ask your doctor whether thyroid evaluation, which may include a TSH test, is suitable."
+    },
+    {
+      "ruleId": "rule_vitamin_d_low_sun_bone_pain_01",
+      "testName": "25-hydroxyvitamin D",
+      "category": "Symptom-based",
+      "conditions": [
+        { "field": "sunExposure", "operator": "equals", "value": "low" },
+        { "field": "symptoms", "operator": "includes", "value": "bone pain" }
+      ],
+      "rationale": "Bone pain and low sun exposure do not identify a cause. Discuss the symptoms with a doctor, who can decide whether vitamin D testing is appropriate."
+    }
+  ]
 }

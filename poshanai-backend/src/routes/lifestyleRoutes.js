@@ -28,12 +28,16 @@ const onboardingSchema = Joi.object({
     .custom((values, helpers) => (values.includes('none') && values.length > 1 ? helpers.error('any.invalid') : values)),
   symptoms: Joi.array().items(Joi.string().valid('fatigue', 'hair fall', 'bone pain', 'none')).min(1).unique()
     .custom((values, helpers) => (values.includes('none') && values.length > 1 ? helpers.error('any.invalid') : values)),
+  familyHistory: Joi.array().items(Joi.string().valid('diabetes', 'thyroid disease')).max(5).unique().default([]),
   consent: Joi.boolean().valid(true).required(),
 }).min(1).unknown(false);
 
 // AI Explanation Schema
 const explainSchema = Joi.object({
-  testName: Joi.string().valid('Vitamin D', 'Vitamin B12', 'Complete blood count (CBC)').required(),
+  testName: Joi.string().valid(
+    'Vitamin D', '25-hydroxyvitamin D', 'Vitamin B12', 'Complete blood count (CBC)',
+    'CBC (Complete Blood Count)', 'HbA1c', 'TSH (Thyroid-Stimulating Hormone)',
+  ).required(),
   reason: Joi.string().trim().min(1).max(500).required(),
   language: Joi.string().valid('hinglish', 'english').required(),
 }).unknown(false);

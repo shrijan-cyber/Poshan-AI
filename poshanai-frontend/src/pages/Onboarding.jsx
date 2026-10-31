@@ -18,6 +18,7 @@ import {
 import {
   ACTIVITY_OPTIONS,
   DIET_OPTIONS,
+  FAMILY_HISTORY_OPTIONS,
   HABIT_OPTIONS,
   SLEEP_TIME_OPTIONS,
   STEP_TITLES,
@@ -272,6 +273,19 @@ export default function Onboarding() {
                           selected={values.habits}
                           onToggle={(v) => setField('habits', toggleExclusive(values.habits, v))}
                           error={errors.habits?.message}
+                        />
+                        <ChipGroup
+                          legend="Is there a family history of either of these? (Optional)"
+                          hint="This helps tailor screening topics. You can leave this blank."
+                          options={FAMILY_HISTORY_OPTIONS}
+                          selected={values.familyHistory}
+                          onToggle={(value) => setField(
+                            'familyHistory',
+                            values.familyHistory.includes(value)
+                              ? values.familyHistory.filter((item) => item !== value)
+                              : [...values.familyHistory, value],
+                          )}
+                          error={errors.familyHistory?.message}
                         />
                       </>
                     )}

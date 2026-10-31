@@ -10,9 +10,10 @@ const baseLogger = winston.createLogger({
 
 function write(level, message, metadata = {}, error) {
   // Logs are operational telemetry, never a copy of request or health data.
-  const safeFields = ['method', 'path', 'status', 'durationMs', 'requestId', 'errorCode'];
+  const safeFields = ['method', 'path', 'status', 'durationMs', 'requestId', 'errorCode', 'ruleId'];
   const fields = Object.fromEntries(safeFields
-    .filter((key) => metadata?.[key] !== undefined)
+    .filter((key) => metadata?.[key] !== undefined
+      && (key !== 'ruleId' || (typeof metadata[key] === 'string' && /^[a-z0-9_]{1,80}$/.test(metadata[key]))))
     .map((key) => [key, typeof metadata[key] === 'string'
       ? metadata[key]
         .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[REDACTED]')

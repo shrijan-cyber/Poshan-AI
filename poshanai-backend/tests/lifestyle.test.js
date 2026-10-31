@@ -103,18 +103,45 @@ test('rejects unknown questionnaire fields and invalid profile values', async ()
   assert.equal(await LifestyleProfile.countDocuments(), 0);
 });
 
-test('test rules are suggestions to discuss with a doctor and reject claim-like rule wording', () => {
-  assert.match(testRules.disclaimer, /suggestions to discuss with a doctor/i);
-  assert.deepEqual(testRules.rules, []);
+test('test rules are structured suggestions to discuss with a doctor', () => {
+  assert.match(testRules.disclaimer, /doctor/i);
+  assert.equal(testRules.rules.length, 5);
+  assert.ok(testRules.rules.every((rule) => rule.ruleId && rule.testName && rule.conditions.length));
   assert.throws(() => validateTestRules({
     version: 1,
     disclaimer: 'Suggestions to discuss with a doctor.',
-    rules: [{ id: 'unsafe', suggestion: 'This test diagnoses a deficiency.' }],
-  }), /doctor-discussion suggestion/);
+    rules: [{ ruleId: 'unsafe', suggestion: 'This test diagnoses a deficiency.' }],
+  }), /unique ID, test, category, conditions, and rationale/);
   assert.throws(() => validateTestRules({
     version: 1,
     disclaimer: 'Suggestions to discuss with a doctor.',
     medicalClaim: 'This test diagnoses a deficiency.',
     rules: [],
   }), /unsupported top-level field/);
+});
+
+test('recommendations endpoint evaluates the authenticated user profile', async () => {
+  const { token, ip } = await registerUser();
+  await request(app)
+    .post('/api/lifestyle/onboarding')
+    .set('Authorization', `Bearer ${token}`)
+    .set('X-Forwarded-For', ip)
+    .send({
+      ...validOnboarding,
+      dietType: 'veg',
+      symptoms: ['fatigue'],
+      familyHistory: ['diabetes'],
+      age: 42,
+    })
+    .expect(200);
+
+  const response = await request(app)
+    .get('/api/lifestyle/recommendations')
+    .set('Authorization', `Bearer ${token}`)
+    .set('X-Forwarded-For', ip)
+    .expect(200);
+  const recommendations = response.body.data.recommendations;
+  assert.ok(recommendations.some((item) => item.testName === 'Vitamin B12'));
+  assert.ok(recommendations.some((item) => item.testName === 'HbA1c'));
+  assert.ok(recommendations.every((item) => item.disclaimer && Array.isArray(item.triggeringFactors)));
 });

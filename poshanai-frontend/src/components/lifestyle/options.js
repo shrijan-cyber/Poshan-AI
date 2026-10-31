@@ -42,4 +42,9 @@ export const SYMPTOM_OPTIONS = [
   { value: 'none', label: 'None of these' },
 ];
 
-export const STEP_TITLES = ['Consent (DPDP Act)', 'Your diet', 'Your lifestyle', 'Symptoms & habits'];
+export const FAMILY_HISTORY_OPTIONS = [
+  { value: 'diabetes', label: 'Diabetes' },
+  { value: 'thyroid disease', label: 'Thyroid disease' },
+];
+
+export const STEP_TITLES = ['Consent (DPDP Act)', 'Your diet', 'Your lifestyle', 'Symptoms, family history & habits'];

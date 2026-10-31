@@ -14,7 +14,8 @@ export default function WhyThisModal({ test, isOpen, onClose }) {
   const [language, setLanguage] = useState('hinglish');
   // Results are kept in memory only, keyed by language + test + reason.
   const [results, setResults] = useState({});
-  const key = test ? `${language}|${test.testName}|${test.reason}` : null;
+  const rationale = test?.rationale ?? test?.reason ?? '';
+  const key = test ? `${language}|${test.testName}|${rationale}` : null;
   const entry = key ? results[key] : undefined;
   const hasEntry = Boolean(entry);
 
@@ -22,7 +23,7 @@ export default function WhyThisModal({ test, isOpen, onClose }) {
     if (!isOpen || !key || hasEntry) return undefined;
     const controller = new AbortController();
     explainTest(
-      { testName: test.testName, reason: test.reason, language },
+      { testName: test.testName, reason: rationale, language },
       { signal: controller.signal },
     )
       .then((data) => setResults((current) => ({ ...current, [key]: { data } })))
@@ -31,7 +32,7 @@ export default function WhyThisModal({ test, isOpen, onClose }) {
         setResults((current) => ({ ...current, [key]: { error: getApiError(error) } }));
       });
     return () => controller.abort();
-  }, [isOpen, key, hasEntry, test, language]);
+  }, [isOpen, key, hasEntry, test, rationale, language]);
 
   const retry = () =>
     setResults((current) => Object.fromEntries(Object.entries(current).filter(([k]) => k !== key)));
@@ -51,7 +52,7 @@ export default function WhyThisModal({ test, isOpen, onClose }) {
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">The reason</h3>
-          <p className="mt-1 text-sm text-slate-800 dark:text-slate-100">{test.reason}</p>
+          <p className="mt-1 text-sm text-slate-800 dark:text-slate-100">{rationale}</p>
         </section>
 
         <section aria-live="polite">

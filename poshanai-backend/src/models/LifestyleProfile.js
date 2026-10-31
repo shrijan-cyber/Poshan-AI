@@ -22,6 +22,11 @@ const lifestyleProfileSchema = new mongoose.Schema(
     activityLevel: { type: String, enum: ['sedentary', 'moderate', 'active'], required: true },
     habits: { type: [String], enum: ['smoking', 'alcohol', 'none'], required: true },
     symptoms: { type: [String], enum: ['fatigue', 'hair fall', 'bone pain', 'none'], required: true },
+    familyHistory: {
+      type: [String],
+      enum: ['diabetes', 'thyroid disease'],
+      default: [],
+    },
     consent: { type: Boolean, required: true, validate: (value) => value === true },
   },
   { timestamps: true, versionKey: false }

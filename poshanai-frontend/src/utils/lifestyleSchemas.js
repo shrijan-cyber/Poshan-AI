@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import {
-  ACTIVITY_OPTIONS, DIET_OPTIONS, HABIT_OPTIONS, SLEEP_TIME_OPTIONS, SUN_OPTIONS, SYMPTOM_OPTIONS,
+  ACTIVITY_OPTIONS, DIET_OPTIONS, FAMILY_HISTORY_OPTIONS, HABIT_OPTIONS, SLEEP_TIME_OPTIONS, SUN_OPTIONS, SYMPTOM_OPTIONS,
 } from '../components/lifestyle/options.js';
 
 const values = (options) => options.map((option) => option.value);
@@ -20,6 +20,7 @@ export const INITIAL_LIFESTYLE_VALUES = {
   activityLevel: '',
   habits: [],
   symptoms: [],
+  familyHistory: [],
   consent: false,
 };
 
@@ -42,6 +43,7 @@ export const stepSchemas = [
   z.object({
     symptoms: multi(SYMPTOM_OPTIONS, 'Select at least one option, or "None of these".'),
     habits: multi(HABIT_OPTIONS, 'Select at least one option, or "None of these".'),
+    familyHistory: z.array(z.enum(values(FAMILY_HISTORY_OPTIONS))).max(5),
   }),
 ];
 
@@ -54,7 +56,7 @@ export const STEP_FIELDS = [
   ['consent'],
   ['dietType', 'mealsPerDay', 'typicalDiet', 'dailyDietDescription'],
   ['sleepHours', 'sleepTime', 'sunExposure', 'activityLevel'],
-  ['symptoms', 'habits'],
+  ['symptoms', 'habits', 'familyHistory'],
 ];
 
 /** @returns {{ ok: boolean, errors: Record<string, string> }} */
@@ -80,6 +82,7 @@ export function buildOnboardingPayload(v) {
     activityLevel: v.activityLevel,
     habits: v.habits,
     symptoms: v.symptoms,
+    familyHistory: v.familyHistory ?? [],
     consent: true,
   };
 }

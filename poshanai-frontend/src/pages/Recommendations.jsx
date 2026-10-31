@@ -126,7 +126,7 @@ export default function Recommendations() {
               <p className="text-3xl" aria-hidden="true">✅</p>
               <p className="mt-2 font-semibold text-slate-900 dark:text-white">No specific tests suggested</p>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                Your answers did not match any of our suggestions. Talk to your doctor about routine check-ups.
+                Based on your answers, no specific tests triggered our current rules. Discuss routine screening with your doctor.
               </p>
             </div>
           ) : (
@@ -136,7 +136,7 @@ export default function Recommendations() {
               </p>
               <ul className="mt-3 space-y-3">
                 {tests.map((test, index) => (
-                  <TestCard key={test.testName} test={test} index={index} onWhyThis={openWhyThis} />
+                  <TestCard key={test.ruleId ?? test.testName} test={test} index={index} onWhyThis={openWhyThis} />
                 ))}
               </ul>
             </>

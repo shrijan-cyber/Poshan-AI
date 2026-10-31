@@ -5,6 +5,7 @@ import TestIcon from './TestIcon.jsx';
 
 export default function TestCard({ test, index, onWhyThis }) {
   const reduceMotion = useReducedMotion();
+  const rationale = test.rationale ?? test.reason ?? 'Discuss whether this test is appropriate with your doctor.';
   return (
     <motion.li
       initial={reduceMotion ? false : { opacity: 0, y: 16 }}
@@ -16,7 +17,15 @@ export default function TestCard({ test, index, onWhyThis }) {
           <TestIcon testName={test.testName} />
           <div className="min-w-0">
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">{test.testName}</h2>
-            <p className="mt-1 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{test.reason}</p>
+            <p className="mt-1 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{rationale}</p>
+            {test.triggeringFactors?.length > 0 && (
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                Based on: {test.triggeringFactors.map((factor) => factor.label).join('; ')}
+              </p>
+            )}
+            <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
+              {test.disclaimer ?? 'This is not a diagnosis. Discuss any test with a qualified doctor.'}
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:shrink-0">
