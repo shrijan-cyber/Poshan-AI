@@ -82,8 +82,8 @@ function mealIngredients(meal) {
     ifctCode: item.ifctCode,
     category: item.category,
     canonicalName: item.canonicalName ?? item.foodName,
-    quantity: item.quantity ?? item.quantityGrams,
-    quantityGrams: item.quantityGrams,
+    quantity: item.quantity ?? item.rawQuantityGrams ?? item.quantityGrams,
+    quantityGrams: item.quantityGrams ?? item.rawQuantityGrams,
     unit: item.unit ?? 'g',
     state: item.state ?? item.rawCookedState ?? item.preparationState,
   }));
@@ -95,7 +95,7 @@ export function buildGroceryList(plan) {
 
   for (const meal of Array.isArray(plan?.meals) ? plan.meals : []) {
     for (const ingredient of mealIngredients(meal)) {
-      const quantity = Number(ingredient.quantity ?? ingredient.quantityGrams);
+      const quantity = Number(ingredient.quantity ?? ingredient.rawQuantityGrams ?? ingredient.quantityGrams);
       if (!Number.isFinite(quantity) || quantity <= 0) continue;
 
       const ifctCode = ingredient.ifctCode ? String(ingredient.ifctCode).trim() : null;
@@ -105,7 +105,7 @@ export function buildGroceryList(plan) {
 
       const stateValue = String(ingredient.state ?? ingredient.rawCookedState ?? ingredient.preparationState ?? '').trim().toLowerCase();
       const state = ['raw', 'cooked'].includes(stateValue) ? stateValue : null;
-      const { quantityUnit, factor } = normalizeUnit(ingredient.unit ?? (ingredient.quantityGrams != null ? 'g' : 'g'));
+      const { quantityUnit, factor } = normalizeUnit(ingredient.unit ?? 'g');
       const normalizedQuantity = Math.round(quantity * factor * 10) / 10;
       const category = categoryFor(food?.category ?? ingredient.category, foodName);
       const normalizedName = foodName.toLocaleLowerCase('en').replace(/[^a-z0-9]+/g, ' ').trim();

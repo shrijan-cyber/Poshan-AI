@@ -12,6 +12,12 @@ const aliasGroups = [
   ['mushroom', 'mushrooms'],
   ['sesame', 'til'],
   ['seeds', 'seed', 'sunflower seed', 'pumpkin seed'],
+  ['onion', 'onions', 'pyaaz', 'pyaz'],
+  ['tomato', 'tomatoes'],
+  ['potato', 'potatoes', 'aloo'],
+  ['cauliflower', 'gobhi', 'gobi'],
+  ['spinach', 'palak'],
+  ['okra', 'lady finger', 'ladies finger', 'bhindi'],
 ];
 
 const normalize = (value) => String(value ?? '').toLocaleLowerCase('en')

@@ -36,12 +36,31 @@ const itemSchema = new mongoose.Schema(
   { _id: false },
 );
 
+const recipeIngredientSchema = new mongoose.Schema(
+  {
+    ifctCode: { type: String, trim: true, default: null },
+    canonicalName: { type: String, trim: true, required: true },
+    quantity: { type: Number, required: true, min: 0.001 },
+    rawQuantityGrams: { type: Number, min: 0.001, default: null },
+    unit: { type: String, required: true, trim: true },
+    householdMeasure: { type: String, trim: true, default: null },
+    state: { type: String, enum: ['raw', 'cooked'], default: null },
+  },
+  { _id: false },
+);
+
 /**
  * A single meal entry within the meal plan.
  */
 const mealSchema = new mongoose.Schema(
   {
     day: { type: Number, required: true, min: 1, max: 30 },
+    recipeId: { type: String, trim: true, default: null },
+    dishName: { type: String, trim: true, default: null },
+    mealCategory: { type: String, enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack'], default: null },
+    region: { type: String, enum: ['North', 'South', 'East', 'West', 'All'], default: null },
+    dietaryCompatibility: { type: [String], default: [] },
+    servings: { type: Number, min: 0.1, default: null },
     mealType: {
       type: String,
       required: true,
@@ -50,9 +69,13 @@ const mealSchema = new mongoose.Schema(
     nutrientTargets: { type: [String], required: true, default: [] },
     proteinSource: { type: String, trim: true, maxlength: 200, required: true },
     cookingInstructions: { type: String, trim: true, maxlength: 300, required: true },
+    recipeInstructions: { type: [String], default: [] },
+    prepTime: { type: Number, min: 0, default: null },
+    cookTime: { type: Number, min: 0, default: null },
     portionDescription: { type: String, trim: true, maxlength: 120, default: null },
     cookedHouseholdMeasure: { type: String, trim: true, maxlength: 120, default: null },
     items: { type: [itemSchema], required: true },
+    ingredients: { type: [recipeIngredientSchema], default: [] },
   },
   { _id: false },
 );
@@ -78,6 +101,12 @@ const mealPlanSchema = new mongoose.Schema(
     preferences: { type: Object, default: {} },
     householdDiet: { type: String, trim: true, maxlength: 600, default: '' },
     targetDeficiencies: { type: [String], default: [] },
+    targetCalories: { type: Number, min: 1, default: null },
+    macroTargets: {
+      protein: { type: Number, min: 0, default: null },
+      carbs: { type: Number, min: 0, default: null },
+      fat: { type: Number, min: 0, default: null },
+    },
     supplementGuidance: { type: String, trim: true, default: null },
     planDurationDays: { type: Number, required: true, min: 1, max: 30, default: 7 },
     meals: {

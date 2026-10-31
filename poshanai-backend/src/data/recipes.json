@@ -1,0 +1,332 @@
+[
+  {
+    "recipeId": "poha-breakfast",
+    "dishName": "Poha",
+    "mealCategory": "Breakfast",
+    "region": "West",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A011", "rawQuantityGrams": 70, "householdMeasure": "1 bowl" },
+      { "ifctCode": "G017", "rawQuantityGrams": 20, "householdMeasure": "2 tablespoons" },
+      { "ifctCode": "D076", "rawQuantityGrams": 30, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Rinse the poha briefly and let it soften for a few minutes.", "Cook the onion and tomato in a covered pan until tender, then fold in the poha and serve warm."],
+    "prepTime": 8,
+    "cookTime": 10
+  },
+  {
+    "recipeId": "moong-dal-chilla",
+    "dishName": "Moong Dal Chilla",
+    "mealCategory": "Breakfast",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "B010", "rawQuantityGrams": 70, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 25, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Soak the moong dal until soft and blend it into a coarse batter.", "Mix in the chopped onion and tomato, spread the batter on a hot pan, and cook both sides through."],
+    "prepTime": 15,
+    "cookTime": 12
+  },
+  {
+    "recipeId": "besan-chilla",
+    "dishName": "Besan Chilla",
+    "mealCategory": "Breakfast",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "B001", "rawQuantityGrams": 65, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 25, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Soak and grind the Bengal gram dal into a smooth batter.", "Fold in the chopped vegetables, spread a thin layer on a hot pan, and cook until set on both sides."],
+    "prepTime": 12,
+    "cookTime": 12
+  },
+  {
+    "recipeId": "moong-idli",
+    "dishName": "Moong Dal Idli",
+    "mealCategory": "Breakfast",
+    "region": "South",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 45, "householdMeasure": "1/4 cup" },
+      { "ifctCode": "B010", "rawQuantityGrams": 45, "householdMeasure": "1/4 cup" }
+    ],
+    "cookingInstructions": ["Soak the rice and moong dal until soft, then grind to a thick batter.", "Spoon the batter into idli moulds and steam until cooked through."],
+    "prepTime": 15,
+    "cookTime": 18
+  },
+  {
+    "recipeId": "paneer-bhurji-roti",
+    "dishName": "Paneer Bhurji with Roti",
+    "mealCategory": "Breakfast",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 45, "householdMeasure": "1 roti" },
+      { "ifctCode": "L003", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup crumbled" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 25, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Cook the roti on a hot pan until both sides are done.", "Warm the onion and tomato until tender, crumble in the paneer, and serve with the roti."],
+    "prepTime": 8,
+    "cookTime": 12
+  },
+  {
+    "recipeId": "egg-bhurji-roti",
+    "dishName": "Egg Bhurji with Roti",
+    "mealCategory": "Breakfast",
+    "region": "North",
+    "dietaryCompatibility": ["Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 45, "householdMeasure": "1 roti" },
+      { "ifctCode": "M001", "rawQuantityGrams": 80, "householdMeasure": "2 eggs" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 25, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Cook the roti on a hot pan until both sides are done.", "Soften the onion and tomato, add the beaten egg, and stir gently until fully cooked."],
+    "prepTime": 8,
+    "cookTime": 12
+  },
+  {
+    "recipeId": "roti-dal-sabzi",
+    "dishName": "Roti with Moong Dal and Gobhi",
+    "mealCategory": "Lunch",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 60, "householdMeasure": "2 rotis" },
+      { "ifctCode": "B010", "rawQuantityGrams": 55, "householdMeasure": "1/4 cup" },
+      { "ifctCode": "D036", "rawQuantityGrams": 100, "householdMeasure": "1 cup florets" },
+      { "ifctCode": "D076", "rawQuantityGrams": 30, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Pressure-cook the moong dal until soft and cook the rotis on a hot pan.", "Simmer the cauliflower with tomato until tender, then serve with dal and rotis."],
+    "prepTime": 12,
+    "cookTime": 25
+  },
+  {
+    "recipeId": "rajma-chawal",
+    "dishName": "Rajma Chawal",
+    "mealCategory": "Lunch",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 65, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "B020", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "G017", "rawQuantityGrams": 20, "householdMeasure": "2 tablespoons" },
+      { "ifctCode": "D076", "rawQuantityGrams": 35, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Soak the rajma and pressure-cook until completely soft; cook the rice separately.", "Simmer the rajma with the onion and tomato until thick, then serve with rice."],
+    "prepTime": 10,
+    "cookTime": 40
+  },
+  {
+    "recipeId": "moong-khichdi",
+    "dishName": "Moong Dal Khichdi",
+    "mealCategory": "Dinner",
+    "region": "All",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 55, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "B010", "rawQuantityGrams": 40, "householdMeasure": "1/4 cup" },
+      { "ifctCode": "C033", "rawQuantityGrams": 35, "householdMeasure": "1/2 cup chopped" }
+    ],
+    "cookingInstructions": ["Rinse the rice and moong dal and add them to a pressure cooker with water.", "Pressure-cook until soft, stir in the spinach, and cook until it wilts."],
+    "prepTime": 8,
+    "cookTime": 22
+  },
+  {
+    "recipeId": "chole-chawal",
+    "dishName": "Chole Chawal",
+    "mealCategory": "Lunch",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "B002", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "G017", "rawQuantityGrams": 20, "householdMeasure": "2 tablespoons" },
+      { "ifctCode": "D076", "rawQuantityGrams": 35, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Soak and pressure-cook the whole Bengal gram until soft; cook the rice separately.", "Simmer the chana with onion and tomato until the gravy thickens, then serve over rice."],
+    "prepTime": 10,
+    "cookTime": 40
+  },
+  {
+    "recipeId": "palak-paneer-roti",
+    "dishName": "Palak Paneer with Roti",
+    "mealCategory": "Dinner",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 50, "householdMeasure": "2 rotis" },
+      { "ifctCode": "C033", "rawQuantityGrams": 100, "householdMeasure": "1 cup chopped" },
+      { "ifctCode": "L003", "rawQuantityGrams": 70, "householdMeasure": "1/2 cup cubes" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" }
+    ],
+    "cookingInstructions": ["Cook the rotis on a hot pan until done.", "Simmer the spinach and onion until soft, fold in the paneer, and serve with the rotis."],
+    "prepTime": 12,
+    "cookTime": 18
+  },
+  {
+    "recipeId": "egg-curry-rice",
+    "dishName": "Egg Curry with Rice",
+    "mealCategory": "Dinner",
+    "region": "All",
+    "dietaryCompatibility": ["Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "M001", "rawQuantityGrams": 100, "householdMeasure": "2 eggs" },
+      { "ifctCode": "G017", "rawQuantityGrams": 20, "householdMeasure": "2 tablespoons" },
+      { "ifctCode": "D076", "rawQuantityGrams": 40, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Boil the eggs and cook the rice until tender.", "Simmer the onion and tomato with water until soft, add the peeled eggs, and serve with rice."],
+    "prepTime": 10,
+    "cookTime": 22
+  },
+  {
+    "recipeId": "chicken-rice-bowl",
+    "dishName": "Chicken and Rice Bowl",
+    "mealCategory": "Lunch",
+    "region": "All",
+    "dietaryCompatibility": ["Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "N003", "rawQuantityGrams": 90, "householdMeasure": "1 small breast portion" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 35, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Cook the rice until tender and keep it covered.", "Simmer the chicken with onion and tomato until fully cooked, then serve with rice."],
+    "prepTime": 10,
+    "cookTime": 25
+  },
+  {
+    "recipeId": "masoor-dal-rice",
+    "dishName": "Masoor Dal with Rice",
+    "mealCategory": "Lunch",
+    "region": "All",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 60, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "B013", "rawQuantityGrams": 55, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" },
+      { "ifctCode": "D076", "rawQuantityGrams": 35, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Rinse and cook the rice until tender.", "Pressure-cook the lentil dal until soft, simmer with onion and tomato, and serve with rice."],
+    "prepTime": 8,
+    "cookTime": 25
+  },
+  {
+    "recipeId": "gobhi-paneer-roti",
+    "dishName": "Gobhi Paneer with Roti",
+    "mealCategory": "Dinner",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 45, "householdMeasure": "2 small rotis" },
+      { "ifctCode": "D036", "rawQuantityGrams": 90, "householdMeasure": "1 cup florets" },
+      { "ifctCode": "L003", "rawQuantityGrams": 55, "householdMeasure": "1/3 cup cubes" },
+      { "ifctCode": "D076", "rawQuantityGrams": 30, "householdMeasure": "1 small tomato" }
+    ],
+    "cookingInstructions": ["Cook the rotis on a hot pan until done.", "Cover and simmer the cauliflower with tomato until tender, fold in paneer, and serve."],
+    "prepTime": 12,
+    "cookTime": 20
+  },
+  {
+    "recipeId": "spinach-moong-rice",
+    "dishName": "Spinach Moong Dal Rice",
+    "mealCategory": "Dinner",
+    "region": "South",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A015", "rawQuantityGrams": 55, "householdMeasure": "1/3 cup raw rice" },
+      { "ifctCode": "B010", "rawQuantityGrams": 45, "householdMeasure": "1/4 cup" },
+      { "ifctCode": "C033", "rawQuantityGrams": 60, "householdMeasure": "1/2 cup chopped" }
+    ],
+    "cookingInstructions": ["Rinse the rice and moong dal and pressure-cook until soft.", "Fold in chopped spinach and simmer until wilted."],
+    "prepTime": 8,
+    "cookTime": 22
+  },
+  {
+    "recipeId": "besan-roti-wrap",
+    "dishName": "Besan and Gobhi Roti Wrap",
+    "mealCategory": "Lunch",
+    "region": "West",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "A019", "rawQuantityGrams": 45, "householdMeasure": "1 roti" },
+      { "ifctCode": "B001", "rawQuantityGrams": 45, "householdMeasure": "1/4 cup" },
+      { "ifctCode": "D036", "rawQuantityGrams": 70, "householdMeasure": "3/4 cup florets" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" }
+    ],
+    "cookingInstructions": ["Cook the roti on a hot pan until done and pressure-cook the Bengal gram dal until soft.", "Cook the cauliflower until tender, then serve with the dal wrapped in the roti."],
+    "prepTime": 12,
+    "cookTime": 25
+  },
+  {
+    "recipeId": "moong-dal-snack-chaat",
+    "dishName": "Moong Dal Chaat",
+    "mealCategory": "Snack",
+    "region": "North",
+    "dietaryCompatibility": ["Veg", "Vegan", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "B010", "rawQuantityGrams": 55, "householdMeasure": "1/3 cup" },
+      { "ifctCode": "D076", "rawQuantityGrams": 35, "householdMeasure": "1 small tomato" },
+      { "ifctCode": "G017", "rawQuantityGrams": 15, "householdMeasure": "1 tablespoon" }
+    ],
+    "cookingInstructions": ["Soak the moong dal and cook it until tender, then drain any extra water.", "Mix with chopped tomato and onion and serve as a warm chaat."],
+    "prepTime": 10,
+    "cookTime": 20
+  },
+  {
+    "recipeId": "paneer-tomato-snack",
+    "dishName": "Paneer and Tomato Bowl",
+    "mealCategory": "Snack",
+    "region": "All",
+    "dietaryCompatibility": ["Veg", "Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "L003", "rawQuantityGrams": 70, "householdMeasure": "1/2 cup cubes" },
+      { "ifctCode": "D076", "rawQuantityGrams": 50, "householdMeasure": "1 small tomato" },
+      { "ifctCode": "C033", "rawQuantityGrams": 25, "householdMeasure": "1/4 cup chopped" }
+    ],
+    "cookingInstructions": ["Cut the paneer and tomato into bite-size pieces.", "Warm them with the chopped spinach until the spinach wilts and serve in a bowl."],
+    "prepTime": 7,
+    "cookTime": 8
+  },
+  {
+    "recipeId": "egg-tomato-snack",
+    "dishName": "Boiled Egg and Tomato Bowl",
+    "mealCategory": "Snack",
+    "region": "All",
+    "dietaryCompatibility": ["Eggetarian", "Non-Veg"],
+    "servings": 1,
+    "ingredients": [
+      { "ifctCode": "M001", "rawQuantityGrams": 60, "householdMeasure": "1 egg" },
+      { "ifctCode": "D076", "rawQuantityGrams": 40, "householdMeasure": "1 small tomato" },
+      { "ifctCode": "G017", "rawQuantityGrams": 10, "householdMeasure": "1 tablespoon" }
+    ],
+    "cookingInstructions": ["Boil the egg until fully cooked, then peel and quarter it.", "Serve with chopped tomato and onion in a small bowl."],
+    "prepTime": 5,
+    "cookTime": 10
+  }
+]

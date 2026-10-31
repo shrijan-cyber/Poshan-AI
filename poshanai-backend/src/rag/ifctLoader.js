@@ -91,7 +91,7 @@ export function getHouseholdFoodWhitelist(foods, requestText = '', limit = 100) 
   const common = foods.filter(isCommonHouseholdFood);
   const preferredCodes = [
     'A011', 'A012', 'A014', 'A015', 'A019', 'B001', 'B003', 'B010', 'B013', 'B018', 'B020', 'B021',
-    'D031', 'D036', 'D056', 'D007', 'D076', 'C033', 'F006', 'F007', 'G017', 'L003', 'M004', 'N003',
+    'D031', 'D036', 'D056', 'D007', 'D076', 'C033', 'F006', 'F007', 'G017', 'L003', 'M001', 'M004', 'N003',
   ];
   const rank = (food) => {
     const index = preferredCodes.indexOf(food.ifctCode);

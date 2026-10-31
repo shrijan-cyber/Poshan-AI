@@ -29,32 +29,14 @@ async function createAuthenticatedUser(name, email) {
 }
 
 function mockAiCompletion(prompt) {
-  const marker = 'Allowed IFCT foods and their per-100g nutrient values (this is the complete allowed food list):\n';
-  const markerIndex = prompt.lastIndexOf(marker);
-  const foods = JSON.parse(prompt.slice(markerIndex + marker.length));
-  const byCode = new Map(foods.map((food) => [food.ifctCode, food]));
-  const preferred = ['A015', 'L003', 'C033'].map((code) => byCode.get(code)).filter(Boolean);
-  const chosenFoods = preferred.length === 3
-    ? preferred
-    : [...preferred, ...foods.filter((food) => !preferred.some((entry) => entry.ifctCode === food.ifctCode))]
-      .sort((a, b) => Number(b.nutrients.calories ?? 0) - Number(a.nutrients.calories ?? 0))
-      .slice(0, 3);
-  const proteinFood = chosenFoods.find((food) => Number(food.nutrients.protein) > 0);
-
+  const payload = JSON.parse(prompt.slice(prompt.lastIndexOf('\n') + 1));
   return {
-    meals: Array.from({ length: 7 }, (_, index) => ['breakfast', 'lunch', 'dinner'].map((mealType) => ({
-      day: index + 1,
-      mealType,
-      nutrientTargets: ['Iron'],
-      proteinSource: proteinFood?.foodName,
-      cookingInstructions: 'Pressure-cook with minimal oil.',
-      items: chosenFoods.map((food) => ({
-        ifctCode: food.ifctCode,
-        foodName: food.foodName,
-        quantityGrams: 100,
-      })),
-    }))).flat(),
-    disclaimer: 'This is nutrition information to discuss with a qualified professional.',
+    recipes: payload.recipes.map(({ mealIndex, recipeId, staticInstructions }) => ({
+      mealIndex,
+      recipeId,
+      cookingInstructions: staticInstructions,
+      swapSuggestion: null,
+    })),
   };
 }
 
@@ -140,6 +122,10 @@ describe('Meal Plan API (/api/mealplans)', () => {
       const { token, user, ip } = await createAuthenticatedUser('User A', 'user_a@example.com');
       await LifestyleProfile.create({
         userId: user.id,
+        age: 35,
+        gender: 'female',
+        weightKg: 60,
+        heightCm: 165,
         dietType: 'veg',
         mealsPerDay: 3,
         typicalDiet: ['rice', 'dal'],
@@ -187,13 +173,14 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.equal(res.body.data.status, 'draft');
       assert.equal(res.body.data.planDurationDays, 7);
       assert.equal(res.body.data.meals.length, 21);
-      assert.match(res.body.data.meals[0].cookingInstructions, /minimal oil/i);
+      assert.ok(res.body.data.meals[0].cookingInstructions.length > 0);
       assert.ok(res.body.data.meals[0].proteinSource);
       assert.equal(res.body.data.householdDiet, 'rice; dal; 2 rotis, 1 bowl dal, rice and sabzi');
       assert.ok(res.body.data.meals.every((meal) => meal.items.every((item) => !/\b(?:amaranth|agathi|ragi|quinoa|barley)\b/i.test(item.foodName))));
       assert.doesNotMatch(lastAiPrompt, /2 rotis, 1 bowl dal, rice and sabzi/);
       assert.doesNotMatch(lastAiPrompt, /42\s+ug\/dL/i);
-      assert.match(lastAiPrompt, /Roti\/chapati/);
+      assert.match(lastAiPrompt, /"recipes"/);
+      assert.match(lastAiPrompt, /Roti/);
       assert.doesNotMatch(lastAiPrompt, /"age"|"weight"/);
       assert.ok(res.body.data.disclaimer);
 
@@ -207,17 +194,30 @@ describe('Meal Plan API (/api/mealplans)', () => {
         .set('Authorization', `Bearer ${token}`)
         .set('X-Forwarded-For', ip);
       assert.equal(recipes.status, 200);
-      assert.deepEqual(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight, {
-        quantityGrams: 100,
-        unit: 'g',
-        basis: 'raw',
-      });
+      assert.ok(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight.quantityGrams > 0);
+      assert.equal(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight.basis, 'raw');
       assert.equal(recipes.body.data.recipes[0].ingredients[0].cookedHouseholdMeasure, null);
-      assert.equal(recipes.body.data.recipes[0].cookedHouseholdMeasure, null);
+      assert.ok(recipes.body.data.recipes[0].dishName);
     });
 
     it('generates Iron-targeted meals and severe B12 clinician guidance from a low Iron and B12 report', async () => {
       const { token, user, ip } = await createAuthenticatedUser('Deficiency User', 'deficiency@example.com');
+      await LifestyleProfile.create({
+        userId: user.id,
+        age: 35,
+        gender: 'female',
+        weightKg: 60,
+        heightCm: 165,
+        dietType: 'veg',
+        mealsPerDay: 3,
+        sleepHours: 7,
+        sleepTime: 'regular',
+        sunExposure: 'moderate',
+        activityLevel: 'moderate',
+        habits: ['none'],
+        symptoms: ['none'],
+        consent: true,
+      });
       const report = await Report.create({
         userId: user.id,
         fileUrl: `uploads/reports/${randomUUID()}.pdf`,
@@ -242,10 +242,8 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.ok(res.body.data.meals.every((meal) => meal.nutrientTargets.includes('Iron')));
       assert.match(res.body.data.supplementGuidance, /clinician-supervised vitamin B12 supplement/i);
       assert.match(res.body.data.disclaimer, /does not diagnose, treat, or replace advice/i);
-      assert.match(lastAiPrompt, /Iron: target intake 17 mg\/day/);
-      assert.match(lastAiPrompt, /Vitamin B12: target intake 2\.2 µg\/day/);
       assert.doesNotMatch(lastAiPrompt, /8 µg\/dL|120 pg\/mL|SEVERE VITAMIN B12 DEFICIENCY/);
-      assert.match(lastAiPrompt, /nutrientTargets/);
+      assert.match(lastAiPrompt, /"recipes"/);
     });
 
     it('rejects request when reportId is missing', async () => {

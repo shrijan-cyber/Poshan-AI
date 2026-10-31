@@ -32,26 +32,33 @@ const formatGrams = (grams) => {
   return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}g`;
 };
 
-const mealCategory = (item) => getFoodByIfctCode(item.ifctCode)?.category ?? 'Miscellaneous Foods';
-
-function recipeSteps(meal) {
-  const categories = meal.items.map(mealCategory);
-  const hasVegetables = categories.some((category) => ['Green Leafy Vegetables', 'Other Vegetables', 'Roots and Tubers', 'Mushrooms'].includes(category));
-  const hasPulses = categories.includes('Grain Legumes');
-  const hasGrains = categories.includes('Cereals and Millets');
-  const preparation = hasVegetables
-    ? 'Wash and chop the vegetables; rinse any grains or pulses.'
-    : hasPulses || hasGrains
-      ? 'Rinse the grains and pulses, then measure the listed ingredients.'
-      : 'Measure and prepare the listed ingredients.';
-  const cooking = String(meal.cookingInstructions ?? '').trim()
-    || (hasPulses ? 'Pressure-cook the pulses until soft, using minimal oil.' : 'Cook the ingredients until tender, using minimal oil.');
-  const finish = hasPulses && hasGrains
-    ? 'Combine the cooked dal and grains, adjust the consistency, and serve warm.'
-    : hasVegetables
-      ? 'Combine the cooked ingredients and serve warm.'
-      : 'Check that everything is cooked through, then serve warm.';
-  return [preparation, cooking, finish];
+function storedRecipeIngredients(meal) {
+  if (Array.isArray(meal.ingredients) && meal.ingredients.length > 0) {
+    return meal.ingredients.map((ingredient) => ({
+      ifctCode: ingredient.ifctCode ?? null,
+      name: ingredient.canonicalName,
+      quantity: formatGrams(Number(ingredient.rawQuantityGrams ?? ingredient.quantity) || 0),
+      quantityGrams: Number(ingredient.rawQuantityGrams ?? ingredient.quantity) || 0,
+      unit: ingredient.unit ?? 'g',
+      state: ingredient.state ?? 'raw',
+      householdMeasure: ingredient.householdMeasure ?? null,
+      rawIngredientWeight: {
+        quantityGrams: Number(ingredient.rawQuantityGrams ?? ingredient.quantity) || 0,
+        unit: ingredient.unit ?? 'g',
+        basis: 'raw',
+      },
+      cookedHouseholdMeasure: null,
+    }));
+  }
+  return (meal.items ?? []).map((item) => ({
+    ifctCode: item.ifctCode,
+    name: getHouseholdFoodName(getFoodByIfctCode(item.ifctCode) ?? { foodName: item.foodName }),
+    quantity: formatGrams(Number(item.quantityGrams) || 0),
+    quantityGrams: Number(item.quantityGrams) || 0,
+    unit: 'g',
+    state: item.weightBasis ?? 'raw',
+    householdMeasure: item.householdMeasure ?? null,
+  }));
 }
 
 async function generateSynchronously(req, res) {
@@ -148,7 +155,14 @@ export const getGroceryList = asyncHandler(async (req, res) => {
   const groupedItems = new Map();
 
   for (const meal of mealPlan.meals) {
-    for (const item of meal.items) {
+    const items = Array.isArray(meal.ingredients) && meal.ingredients.length > 0
+      ? meal.ingredients.map((ingredient) => ({
+        ...ingredient,
+        foodName: ingredient.canonicalName,
+        quantityGrams: ingredient.rawQuantityGrams ?? ingredient.quantity,
+      }))
+      : meal.items;
+    for (const item of items) {
       const food = getFoodByIfctCode(item.ifctCode);
       const name = food ? getHouseholdFoodName(food) : item.foodName;
       const category = groceryCategoryForIfct(food?.category);
@@ -178,26 +192,19 @@ export const getGroceryList = asyncHandler(async (req, res) => {
 export const getRecipes = asyncHandler(async (req, res) => {
   const mealPlan = await findOwnedMealPlan(req.params.id, req.user._id);
   const recipes = mealPlan.meals.map((meal) => ({
+    recipeId: meal.recipeId ?? null,
     day: meal.day,
     mealType: meal.mealType,
-    title: `${meal.mealType[0].toUpperCase()}${meal.mealType.slice(1)} — Day ${meal.day}`,
-    ingredients: meal.items.map((item) => ({
-      name: (() => {
-        const food = getFoodByIfctCode(item.ifctCode);
-        return food ? getHouseholdFoodName(food) : item.foodName;
-      })(),
-      quantity: formatGrams(Number(item.quantityGrams) || 0),
-      rawIngredientWeight: {
-        ...(item.rawIngredientWeight ?? {
-          quantityGrams: Number(item.quantityGrams) || 0,
-          unit: 'g',
-        }),
-        basis: item.weightBasis ?? 'raw',
-      },
-      cookedHouseholdMeasure: item.householdMeasure ?? null,
-    })),
-    cookedHouseholdMeasure: meal.portionDescription ?? null,
-    steps: recipeSteps(meal),
+    title: meal.dishName ?? `${meal.mealType[0].toUpperCase()}${meal.mealType.slice(1)} — Day ${meal.day}`,
+    dishName: meal.dishName ?? meal.recipeId ?? null,
+    servings: meal.servings ?? null,
+    portionDescription: meal.portionDescription ?? null,
+    preparationTime: meal.prepTime ?? null,
+    cookingTime: meal.cookTime ?? null,
+    ingredients: storedRecipeIngredients(meal),
+    steps: meal.recipeInstructions?.length
+      ? meal.recipeInstructions
+      : (Array.isArray(meal.cookingInstructions) ? meal.cookingInstructions : []),
   }));
 
   return res.json({ success: true, data: { mealPlanId: String(mealPlan._id), recipes } });
