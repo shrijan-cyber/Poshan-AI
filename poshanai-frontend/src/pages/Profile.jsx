@@ -169,8 +169,8 @@ function ProfileEditor({ profile }) {
     diet: [['veg', 'Vegetarian'], ['non-veg', 'Non-vegetarian'], ['vegan', 'Vegan'], ['eggetarian', 'Eggetarian']],
   };
   return (
-    <Card as="section" className="mx-auto max-w-3xl" aria-labelledby="profile-title">
-      <p className="text-sm font-semibold uppercase tracking-wider text-leaf">Your account</p>
+    <Card as="section" className="mx-auto max-w-3xl font-sans shadow-sm" aria-labelledby="profile-title">
+      <p className="text-sm font-semibold uppercase tracking-wider text-forest dark:text-emerald-300">Your account</p>
       <h1 id="profile-title" className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Profile</h1>
       <form className="mt-6 grid gap-4 sm:grid-cols-2" onSubmit={submit}>
         <label className="text-sm font-medium text-slate-700 dark:text-slate-200 sm:col-span-2">Name<input required minLength="2" maxLength="80" value={form.name} onChange={(event) => update('name', event.target.value)} className="mt-1 w-full rounded-xl border border-green-200 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-slate-800" /></label>

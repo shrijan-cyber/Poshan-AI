@@ -102,6 +102,54 @@ export const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
+export const saveProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) throw httpError(404, 'USER_NOT_FOUND', 'User not found.');
+
+  const {
+    name,
+    age,
+    gender,
+    heightCm,
+    weightKg,
+    activityLevel,
+    dietaryPreference,
+    monthlyFoodBudget,
+  } = req.body;
+
+  user.name = name;
+  user.profile = {
+    ...(user.profile?.toObject() ?? {}),
+    age,
+    gender,
+    heightCm,
+    weightKg,
+    activityLevel,
+    dietType: dietaryPreference.toLowerCase(),
+    monthlyFoodBudget,
+  };
+
+  await user.save();
+  await logAuditEvent({ userId: user._id, action: 'profile_update', req });
+
+  return res.json({
+    success: true,
+    data: {
+      id: user.id,
+      name: user.name,
+      profile: {
+        age: user.profile.age,
+        gender: user.profile.gender,
+        heightCm: user.profile.heightCm,
+        weightKg: user.profile.weightKg,
+        activityLevel: user.profile.activityLevel,
+        dietaryPreference: dietaryPreference,
+        monthlyFoodBudget: user.profile.monthlyFoodBudget,
+      },
+    },
+  });
+});
+
 export const exportUserData = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId).lean();
@@ -226,6 +274,7 @@ export const deleteAccount = asyncHandler(async (req, res) => {
 export default {
   getProfile,
   updateProfile,
+  saveProfile,
   exportUserData,
   deleteAccount,
 };

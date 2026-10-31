@@ -1,12 +1,10 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import httpError from '../utils/httpError.js';
+import { getHouseholdFoodName, getHouseholdFoodWhitelist, getIfctFoods } from '../rag/ifctLoader.js';
+import { foodMatchesAnyRestriction } from './foodRestrictions.js';
 
-const datasetPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../data/ifct_2017.json');
 let foods = [];
 try {
-  foods = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
+  foods = getIfctFoods();
 } catch {
   // Return a safe service-unavailable response when the packaged catalog is absent.
 }
@@ -23,25 +21,40 @@ const mealNames = ['Breakfast', 'Lunch', 'Dinner', 'Snack 1', 'Snack 2', 'Snack 
 const macroKeys = ['protein', 'carbs', 'fat'];
 const round1 = (value) => Math.round(value * 10) / 10;
 const safeNutrient = (food, name) => Number.isFinite(food.nutrients?.[name]) ? food.nutrients[name] : 0;
-const normalizedText = (text) => text.toLocaleLowerCase('en').replace(/[^a-z0-9]+/g, ' ').trim();
 
 function matchesDiet(food, dietType) {
-  if (dietType === 'veg' || dietType === 'vegan') return food.dietTags?.includes('veg');
-  if (dietType === 'eggetarian') return food.dietTags?.includes('eggetarian') || food.dietTags?.includes('veg');
-  return food.dietTags?.some((tag) => ['nonveg', 'fishetarian', 'eggetarian', 'veg'].includes(tag));
+  const tags = food.dietTags ?? [];
+  if (dietType === 'veg') return tags.includes('veg');
+  if (dietType === 'eggetarian') return tags.includes('eggetarian') || tags.includes('veg');
+  if (dietType === 'vegan') {
+    return tags.includes('veg')
+      && !/milk and milk products|egg and egg products|poultry|animal meat|marine fish|marine shellfish|marine mollusks|fresh water fish/i.test(food.category);
+  }
+  return tags.some((tag) => ['nonveg', 'fishetarian', 'eggetarian', 'veg'].includes(tag));
 }
 
 function chooseFoods(profile) {
   if (!foods.length) throw httpError(503, 'FOOD_CATALOG_UNAVAILABLE', 'The food database is temporarily unavailable.');
-  const dislikes = profile.dislikes.map(normalizedText).filter(Boolean);
-  const eligible = foods.filter((food) => food.nutrients?.calories > 0
+  const requestText = [
+    ...(Array.isArray(profile.preferredFoods) ? profile.preferredFoods : []),
+    profile.typicalDiet ?? '',
+  ].join(' ');
+  const householdFoods = getHouseholdFoodWhitelist(foods, requestText);
+  const restrictions = [...(profile.allergies ?? []), ...(profile.dislikes ?? [])].filter(Boolean);
+  const eligible = householdFoods.filter((food) => Number(food.nutrients?.calories) > 0
+    && macroKeys.every((key) => food.nutrients?.[key] !== null
+      && food.nutrients?.[key] !== undefined
+      && Number.isFinite(Number(food.nutrients[key])))
     && matchesDiet(food, profile.dietType)
-    && !(profile.dietType === 'vegan' && /dairy|milk|egg|meat|fish|poultry|animal/i.test(`${food.category} ${food.foodName}`))
-    && !dislikes.some((dislike) => normalizedText(food.foodName).includes(dislike)));
+    && !foodMatchesAnyRestriction(restrictions, {
+      ...food,
+      householdName: getHouseholdFoodName(food),
+    }));
 
   const cerealCategory = /cereal|millet|grain/i;
   const groups = [
-    eligible.filter((food) => cerealCategory.test(`${food.category} ${food.foodName}`)),
+    eligible.filter((food) => cerealCategory.test(`${food.category} ${food.foodName}`)
+      || /potato/i.test(getHouseholdFoodName(food))),
     eligible.filter((food) => /grain legumes|milk and milk products|egg and egg products|poultry|animal meat|marine fish|marine shellfish|marine mollusks|fresh water fish/i.test(food.category)),
     eligible.filter((food) => /green leafy vegetables|other vegetables|fruits|roots and tubers/i.test(food.category)),
   ];
@@ -94,9 +107,17 @@ export function generateBasicDietPlan(profile) {
     }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
     return {
       mealName: mealNames[mealIndex],
+      cookedHouseholdMeasure: null,
       calories: round1(totals.calories),
       macros: Object.fromEntries(macroKeys.map((key) => [key, round1(totals[key])])),
-      items: items.map(({ foodName, ifctCode, quantity }) => ({ foodName, ifctCode, quantity })),
+      items: items.map(({ foodName, ifctCode, quantity }) => ({
+        foodName,
+        ifctCode,
+        quantity,
+        weightBasis: 'raw',
+        householdMeasure: null,
+        rawIngredientWeight: { quantityGrams: quantity, unit: 'g' },
+      })),
     };
   });
   const macros = Object.fromEntries(macroKeys.map((key) => [

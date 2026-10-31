@@ -1,5 +1,3 @@
-import { ProgressBar } from 'pixel-retroui';
-
 export default function OnboardingProgress({ step, total, title }) {
   const current = step + 1;
   const progress = (current / total) * 100;
@@ -18,8 +16,8 @@ export default function OnboardingProgress({ step, total, title }) {
         aria-valuetext={`Step ${current} of ${total}: ${title}`}
         className="mt-2"
       >
-        <div aria-hidden="true">
-          <ProgressBar progress={progress} size="sm" color="#1E5631" borderColor="#000000" />
+        <div aria-hidden="true" className="h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div className="h-full rounded-full bg-leaf transition-[width] duration-300" style={{ width: `${progress}%` }} />
         </div>
       </div>
     </div>

@@ -1,21 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Download, Flame, Leaf, LoaderCircle } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { getDietPlans } from '../api/dietPlanApi.js';
+import { getDietPlanGroceryList, getDietPlans } from '../api/dietPlanApi.js';
 import { getApiError } from '../api/client.js';
 
-function downloadGroceryList(meals) {
-  const groceryItems = new Map();
-  meals.forEach((meal) => meal.items?.forEach((item) => {
-    const key = item.ifctCode || item.foodName;
-    const current = groceryItems.get(key) ?? { foodName: item.foodName, quantity: 0 };
-    current.quantity += Number(item.quantity) || 0;
-    groceryItems.set(key, current);
-  }));
+function downloadGroceryList(groceryList) {
   const content = [
     'PoshanAI grocery list',
     '',
-    ...[...groceryItems.values()].map(({ foodName, quantity }) => `- ${foodName} — ${Math.round(quantity)} g`),
+    ...(groceryList ?? []).flatMap(({ category, items }) => [
+      category,
+      ...(items ?? []).map(({ foodName, quantityLabel }) => `- ${foodName} — ${quantityLabel}`),
+      '',
+    ]),
   ].join('\n');
   const file = new Blob([content], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(file);
@@ -31,6 +28,10 @@ function downloadGroceryList(meals) {
 export default function DietPlanResult() {
   const location = useLocation();
   const [plan, setPlan] = useState(location.state?.plan ?? null);
+  const [groceryList, setGroceryList] = useState(
+    location.state?.plan?.groceryList?.length ? location.state.plan.groceryList : null,
+  );
+  const [groceryError, setGroceryError] = useState('');
   const [isLoading, setIsLoading] = useState(!location.state?.plan);
   const [error, setError] = useState('');
 
@@ -49,6 +50,18 @@ export default function DietPlanResult() {
       });
     return () => { cancelled = true; };
   }, [plan]);
+
+  useEffect(() => {
+    const planId = plan?._id ?? plan?.id;
+    if (!planId || groceryList !== null) return undefined;
+    let cancelled = false;
+    getDietPlanGroceryList(planId)
+      .then((list) => { if (!cancelled) setGroceryList(list); })
+      .catch(() => {
+        if (!cancelled) setGroceryError('The grocery list could not be prepared. Please reload the plan and try again.');
+      });
+    return () => { cancelled = true; };
+  }, [plan, groceryList]);
 
   const totalCalories = useMemo(
     () => plan?.meals?.reduce((total, meal) => total + (Number(meal.calories) || 0), 0) ?? 0,
@@ -70,7 +83,10 @@ export default function DietPlanResult() {
       <Link to="/diet-plan" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:text-emerald-950"><ArrowLeft size={16} /> Create another plan</Link>
       <div className="mt-5 flex flex-col justify-between gap-5 rounded-3xl bg-emerald-950 p-6 text-white sm:flex-row sm:items-end sm:p-9">
         <div><p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-200">Your basic diet plan</p><h1 className="mt-2 text-3xl font-bold sm:text-4xl">A steady plan for your day</h1><p className="mt-2 text-emerald-100">Built around your goal and food preferences.</p></div>
-        <button type="button" onClick={() => downloadGroceryList(plan.meals ?? [])} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-emerald-950 hover:bg-emerald-50"><Download size={17} /> Download grocery list</button>
+        <button type="button" disabled={!groceryList?.length} onClick={() => downloadGroceryList(groceryList)} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-semibold text-emerald-950 hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-70" aria-busy={!groceryList && !groceryError}>
+          <Download size={17} /> {groceryList?.length ? 'Download grocery list' : groceryError ? 'Grocery list unavailable' : 'Preparing grocery list…'}
+        </button>
+        {groceryError && <p className="text-sm text-emerald-100" role="status">{groceryError}</p>}
       </div>
 
       <section className="mt-5 grid gap-4 md:grid-cols-[1.2fr_1fr]" aria-label="Daily nutrition overview">

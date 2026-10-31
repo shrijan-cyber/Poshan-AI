@@ -3,6 +3,7 @@ import MealPlan from '../models/MealPlan.js';
 import Report from '../models/Report.js';
 import User from '../models/User.js';
 import LifestyleProfile from '../models/LifestyleProfile.js';
+import { getHouseholdFoodName } from '../rag/ifctLoader.js';
 import { env } from '../config/env.js';
 import {
   getMedicalDisclaimer,
@@ -13,9 +14,12 @@ import {
   filterHouseholdPlanFoods,
   hasSevereB12Deficiency,
   mealPlanSystemPrompt,
+  abstractNutrientTargets,
+  sanitizeTypicalDiet,
 } from '../rag/promptBuilder.js';
 import logger from '../utils/logger.js';
 import httpError from '../utils/httpError.js';
+import { assertNoHighRiskConditions } from './medicalConditionPolicy.js';
 
 const aiMealSchema = Joi.object({
   day: Joi.number().integer().min(1).max(7).required(),
@@ -231,8 +235,6 @@ function round(value) {
   return Math.round(value * 100) / 100;
 }
 
-const minimumMealProteinGrams = 10;
-
 function getCalculatedItem(food, ifctCode, quantityGrams) {
   const nutrients = Object.fromEntries(
     Object.entries(food.nutrients).map(([nutrient, perHundredGrams]) => [
@@ -242,7 +244,15 @@ function getCalculatedItem(food, ifctCode, quantityGrams) {
         : round((perHundredGrams * quantityGrams) / 100),
     ]),
   );
-  return { foodName: food.foodName, ifctCode, quantityGrams, nutrients };
+  return {
+    foodName: getHouseholdFoodName(food),
+    ifctCode,
+    quantityGrams,
+    weightBasis: 'raw',
+    householdMeasure: null,
+    rawIngredientWeight: { quantityGrams, unit: 'g' },
+    nutrients,
+  };
 }
 
 function getProteinSupplement(foodByCode, dietType) {
@@ -253,11 +263,11 @@ function getProteinSupplement(foodByCode, dietType) {
     vegan: [['B024', 50], ['B025', 50], ['B010', 50], ['B013', 50]],
   };
   return (candidates[dietType] ?? candidates.veg)
-    .map(([code, quantityGrams]) => ({ food: foodByCode.get(code), quantityGrams }))
-    .find(({ food }) => food && Number(food.nutrients?.protein) >= 10) ?? null;
+    .map(([code]) => ({ food: foodByCode.get(code) }))
+    .find(({ food }) => food && Number(food.nutrients?.protein) > 0) ?? null;
 }
 
-export function buildStoredMeals(generatedMeals, foodByCode, dietType = 'veg') {
+export function buildStoredMeals(generatedMeals, foodByCode, dietType = 'veg', proteinTargetGrams = null) {
   const supplement = getProteinSupplement(foodByCode, dietType);
 
   return generatedMeals.map(({ day, mealType, nutrientTargets, proteinSource, cookingInstructions, items }) => {
@@ -275,35 +285,88 @@ export function buildStoredMeals(generatedMeals, foodByCode, dietType = 'veg') {
       throw httpError(502, 'AI_RESPONSE_INVALID', 'OmniRoute did not select a verified protein food for a meal.');
     }
 
-    const proteinTotal = () => storedItems.reduce((total, item) => total + (item.nutrients.protein ?? 0), 0);
-    if (proteinTotal() < minimumMealProteinGrams && supplement) {
+    const proteinTotal = () => round(storedItems.reduce((total, item) => total + (item.nutrients.protein ?? 0), 0));
+    const target = Number(proteinTargetGrams);
+    if (Number.isFinite(target) && target > 0 && proteinTotal() < target && supplement) {
       const existingSupplement = storedItems.find((item) => item.ifctCode === supplement.food.ifctCode);
+      const missingProtein = target - proteinTotal();
+      const proteinPer100g = Number(supplement.food.nutrients.protein);
+      const additionalGrams = Math.ceil((missingProtein * 100) / proteinPer100g);
+      const currentMealGrams = storedItems.reduce((total, item) => total + item.quantityGrams, 0);
+      const portionLimit = Math.max(0, 1000 - currentMealGrams);
+      const supplementGrams = Math.min(additionalGrams, portionLimit);
+      if (supplementGrams <= 0) {
+        throw httpError(422, 'MEAL_PROTEIN_TARGET_UNMET', 'The meal portions cannot meet the protein target within the 1000 g meal limit.');
+      }
       if (existingSupplement) {
-        const adjustedQuantity = Math.min(2000, existingSupplement.quantityGrams + supplement.quantityGrams);
+        const adjustedQuantity = existingSupplement.quantityGrams + supplementGrams;
         existingSupplement.quantityGrams = adjustedQuantity;
         Object.assign(existingSupplement, getCalculatedItem(supplement.food, existingSupplement.ifctCode, adjustedQuantity));
       } else {
-        storedItems.push(getCalculatedItem(supplement.food, supplement.food.ifctCode, supplement.quantityGrams));
+        storedItems.push(getCalculatedItem(supplement.food, supplement.food.ifctCode, supplementGrams));
       }
       verifiedProteinSource = supplement.food;
+    }
+
+    if (Number.isFinite(target) && target > 0 && proteinTotal() < target) {
+      throw httpError(422, 'MEAL_PROTEIN_TARGET_UNMET', 'The generated meal could not meet its backend-calculated protein target.');
     }
 
     return {
       day,
       mealType,
       nutrientTargets,
-      proteinSource: verifiedProteinSource.foodName,
+      proteinSource: getHouseholdFoodName(verifiedProteinSource),
       cookingInstructions,
       items: storedItems,
     };
   });
 }
 
+export function validateGeneratedMealPlan(meals, expectedDays = 7) {
+  if (!Array.isArray(meals) || meals.length === 0) {
+    throw httpError(422, 'MEAL_PLAN_INVALID', 'The generated meal plan contains no meals.');
+  }
+  const mealsByDay = new Map();
+  for (const meal of meals) {
+    const grams = meal.items.reduce((total, item) => total + Number(item.quantityGrams || 0), 0);
+    if (grams > 1000) {
+      throw httpError(422, 'MEAL_PORTION_TOO_LARGE', 'A meal portion exceeds the 1000 g safety limit. Please regenerate the plan.');
+    }
+    const dayMeals = mealsByDay.get(meal.day) ?? [];
+    dayMeals.push(meal);
+    mealsByDay.set(meal.day, dayMeals);
+  }
+
+  if (mealsByDay.size !== expectedDays) {
+    throw httpError(422, 'MEAL_PLAN_INCOMPLETE', 'The meal plan must include all seven days.');
+  }
+
+  for (let day = 1; day <= expectedDays; day += 1) {
+    const dayMeals = mealsByDay.get(day) ?? [];
+    const types = new Set(dayMeals.map(({ mealType }) => mealType));
+    if (!types.has('breakfast') || !types.has('lunch') || (!types.has('dinner') && !types.has('snack'))) {
+      throw httpError(422, 'MEAL_PLAN_INCOMPLETE', `Day ${day} must include breakfast, lunch, and dinner or a snack.`);
+    }
+
+    const hasCompleteEnergyData = dayMeals.every((meal) => meal.items.every((item) => Number.isFinite(item.nutrients?.calories)));
+    if (hasCompleteEnergyData) {
+      const dailyCalories = dayMeals.reduce((total, meal) => total
+        + meal.items.reduce((mealTotal, item) => mealTotal + item.nutrients.calories, 0), 0);
+      if (dailyCalories < 1200 || dailyCalories > 4000) {
+        throw httpError(422, 'MEAL_PLAN_CALORIES_UNREALISTIC', `Day ${day} totals ${round(dailyCalories)} kcal, outside the supported 1200–4000 kcal range.`);
+      }
+    }
+  }
+  return true;
+}
+
 /**
  * Generates and persists a validated seven-day meal plan for an owned report.
  */
 export async function generateMealPlan(userId, reportId, preferences = {}) {
-  const user = await User.findById(userId).select('_id').lean();
+  assertNoHighRiskConditions(preferences.conditions);
+  const user = await User.findById(userId).select('_id profile.weightKg').lean();
   if (!user) throw httpError(404, 'USER_NOT_FOUND', 'User profile not found.');
   const lifestyleProfile = await LifestyleProfile.findOne({ userId }).lean();
 
@@ -346,11 +409,25 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
     activityLevel: preferences.activityLevel ?? lifestyleProfile?.activityLevel ?? 'moderate',
     householdDiet: effectivePreferences.householdDiet,
   };
-  const prompt = buildMealPlanPrompt(profile, deficiencies, foods);
+  const promptProfile = {
+    dietType: profile.dietType,
+    region: profile.region,
+    activityLevel: profile.activityLevel,
+    typicalFoods: sanitizeTypicalDiet(profile.householdDiet),
+    foodCandidatesValidated: true,
+  };
+  const promptTargets = abstractNutrientTargets(deficiencies);
+  const prompt = buildMealPlanPrompt(promptProfile, promptTargets, foods);
   logger.info('Meal-plan generation started.');
   const generated = await requestOmniRoute(prompt);
   const foodByCode = new Map(foods.map((food) => [food.ifctCode, food]));
-  const meals = buildStoredMeals(generated.meals, foodByCode, effectivePreferences.dietType);
+  const weightKg = Number(lifestyleProfile?.weightKg ?? user.profile?.weightKg);
+  const mealCount = Number(lifestyleProfile?.mealsPerDay) || 3;
+  const proteinTargetPerMeal = Number.isFinite(weightKg) && weightKg > 0
+    ? (0.8 * weightKg) / mealCount
+    : null;
+  const meals = buildStoredMeals(generated.meals, foodByCode, effectivePreferences.dietType, proteinTargetPerMeal);
+  validateGeneratedMealPlan(meals, 7);
   const ragSourcesUsed = [...new Set(meals.flatMap((meal) => meal.items.map((item) => item.ifctCode)))];
   const disclaimer = getMedicalDisclaimer();
 
@@ -369,7 +446,7 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
     meals,
     supplementGuidance: hasSevereB12Deficiency(deficiencies)
       ? 'Discuss a clinician-supervised vitamin B12 supplement with your healthcare professional. They should decide whether it is appropriate and determine the dose and duration; do not self-medicate.'
-      : generated.supplementGuidance || null,
+      : null,
     aiModelUsed: env.omniRouteModel,
     ragSourcesUsed,
     disclaimer,

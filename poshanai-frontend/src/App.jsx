@@ -24,7 +24,7 @@ const FoodLibrary = lazy(() => import('./pages/FoodLibrary.jsx'));
 
 function RouteLoading() {
   return (
-    <div className="mx-auto my-12 w-fit border-4 border-black bg-white p-6 font-minecraft text-[#1E5631] shadow-[4px_4px_0px_#000]">
+    <div className="mx-auto my-12 w-fit rounded-xl border border-slate-200 bg-white p-6 font-sans text-forest shadow-md dark:border-slate-700 dark:bg-slate-900 dark:text-emerald-200">
       Loading page…
     </div>
   );

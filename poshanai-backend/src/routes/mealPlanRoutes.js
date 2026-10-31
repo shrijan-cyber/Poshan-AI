@@ -14,10 +14,15 @@ const allergyOptions = [
 ];
 
 const preferencesSchema = Joi.object({
-  dietType: Joi.string().valid('veg', 'eggetarian', 'nonveg').default('veg'),
+  dietType: Joi.string().valid('veg', 'eggetarian', 'nonveg'),
   allergies: Joi.array()
     .items(Joi.string().valid(...allergyOptions).insensitive())
     .max(20)
+    .default([]),
+  conditions: Joi.array()
+    .items(Joi.string().trim().min(2).max(80))
+    .max(20)
+    .unique()
     .default([]),
   region: Joi.string().valid(...supportedRegions).insensitive().max(60).allow(null),
   activityLevel: Joi.string()
@@ -61,6 +66,8 @@ router.post(
 );
 router.get('/', verifyToken, validate(listSchema, 'query'), mealPlanController.list);
 router.get('/jobs/:jobId', verifyToken, validate(jobIdSchema, 'params'), mealPlanController.getGenerationStatus);
+router.get('/:id/grocery-list', verifyToken, validate(idSchema, 'params'), mealPlanController.getGroceryList);
+router.get('/:id/recipes', verifyToken, validate(idSchema, 'params'), mealPlanController.getRecipes);
 router.get('/:id', verifyToken, validate(idSchema, 'params'), mealPlanController.getById);
 router.patch(
   '/:id/status',

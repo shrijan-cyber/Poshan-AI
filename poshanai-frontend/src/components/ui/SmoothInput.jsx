@@ -32,9 +32,9 @@ const SmoothInput = forwardRef(function SmoothInput(
     <div className="w-full">
       {label && <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-slate-800 dark:text-slate-100">{label}</label>}
       <motion.div
-        animate={{ y: focused ? -1 : 0, boxShadow: focused ? '4px 4px 0 #000' : '0 0 0 0 #000' }}
+        animate={{ y: focused ? -1 : 0, boxShadow: focused ? '0 0 0 4px rgb(36 75 54 / 12%)' : '0 2px 8px rgb(23 58 44 / 4%)' }}
         transition={spring}
-        className={cn('relative rounded-none border-4 border-black bg-white', icon && 'pl-10')}
+        className={cn('relative rounded-xl border border-slate-200 bg-white shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900', icon && 'pl-10')}
       >
         {icon && <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-slate-400">{icon}</span>}
         <input
@@ -53,9 +53,9 @@ const SmoothInput = forwardRef(function SmoothInput(
           onClick={(event) => { updateCaret(event.currentTarget); onClick?.(event); }}
           onKeyUp={(event) => { updateCaret(event.currentTarget); onKeyUp?.(event); }}
           onSelect={(event) => { updateCaret(event.currentTarget); onSelect?.(event); }}
-          className={cn('relative z-[1] w-full rounded-none border-0 bg-white px-3 py-2.5 font-minecraft text-black caret-black outline-none placeholder:text-slate-500 focus:caret-transparent dark:bg-white dark:text-black', icon && 'pl-0', error && 'text-red-700', className)}
+          className={cn('relative z-[1] w-full rounded-xl border-0 bg-transparent px-3 py-2.5 font-sans text-slate-900 outline-none placeholder:text-slate-400 focus:caret-transparent dark:text-slate-100 dark:placeholder:text-slate-500', icon && 'pl-0', error && 'text-red-700 dark:text-red-300', className)}
         />
-        <motion.span aria-hidden="true" animate={{ left: caretLeft, opacity: focused ? 1 : 0, scaleY: focused ? 1 : 0.65 }} transition={spring} className="pointer-events-none absolute top-1/2 z-[2] h-[1.2em] w-0.5 -translate-y-1/2 rounded-none bg-black" />
+        <motion.span aria-hidden="true" animate={{ left: caretLeft, opacity: focused ? 1 : 0, scaleY: focused ? 1 : 0.65 }} transition={spring} className="pointer-events-none absolute top-1/2 z-[2] h-[1.2em] w-0.5 -translate-y-1/2 rounded-sm bg-leaf" />
       </motion.div>
       {(error || helperText) && <p id={messageId} className={cn('mt-1.5 text-sm', error ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400')} role={error ? 'alert' : undefined}>{error || helperText}</p>}
     </div>

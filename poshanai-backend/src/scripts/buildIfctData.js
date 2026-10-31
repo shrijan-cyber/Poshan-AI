@@ -45,7 +45,11 @@ function parseCsvLine(line) {
   return result;
 }
 
-const round = (val) => (val === null || val === undefined || isNaN(val) ? 0 : Math.round(Number(val) * 100) / 100);
+const round = (val) => (val === null || val === undefined || !Number.isFinite(Number(val)) ? null : Math.round(Number(val) * 100) / 100);
+const parseNutrient = (value, multiplier = 1) => {
+  const parsed = parseFloat(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? round(parsed * multiplier) : null;
+};
 
 const SERVING_UNITS_BY_CODE = {
   A013: { bowl: 150, cup: 200, defaultUnit: 'cup' },
@@ -132,31 +136,25 @@ for (let i = 1; i < lines.length; i++) {
 
   // Energy in kJ -> kcal (kJ / 4.184)
   const enercVal = parseFloat(row[7]);
-  const calories = !isNaN(enercVal) && enercVal > 0 ? round(enercVal / 4.184) : 0;
+  const calories = Number.isFinite(enercVal) && enercVal > 0 ? round(enercVal / 4.184) : null;
 
   // Fat (col 15) in g
-  const fatVal = parseFloat(row[15]);
-  const fat = !isNaN(fatVal) && fatVal >= 0 ? round(fatVal) : 0;
+  const fat = parseNutrient(row[15]);
 
   // Carbohydrate (col 21) in g
-  const carbVal = parseFloat(row[21]);
-  const carbs = !isNaN(carbVal) && carbVal >= 0 ? round(carbVal) : 0;
+  const carbs = parseNutrient(row[21]);
 
   // Protein (col 23) in g
-  const protVal = parseFloat(row[23]);
-  const protein = !isNaN(protVal) && protVal >= 0 ? round(protVal) : 0;
+  const protein = parseNutrient(row[23]);
 
   // Vitamin D (col 59) in g -> mcg (* 1e6)
-  const vitdVal = parseFloat(row[59]);
-  const vitaminD = !isNaN(vitdVal) && vitdVal >= 0 ? round(vitdVal * 1e6) : 0;
+  const vitaminD = parseNutrient(row[59], 1e6);
 
   // Calcium (col 169) in g -> mg (* 1000)
-  const caVal = parseFloat(row[169]);
-  const calcium = !isNaN(caVal) && caVal >= 0 ? round(caVal * 1000) : 0;
+  const calcium = parseNutrient(row[169], 1000);
 
   // Iron (col 177) in g -> mg (* 1000)
-  const feVal = parseFloat(row[177]);
-  const iron = !isNaN(feVal) && feVal >= 0 ? round(feVal * 1000) : 0;
+  const iron = parseNutrient(row[177], 1000);
 
   const record = {
     ifctCode,

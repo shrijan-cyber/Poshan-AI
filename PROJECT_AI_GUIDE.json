@@ -1,0 +1,885 @@
+{
+  "meta": {
+    "document": "PROJECT_AI_GUIDE.json",
+    "version": "1.0.0",
+    "project": "PoshanAI",
+    "createdOn": "2026-11-01",
+    "purpose": "Detailed, repository-grounded handoff for AI assistants and developers working on PoshanAI.",
+    "readFirst": [
+      "Read AI_CONTEXT.json for the concise project rules, then read this guide for architecture and implementation detail.",
+      "Treat source code and the current Git worktree as authoritative when this snapshot conflicts with either.",
+      "Check git status before editing. The snapshot includes uncommitted work and does not imply that all listed changes are committed or deployed.",
+      "Never put real credentials, user records, tokens, or credential-bearing connection strings in documentation."
+    ],
+    "snapshot": {
+      "date": "2026-11-01",
+      "branch": "main",
+      "lastKnownCommit": "d16cad7 fix(auth): remove email verification requirement",
+      "note": "At guide creation, several additional feature changes were present in the working tree. Verify git status and inspect diffs before assuming their ownership or stability."
+    }
+  },
+  "project": {
+    "name": "PoshanAI",
+    "tagline": "Nutrition awareness and practical meal planning using familiar Indian foods.",
+    "purpose": "A web application for account-based nutrition tracking, Indian food lookup, report OCR, lifestyle recommendations, and meal-plan suggestions.",
+    "audience": [
+      "People tracking food and nutrition",
+      "People seeking practical Indian meal suggestions",
+      "People reviewing lab-report values with educational context"
+    ],
+    "medicalBoundary": "The app provides nutrition awareness and suggestions. It does not diagnose, treat, or replace advice from a qualified healthcare professional.",
+    "implementationReality": "The repository contains an active JavaScript MERN application. The reserved ai-service directory is not an active Python service. AI text parsing and meal-plan calls run from the Express backend through an OpenAI-compatible OmniRoute endpoint."
+  },
+  "technology": {
+    "frontend": {
+      "runtime": "JavaScript / JSX",
+      "framework": "React 18",
+      "bundler": "Vite 6",
+      "routing": "React Router",
+      "forms": "React Hook Form, Zod, and Joi validation on the server",
+      "state": "React Context for session/theme; Redux Toolkit for reports, meal plans, food logs, and user state",
+      "styling": "Tailwind CSS plus project CSS, Framer Motion, GSAP, and selected Three.js scenes"
+    },
+    "backend": {
+      "runtime": "Node.js ES modules",
+      "framework": "Express 4",
+      "database": "MongoDB with Mongoose 8",
+      "validation": "Joi middleware",
+      "authentication": "JWT access tokens and rotating HTTP-only refresh-token cookies",
+      "uploads": "Multer with file-signature validation",
+      "ocr": "Tesseract.js, pdfjs-dist, and @napi-rs/canvas",
+      "queues": "BullMQ and Redis when configured",
+      "storage": "Local filesystem or AWS S3 adapter",
+      "logging": "Winston with request IDs"
+    },
+    "ai": {
+      "providerPath": "OpenAI-compatible chat-completions endpoint configured by OMNIROUTE_URL.",
+      "modelSetting": "OMNIROUTE_MODEL; current default is gemini-2.0-flash.",
+      "secretSetting": "OMNIROUTE_API_KEY is optional and remains server-side.",
+      "dataGrounding": "Bundled IFCT-derived food records are used to search food names and calculate nutrient values. The model does not own the nutrition arithmetic for meal plans.",
+      "notImplemented": "No active Python OCR/RAG microservice is present."
+    }
+  },
+  "repositoryLayout": {
+    "root": {
+      "AI_CONTEXT.json": "Concise AI contribution rules and repository context; read before code changes.",
+      "PROJECT_AI_GUIDE.json": "This expanded architecture, workflow, API, data, configuration, and change handoff.",
+      "README.md": "Setup, environment variables, API highlights, deployment, and product boundaries.",
+      "package.json": "Root development/build scripts; starts backend and frontend together with concurrently.",
+      "docker-compose.yml": "Local container services for MongoDB, Redis, backend, and frontend.",
+      "docker-compose.prod.yml": "Production-oriented container setup.",
+      ".env.example": "Local/container environment variable template; values are examples only.",
+      ".env.production.example": "Production Compose variable template; replace placeholders before deployment.",
+      "nginx/nginx.conf": "Reverse-proxy and TLS configuration.",
+      "docs/": "Project structure, backend architecture, security, email OTP, and Postman notes.",
+      "ai-service/": "Reserved extension point; currently no running Python AI service.",
+      "artifacts/": "Local screenshots and generated review files; not application source."
+    },
+    "backend": {
+      "poshanai-backend/src/app.js": "Express middleware, API-wide rate limit, health route, and API router mounts.",
+      "poshanai-backend/src/server.js": "Mongo connection, maintenance sweeps, HTTP server, and graceful shutdown.",
+      "config/": "Environment validation, Mongo connection, auth/rate-limit/nutrient/upload constants.",
+      "controllers/": "HTTP handlers for auth, users, reports, onboarding, logs, plans, experts, bookings, notifications, and admin operations.",
+      "middleware/": "JWT authorization, upload handling, sensitive/Redis rate limiting, request IDs, and error responses.",
+      "models/": "Mongoose schemas and indexes for users, profiles, reports, plans, logs, notifications, experts, and audit data.",
+      "rag/": "IFCT loader, household-food filtering, and meal-plan system/user prompt construction.",
+      "routes/": "Joi validation and route-to-controller composition.",
+      "services/": "Business logic, OCR/parser, AI gateway, storage, nutrition calculations, reminders, notifications, and audits.",
+      "jobs/": "OCR, meal-plan, notification, and retention/retest queue workers and schedulers.",
+      "data/ifct_2017.json": "Bundled food and nutrient records used by IFCT search and meal-plan retrieval.",
+      "data/testRules.json": "Reviewed lifestyle recommendation rules; currently may contain no entries.",
+      "tests/": "Node test-runner suites using mongodb-memory-server and HTTP/controller/model tests."
+    },
+    "frontend": {
+      "poshanai-frontend/src/main.jsx": "Browser entry point and providers.",
+      "poshanai-frontend/src/App.jsx": "Public/protected routes and lazy-loaded pages.",
+      "api/": "Axios client and feature API functions.",
+      "context/": "Authentication/session and theme contexts.",
+      "store/": "Redux store, typed hooks, and feature slices.",
+      "pages/": "Landing, auth, dashboard, profile, onboarding, reports, nutrition tools, experts, and plan views.",
+      "components/": "Shared controls, layout, tracker, lifestyle, hero, and visual components.",
+      "hooks/ and utils/": "Fetch caching, debounce/throttle, nutrition calculations, and lifestyle form schemas.",
+      "styles.css": "Global styles, design system, responsive layouts, and landing page styling."
+    }
+  },
+  "commands": {
+    "install": [
+      "npm install (repository root)",
+      "npm install --prefix poshanai-backend",
+      "npm install --prefix poshanai-frontend"
+    ],
+    "development": {
+      "command": "npm run dev (repository root)",
+      "frontend": "http://localhost:5173",
+      "backend": "http://localhost:5000",
+      "database": "A reachable MongoDB URI is required. Redis is optional for local development; queued OCR uses a synchronous fallback when Redis is unavailable."
+    },
+    "docker": {
+      "command": "docker compose up --build",
+      "frontend": "http://localhost:8080",
+      "apiHealth": "http://localhost:4000/health"
+    },
+    "verification": {
+      "backendTests": "npm test --prefix poshanai-backend",
+      "backendLint": "npm run lint --prefix poshanai-backend",
+      "frontendLint": "npm run lint --prefix poshanai-frontend",
+      "frontendBuild": "npm run build --prefix poshanai-frontend",
+      "warning": "A command listed here is a project script, not evidence that it passed in this snapshot."
+    },
+    "health": "GET /health checks runtime dependency status and returns a health payload."
+  },
+  "runtimeConfiguration": {
+    "backendVariableNames": {
+      "required": [
+        "MONGODB_URI",
+        "JWT_SECRET or JWT_ACCESS_SECRET plus JWT_REFRESH_SECRET"
+      ],
+      "server": [
+        "NODE_ENV",
+        "PORT",
+        "TRUST_PROXY_HOPS",
+        "CLIENT_URL",
+        "CLIENT_ORIGIN",
+        "MONGODB_TLS"
+      ],
+      "tokensAndEncryption": [
+        "JWT_SECRET",
+        "JWT_ACCESS_SECRET",
+        "JWT_REFRESH_SECRET",
+        "JWT_ACCESS_EXPIRY",
+        "JWT_REFRESH_EXPIRY",
+        "ENCRYPTION_KEY",
+        "SIGNING_KEY"
+      ],
+      "redisAndJobs": [
+        "REDIS_URL",
+        "REPORT_RETENTION_DAYS"
+      ],
+      "storage": [
+        "STORAGE_TYPE",
+        "S3_BUCKET",
+        "S3_REGION",
+        "S3_ACCESS_KEY",
+        "S3_SECRET_KEY",
+        "S3_KMS_KEY_ID"
+      ],
+      "ai": [
+        "OMNIROUTE_URL",
+        "OMNIROUTE_MODEL",
+        "OMNIROUTE_API_KEY",
+        "GEMINI_API_KEY"
+      ],
+      "otpEmail": [
+        "OTP_EXPIRY_MINUTES",
+        "OTP_MAX_ATTEMPTS",
+        "GMAIL_USER",
+        "GMAIL_PASS"
+      ],
+      "future": [
+        "ENABLE_EMAIL_VERIFICATION"
+      ]
+    },
+    "frontendVariableNames": [
+      "VITE_API_URL"
+    ],
+    "rules": [
+      "Never store secrets in tracked JSON, source, frontend VITE variables, screenshots, or logs.",
+      "JWT access and refresh secrets must be strong, at least 32 characters in production, and distinct when separately configured.",
+      "Production requires Redis for distributed rate limits and background jobs; local development can run without it.",
+      "Production S3 mode requires S3_BUCKET and S3_REGION; access key and secret must be configured together or use workload credentials.",
+      "MONGODB_TLS is validated; production remote MongoDB requires TLS."
+    ]
+  },
+  "api": {
+    "prefixes": {
+      "canonical": "/api/v1",
+      "compatibility": "/api",
+      "health": "/health",
+      "note": "app.js mounts most routers under both API prefixes. Check app.js for exact mounts before adding another route."
+    },
+    "responseConvention": {
+      "success": {
+        "success": true,
+        "data": "result"
+      },
+      "error": {
+        "success": false,
+        "error": {
+          "code": "STABLE_ERROR_CODE",
+          "message": "Safe message",
+          "requestId": "request identifier"
+        }
+      }
+    },
+    "authenticationHeader": "Authorization: Bearer <accessToken>",
+    "routes": [
+      {
+        "group": "auth",
+        "base": "/auth",
+        "access": "public unless stated",
+        "endpoints": [
+          "POST /register",
+          "POST /login",
+          "POST /refresh (refresh cookie)",
+          "POST /logout (refresh cookie)",
+          "POST /logout-all (bearer)",
+          "POST /2fa/setup (bearer)",
+          "POST /2fa/verify-setup (bearer)",
+          "POST /2fa/verify-login",
+          "POST /2fa/disable (bearer)"
+        ],
+        "notes": "Password login uses email/password. Email verification is not a login gate. TOTP two-factor authentication is a separate feature. Access JWTs are short-lived; refresh tokens are rotated and stored hashed."
+      },
+      {
+        "group": "otp",
+        "base": "/auth/otp",
+        "access": "public, IP rate-limited",
+        "endpoints": [
+          "POST /request",
+          "POST /verify",
+          "POST /reset-password"
+        ],
+        "notes": "Supported purposes are login and reset-password. Email delivery uses configured Gmail SMTP. Resend email verification is not in the MVP."
+      },
+      {
+        "group": "users",
+        "base": "/users and /user",
+        "access": "bearer required",
+        "endpoints": [
+          "GET /me",
+          "PATCH /me",
+          "POST /profile",
+          "GET /me/export",
+          "DELETE /me"
+        ],
+        "notes": "POST /api/user/profile is present in the current uncommitted snapshot. It updates the authenticated user's profile and does not accept identity from the body. Password is stored as passwordHash, not plaintext."
+      },
+      {
+        "group": "lifestyle",
+        "base": "/lifestyle",
+        "access": "bearer required",
+        "endpoints": [
+          "POST /onboarding",
+          "GET /recommendations",
+          "POST /explain-test"
+        ],
+        "notes": "Onboarding validates consent and lifestyle fields, persists the caller's data, and controls completion gating."
+      },
+      {
+        "group": "reports",
+        "base": "/reports",
+        "access": "bearer required",
+        "endpoints": [
+          "POST /upload or POST / (multipart file)",
+          "GET /",
+          "GET /:id",
+          "PATCH /:id/review",
+          "DELETE /:id"
+        ],
+        "notes": "Uploads are restricted to PDF/JPEG/PNG, signature-checked, capped at 10 MB, stored privately, and ownership checked."
+      },
+      {
+        "group": "mealplans",
+        "base": "/mealplans",
+        "access": "bearer required",
+        "endpoints": [
+          "POST /generate",
+          "GET /",
+          "GET /jobs/:jobId",
+          "GET /:id/grocery-list",
+          "GET /:id/recipes",
+          "GET /:id",
+          "PATCH /:id/status"
+        ],
+        "notes": "Generation requires an owned completed report; requests are queued when Redis is available and validated before persistence."
+      },
+      {
+        "group": "dietPlans",
+        "base": "/diet-plans",
+        "access": "bearer required",
+        "endpoints": [
+          "POST /generate-basic",
+          "GET /"
+        ],
+        "notes": "Basic IFCT-backed plan flow is distinct from report-based mealplans."
+      },
+      {
+        "group": "nutrition",
+        "base": "/calories, /foods, /logs, /daily-logs, /supplements",
+        "access": "mostly bearer; food catalog and supplement catalog are public read-only",
+        "endpoints": [
+          "GET /calories/maintenance",
+          "GET /foods and /foods/search",
+          "POST /logs/add-food",
+          "GET /logs",
+          "GET /logs/today",
+          "DELETE /logs/:logId",
+          "POST /daily-logs/add-food",
+          "POST /daily-logs/add-supplement",
+          "POST /daily-logs/ai-parse",
+          "POST /daily-logs/smart-log",
+          "GET /daily-logs/foods/search",
+          "GET /daily-logs/today",
+          "DELETE /daily-logs/:logId",
+          "GET /supplements/list"
+        ],
+        "notes": "There are legacy and newer logging route groups. Inspect the frontend API client to see which is used by each screen. Nutrients are calculated server-side from the IFCT data."
+      },
+      {
+        "group": "expertsAndBookings",
+        "base": "/experts and /bookings",
+        "access": "directory read is public; booking actions require bearer",
+        "endpoints": [
+          "GET /experts",
+          "POST /experts/book",
+          "POST /experts/:id/book",
+          "GET /bookings"
+        ],
+        "notes": "Booking and appointment models coexist; inspect the current controller/service before changing their lifecycle."
+      },
+      {
+        "group": "notifications",
+        "base": "/notifications",
+        "access": "bearer required",
+        "endpoints": [
+          "GET /",
+          "PATCH /:id/read"
+        ],
+        "notes": "User notifications include scheduled water, meal-log, and retest reminders when worker/scheduler support is available."
+      },
+      {
+        "group": "admin",
+        "base": "/admin",
+        "access": "bearer plus role check",
+        "endpoints": [
+          "GET /audit-logs"
+        ]
+      }
+    ]
+  },
+  "frontend": {
+    "routeTable": [
+      {
+        "path": "/",
+        "page": "Landing"
+      },
+      {
+        "path": "/login",
+        "page": "Login"
+      },
+      {
+        "path": "/login-otp",
+        "page": "OtpLogin"
+      },
+      {
+        "path": "/two-factor-verify",
+        "page": "TwoFactorVerify"
+      },
+      {
+        "path": "/register",
+        "page": "Register"
+      },
+      {
+        "path": "/food-library",
+        "page": "FoodLibrary"
+      },
+      {
+        "path": "/dashboard",
+        "page": "Dashboard",
+        "protected": true
+      },
+      {
+        "path": "/experts",
+        "page": "Experts",
+        "protected": true
+      },
+      {
+        "path": "/profile",
+        "page": "Profile",
+        "protected": true
+      },
+      {
+        "path": "/upload",
+        "page": "UploadReport",
+        "protected": true
+      },
+      {
+        "path": "/meal-plan and /meal-plan/:id",
+        "page": "MealPlanView",
+        "protected": true
+      },
+      {
+        "path": "/diet-plan",
+        "page": "DietPlanWizard",
+        "protected": true
+      },
+      {
+        "path": "/diet-plan/view",
+        "page": "DietPlanResult",
+        "protected": true
+      },
+      {
+        "path": "/onboarding",
+        "page": "Onboarding",
+        "protected": true
+      },
+      {
+        "path": "/recommendations",
+        "page": "Recommendations",
+        "protected": true
+      },
+      {
+        "path": "/calorie-tracker",
+        "page": "CalorieTracker",
+        "protected": true
+      },
+      {
+        "path": "*",
+        "page": "NotFound"
+      }
+    ],
+    "sessionFlow": [
+      "AuthContext calls the feature methods in src/api/authApi.js.",
+      "The Axios client attaches the in-memory access token and handles refresh-cookie session renewal.",
+      "Registration/login responses populate the user and access-token state; refresh tokens are HTTP-only cookies.",
+      "ProtectedRoute blocks unauthenticated navigation and onboarding completion gates downstream app routes."
+    ],
+    "apiModules": [
+      "authApi.js",
+      "userApi.js",
+      "reportApi.js",
+      "lifestyleApi.js",
+      "mealPlanApi.js",
+      "dietPlanApi.js",
+      "foodLogApi.js",
+      "dailyLogApi.js",
+      "expertsApi.js",
+      "client.js"
+    ],
+    "stateSlices": [
+      "userSlice",
+      "reportSlice",
+      "mealPlanSlice",
+      "foodLogSlice"
+    ],
+    "designNotes": "The UI uses a forest/sage/paper palette, serif display typography, reusable accessible controls, responsive layouts, and motion/3D elements. Prefer existing components and honor reduced-motion behavior when editing UI."
+  },
+  "dataModels": {
+    "User": "Auth identity, bcrypt passwordHash, verified-status compatibility flag, role, profile subdocument, consent, onboarding state, TOTP data, refresh-session hashes, account status, and upload quotas. Sensitive TOTP/refresh/password paths are selectively hidden. The current worktree adds monthlyFoodBudget to the profile subdocument.",
+    "LifestyleProfile": "Separate questionnaire model with userId, demographics, dietType, meals/day, typicalDiet, dailyDietDescription, sleep, sun exposure, activity, habits, symptoms, consent; unique userId index.",
+    "Report": "Owned uploaded file metadata, OCR/review status, raw OCR text, extracted biomarkers, micronutrient intake, processing and retention/retest timestamps; raw OCR is encrypted.",
+    "MealPlan": "Report-linked, owned multi-day plan with preferences, household diet, deficiencies, meals/items, IFCT codes, portions, nutrient targets, cooking instructions, status, model/source metadata, and mandatory disclaimer.",
+    "DietPlan": "Separate basic/personalized plan model with calorie/macro targets, profile snapshot, goal, meals and IFCT item references.",
+    "FoodLog and DailyLog": "Owned dated food entries. FoodLog encrypts item details; DailyLog stores meals and calculated nutrients with a unique user/date index.",
+    "SupplementLog": "Owned dated supplement entries and micronutrient amounts.",
+    "Otp": "Email, purpose (login/reset-password only), bcrypt OTP hash, attempts, and expiry TTL index.",
+    "Notification": "User-targeted reminder/notification content, optional report/dedupe keys, read state and optional emailSentAt compatibility field.",
+    "Expert and ExpertAppointment": "Expert directory and scheduled appointment records.",
+    "Booking": "Current worktree adds user/expert/date/timeSlot/status booking data and indexes preventing simultaneous active bookings for a slot.",
+    "AuditLog": "User/action/time, request metadata and event metadata for audit records."
+  },
+  "majorWorkflows": {
+    "authentication": [
+      "Register validates name/email/password/consent, hashes password with bcrypt, creates a session, and returns an access JWT plus refresh cookie.",
+      "Password login looks up by normalized email, checks bcrypt password, then issues a session. Email verification is not a login gate in the MVP.",
+      "If twoFactorEnabled is true, login returns a separate TOTP challenge; this is not Resend email verification.",
+      "Refresh validates and rotates the refresh token; only a SHA-256 token hash is stored. Logout revokes a session; logout-all revokes all sessions.",
+      "OTP routes remain for code-based sign-in and password reset. Email verification OTP purpose was removed."
+    ],
+    "onboardingAndProfile": [
+      "Register creates the account; the authenticated user completes consent-first lifestyle onboarding.",
+      "Lifestyle data is associated with the caller identity, never a body-supplied userId.",
+      "Profile supports GET/PATCH /api/users/me. The current uncommitted profile work adds POST /api/user/profile, maps dietaryPreference to existing dietType, and stores monthlyFoodBudget under profile.",
+      "Profile changes do not accept or persist plaintext passwords. Password changes use dedicated auth/reset flows."
+    ],
+    "reportOcr": [
+      "Authenticated report upload accepts one PDF/JPEG/PNG with magic-byte checking, a 10 MB request cap, private storage and per-user quotas.",
+      "When Redis is available, BullMQ queues OCR; otherwise local development processes OCR synchronously with a timeout.",
+      "Tesseract uses English and Hindi trained data; PDF pages are rendered to images with resource caps.",
+      "Report parser extracts supported biomarkers and values; review endpoints let the user confirm or correct extraction.",
+      "Report reads/deletes and all stored-file operations are ownership checked."
+    ],
+    "householdMealPlanning": [
+      "Meal-plan generation requires the authenticated user's OCR-completed report and validated diet/allergy/region/activity preferences.",
+      "IFCT loader reads bundled records and normalizes selected names to household labels.",
+      "A household whitelist limits normal retrieval to familiar Indian foods; explicit food requests may add eligible requested records, with permanent exclusions enforced for barley.",
+      "Prompt requires familiar staples, respects the user's typical diet, uses realistic cooking, and tells the model to select foods and portions only.",
+      "Backend validates returned IFCT codes and portion bounds, looks up nutrient values, calculates macros from IFCT, and applies the medical disclaimer before persistence.",
+      "Redis-enabled deployments can queue plan generation; status endpoints expose job progress."
+    ],
+    "dailyNutrition": [
+      "Food search returns IFCT entries and serving metadata.",
+      "Food and supplement logging is authenticated. Server resolves food codes/serving units, computes nutrient totals, and persists dated user entries.",
+      "Dashboard and tracker screens display calorie/macronutrient and micronutrient summaries against project reference values.",
+      "AI food parsing produces a preview; the user confirms before persistence."
+    ],
+    "notificationsAndRetention": [
+      "Notification endpoints list/read only the authenticated user's notifications.",
+      "Optional Redis workers/schedulers process notification and retention/retest jobs.",
+      "Retest reminders are in-app in the current MVP; email verification/Resend is future scope."
+    ]
+  },
+  "nutritionAiRules": {
+    "systemPromptFile": "poshanai-backend/src/rag/promptBuilder.js",
+    "role": "Indian Household Nutrition Planner",
+    "expectedFoodPolicy": [
+      "Prefer everyday affordable Indian foods: roti, rice, poha, oats when present in IFCT candidates, potato, dal, rajma, chole, dahi, paneer, eggs, chicken, fish, soya chunks, chana and common vegetables.",
+      "Preserve familiar staples from typicalDiet/householdDiet and adjust portions/add suitable protein rather than replacing the user's normal meals.",
+      "Use boiling, pressure cooking, steaming, or minimal-oil tadka; do not recommend deep frying.",
+      "Do not use amaranth, agathi, ragi, or quinoa unless explicitly requested and present in the allowed records. Barley is forbidden.",
+      "Only use food code/name pairs passed from the backend; respect dietary preference and allergen filters."
+    ],
+    "nutrientAuthority": "The IFCT database and backend are authoritative for nutrition values. The model chooses food records and portions; backend code calculates calories, protein, carbohydrate, fat, and available micronutrients. Do not trust model-invented macro fields.",
+    "keyFiles": [
+      "src/rag/ifctLoader.js",
+      "src/rag/promptBuilder.js",
+      "src/rag/ragService.js",
+      "src/services/aiService.js",
+      "src/services/aiFoodParserService.js",
+      "src/data/ifct_2017.json"
+    ],
+    "caveat": "The AI gateway must be configured and reachable. Model output is untrusted until schema/code/portion validation succeeds."
+  },
+  "securityAndPrivacy": [
+    "Use verifyToken on every user-scoped API route; use requireRole for admin-only routes.",
+    "Derive user ownership from req.user, not request-body userId.",
+    "Validate POST/PATCH inputs with Joi and strip or reject unknown fields.",
+    "Never store raw passwords; use bcrypt passwordHash and verifyPassword().",
+    "Access tokens use HS256; refresh tokens are HTTP-only, SameSite strict cookies and are rotated/revoked server-side.",
+    "Use ipKeyGenerator(req.ip) in custom express-rate-limit keys to support IPv6 correctly.",
+    "Trust only configured reverse-proxy hops; do not blindly trust X-Forwarded-For.",
+    "Helmet, restricted credentialed CORS, JSON size limits, Mongo operator sanitization, and API limits are applied in app.js.",
+    "Uploads must pass allowed MIME and magic-byte checks, have random server filenames, remain private, and be cleaned up safely.",
+    "Health and audit logs must not reveal secrets, tokens, PII, or raw health data."
+  ],
+  "emailVerificationMvp": {
+    "status": "Disabled / Future Scope",
+    "signupAndLogin": "Remain available without email verification gating.",
+    "schema": "emailVerified remains on User and defaults true for MVP accounts.",
+    "remainingEmailOtp": "Login and password-reset OTP can use Gmail SMTP when configured.",
+    "extensionPoint": "src/services/emailVerificationService.js contains the disabled adapter and TODO to re-add Resend later.",
+    "featureFlag": "ENABLE_EMAIL_VERIFICATION defaults false; implementation and routes/UI must be restored before enabling it.",
+    "reenableChecklist": [
+      "Install/configure Resend server-side",
+      "Implement the email service adapter",
+      "Restore verify-email purpose, route, UI and login policy",
+      "Set ENABLE_EMAIL_VERIFICATION=true only after implementation",
+      "Add/update tests and deployment secrets"
+    ]
+  },
+  "testsAndQuality": {
+    "runner": "Node.js built-in test runner with mongodb-memory-server; setTestEnvironment.js configures isolated test mode.",
+    "suites": [
+      "auth.test.js",
+      "otp.test.js",
+      "security.test.js",
+      "cors.test.js",
+      "lifestyle.test.js",
+      "report.test.js",
+      "reportModel.test.js",
+      "ocrService.test.js",
+      "mealplan.test.js",
+      "mealPlanModel.test.js",
+      "ragService.test.js",
+      "foodLog.test.js",
+      "dailyLogService.test.js",
+      "nutrientsExperts.test.js",
+      "retestReminder.test.js"
+    ],
+    "guidance": "Use focused tests around touched behavior, then the broader suite when appropriate. Never claim a suite passed unless it was run and its output observed.",
+    "currentSnapshotEvidence": "No test or full build result is asserted by this guide."
+  },
+  "knownCaveats": [
+    "README and older architecture documents may lag source. This guide is a dated map; verify route/model behavior in source before relying on it.",
+    "There are two related but distinct plan systems: report-linked mealplans and basic diet-plans.",
+    "There are overlapping legacy log and daily-log API route groups; use the established frontend API module for the screen being changed.",
+    "Compose backend ports and direct local ports differ by design: direct backend defaults to 5000; Compose commonly maps API to 4000 and frontend to 8080.",
+    "The report-based AI mealplan path and the basic diet plan path have different request/response models; do not merge them casually.",
+    "Lifestyle recommendation content depends on reviewed data in data/testRules.json and may be empty. Never invent clinical recommendations to fill it."
+  ],
+  "recentCodeChangesSnapshot": {
+    "commits": [
+      {
+        "hash": "d16cad7",
+        "summary": "Remove Resend email verification from MVP; preserve auth and login/reset OTP paths."
+      },
+      {
+        "hash": "4c78698",
+        "summary": "Constrain meal plans to everyday household foods and IFCT-backed nutrients."
+      },
+      {
+        "hash": "d0885b7",
+        "summary": "Expand landing-page features and statistics."
+      }
+    ],
+    "uncommittedGroupsAtSnapshot": [
+      {
+        "area": "User profile API",
+        "paths": [
+          "poshanai-backend/src/app.js",
+          "poshanai-backend/src/controllers/userController.js",
+          "poshanai-backend/src/models/User.js",
+          "poshanai-backend/src/routes/userRoutes.js"
+        ],
+        "summary": "Add POST /api/user/profile for the authenticated user; store demographics, activity, diet preference mapping and monthly food budget."
+      },
+      {
+        "area": "Bookings and notifications",
+        "paths": [
+          "poshanai-backend/src/controllers/bookingController.js",
+          "poshanai-backend/src/controllers/expertController.js",
+          "poshanai-backend/src/controllers/notificationController.js",
+          "poshanai-backend/src/jobs/notificationQueue.js",
+          "poshanai-backend/src/jobs/notificationWorker.js",
+          "poshanai-backend/src/jobs/retestReminderQueue.js",
+          "poshanai-backend/src/jobs/worker.js",
+          "poshanai-backend/src/models/Booking.js",
+          "poshanai-backend/src/models/Expert.js",
+          "poshanai-backend/src/models/Notification.js",
+          "poshanai-backend/src/routes/bookingRoutes.js",
+          "poshanai-backend/src/routes/expertRoutes.js",
+          "poshanai-backend/src/routes/notificationRoutes.js",
+          "poshanai-backend/src/services/expertBookingService.js",
+          "poshanai-backend/src/services/notificationService.js",
+          "poshanai-backend/src/services/retestReminderService.js"
+        ],
+        "summary": "Worktree includes expert-slot booking and notification/reminder queue changes; inspect diffs and tests before assuming complete or deployed."
+      },
+      {
+        "area": "Meal plans, IFCT and AI",
+        "paths": [
+          "poshanai-backend/data/ifct_2017.json",
+          "poshanai-backend/src/config/constants.js",
+          "poshanai-backend/src/controllers/mealPlanController.js",
+          "poshanai-backend/src/rag/ifctLoader.js",
+          "poshanai-backend/src/rag/ragService.js",
+          "poshanai-backend/src/routes/mealPlanRoutes.js",
+          "poshanai-backend/src/scripts/buildIfctData.js",
+          "poshanai-backend/src/scripts/enrichIfctData.js",
+          "poshanai-backend/src/services/aiService.js",
+          "poshanai-backend/tests/ragService.test.js",
+          "poshanai-frontend/src/pages/MealPlanView.jsx",
+          "poshanai-frontend/src/pages/Recommendations.jsx"
+        ],
+        "summary": "Worktree includes IFCT enrichment/catalog and meal-plan endpoint/service/UI adjustments. The committed household-food prompt work is at 4c78698."
+      },
+      {
+        "area": "Frontend and package scripts",
+        "paths": [
+          "poshanai-backend/package.json",
+          "poshanai-backend/src/jobs/worker.js",
+          "poshanai-frontend/index.html",
+          "poshanai-frontend/src/components/layout/Navbar.jsx",
+          "poshanai-frontend/src/components/lifestyle/OnboardingProgress.jsx",
+          "poshanai-frontend/src/components/lifestyle/OptionControls.jsx",
+          "poshanai-frontend/src/components/lifestyle/TestCard.jsx",
+          "poshanai-frontend/src/styles.css"
+        ],
+        "summary": "Additional UI and expert-seeding work exists in the working tree. Do not stage it with unrelated commits without reviewing intent."
+      }
+    ],
+    "workingTreeRule": "This list is a snapshot, not a claim that every path was changed by the same author. Use git status and git diff for current and exact changes."
+  },
+  "sourceFileCatalog": {
+    "generatedFrom": [
+      "poshanai-backend/src",
+      "poshanai-frontend/src"
+    ],
+    "fileCount": 193,
+    "paths": [
+      "poshanai-backend/src\\app.js",
+      "poshanai-backend/src\\config\\constants.js",
+      "poshanai-backend/src\\config\\db.js",
+      "poshanai-backend/src\\config\\env.js",
+      "poshanai-backend/src\\controllers\\adminController.js",
+      "poshanai-backend/src\\controllers\\authController.js",
+      "poshanai-backend/src\\controllers\\bookingController.js",
+      "poshanai-backend/src\\controllers\\calorieController.js",
+      "poshanai-backend/src\\controllers\\dailyLogController.js",
+      "poshanai-backend/src\\controllers\\dietPlanController.js",
+      "poshanai-backend/src\\controllers\\expertController.js",
+      "poshanai-backend/src\\controllers\\foodLogController.js",
+      "poshanai-backend/src\\controllers\\lifestyleController.js",
+      "poshanai-backend/src\\controllers\\mealPlanController.js",
+      "poshanai-backend/src\\controllers\\notificationController.js",
+      "poshanai-backend/src\\controllers\\otpController.js",
+      "poshanai-backend/src\\controllers\\reportController.js",
+      "poshanai-backend/src\\controllers\\supplementController.js",
+      "poshanai-backend/src\\controllers\\twoFactorController.js",
+      "poshanai-backend/src\\controllers\\userController.js",
+      "poshanai-backend/src\\jobs\\mealPlanQueue.js",
+      "poshanai-backend/src\\jobs\\notificationQueue.js",
+      "poshanai-backend/src\\jobs\\notificationWorker.js",
+      "poshanai-backend/src\\jobs\\queue.js",
+      "poshanai-backend/src\\jobs\\retestReminderQueue.js",
+      "poshanai-backend/src\\jobs\\sweeper.js",
+      "poshanai-backend/src\\jobs\\worker.js",
+      "poshanai-backend/src\\middleware\\authMiddleware.js",
+      "poshanai-backend/src\\middleware\\errorHandler.js",
+      "poshanai-backend/src\\middleware\\requestLogger.js",
+      "poshanai-backend/src\\middleware\\sensitiveRateLimiter.js",
+      "poshanai-backend/src\\middleware\\uploadMiddleware.js",
+      "poshanai-backend/src\\models\\AuditLog.js",
+      "poshanai-backend/src\\models\\Booking.js",
+      "poshanai-backend/src\\models\\DailyLog.js",
+      "poshanai-backend/src\\models\\DietPlan.js",
+      "poshanai-backend/src\\models\\Expert.js",
+      "poshanai-backend/src\\models\\ExpertAppointment.js",
+      "poshanai-backend/src\\models\\FoodLog.js",
+      "poshanai-backend/src\\models\\LifestyleProfile.js",
+      "poshanai-backend/src\\models\\MealPlan.js",
+      "poshanai-backend/src\\models\\Notification.js",
+      "poshanai-backend/src\\models\\Otp.js",
+      "poshanai-backend/src\\models\\Report.js",
+      "poshanai-backend/src\\models\\SupplementLog.js",
+      "poshanai-backend/src\\models\\User.js",
+      "poshanai-backend/src\\rag\\ifctLoader.js",
+      "poshanai-backend/src\\rag\\promptBuilder.js",
+      "poshanai-backend/src\\rag\\ragService.js",
+      "poshanai-backend/src\\routes\\adminRoutes.js",
+      "poshanai-backend/src\\routes\\authRoutes.js",
+      "poshanai-backend/src\\routes\\bookingRoutes.js",
+      "poshanai-backend/src\\routes\\calorieRoutes.js",
+      "poshanai-backend/src\\routes\\dailyLogRoutes.js",
+      "poshanai-backend/src\\routes\\dietPlanRoutes.js",
+      "poshanai-backend/src\\routes\\expertRoutes.js",
+      "poshanai-backend/src\\routes\\foodRoutes.js",
+      "poshanai-backend/src\\routes\\lifestyleRoutes.js",
+      "poshanai-backend/src\\routes\\logRoutes.js",
+      "poshanai-backend/src\\routes\\mealPlanRoutes.js",
+      "poshanai-backend/src\\routes\\notificationRoutes.js",
+      "poshanai-backend/src\\routes\\otpRoutes.js",
+      "poshanai-backend/src\\routes\\reportRoutes.js",
+      "poshanai-backend/src\\routes\\supplementRoutes.js",
+      "poshanai-backend/src\\routes\\userRoutes.js",
+      "poshanai-backend/src\\scripts\\buildIfctData.js",
+      "poshanai-backend/src\\scripts\\enrichIfctData.js",
+      "poshanai-backend/src\\scripts\\seedExperts.js",
+      "poshanai-backend/src\\scripts\\setTestEnvironment.js",
+      "poshanai-backend/src\\server.js",
+      "poshanai-backend/src\\services\\aiFoodParserService.js",
+      "poshanai-backend/src\\services\\aiService.js",
+      "poshanai-backend/src\\services\\auditService.js",
+      "poshanai-backend/src\\services\\calorieService.js",
+      "poshanai-backend/src\\services\\dailyLogService.js",
+      "poshanai-backend/src\\services\\dietService.js",
+      "poshanai-backend/src\\services\\emailVerificationService.js",
+      "poshanai-backend/src\\services\\expertBookingService.js",
+      "poshanai-backend/src\\services\\foodCatalog.service.js",
+      "poshanai-backend/src\\services\\healthService.js",
+      "poshanai-backend/src\\services\\notificationService.js",
+      "poshanai-backend/src\\services\\ocrProcessor.js",
+      "poshanai-backend/src\\services\\ocrService.js",
+      "poshanai-backend/src\\services\\reportParser.js",
+      "poshanai-backend/src\\services\\retestReminderService.js",
+      "poshanai-backend/src\\services\\storageService.js",
+      "poshanai-backend/src\\services\\supplementCatalogService.js",
+      "poshanai-backend/src\\services\\tesseractWorker.cjs",
+      "poshanai-backend/src\\services\\testRules.js",
+      "poshanai-backend/src\\utils\\asyncHandler.js",
+      "poshanai-backend/src\\utils\\httpError.js",
+      "poshanai-backend/src\\utils\\logger.js",
+      "poshanai-backend/src\\utils\\sendEmail.js",
+      "poshanai-backend/src\\utils\\validationError.js",
+      "poshanai-backend/src\\validators\\authValidators.js",
+      "poshanai-backend/src\\validators\\logValidators.js",
+      "poshanai-backend/src\\validators\\otpValidators.js",
+      "poshanai-backend/src\\validators\\twoFactorValidators.js",
+      "poshanai-frontend/src\\api\\authApi.js",
+      "poshanai-frontend/src\\api\\client.js",
+      "poshanai-frontend/src\\api\\dailyLogApi.js",
+      "poshanai-frontend/src\\api\\dietPlanApi.js",
+      "poshanai-frontend/src\\api\\expertsApi.js",
+      "poshanai-frontend/src\\api\\foodLogApi.js",
+      "poshanai-frontend/src\\api\\lifestyleApi.js",
+      "poshanai-frontend/src\\api\\mealPlanApi.js",
+      "poshanai-frontend/src\\api\\reportApi.js",
+      "poshanai-frontend/src\\api\\userApi.js",
+      "poshanai-frontend/src\\App.jsx",
+      "poshanai-frontend/src\\components\\common\\Badge.jsx",
+      "poshanai-frontend/src\\components\\common\\Button.jsx",
+      "poshanai-frontend/src\\components\\common\\Card.jsx",
+      "poshanai-frontend/src\\components\\common\\ErrorBoundary.jsx",
+      "poshanai-frontend/src\\components\\common\\index.js",
+      "poshanai-frontend/src\\components\\common\\Input.jsx",
+      "poshanai-frontend/src\\components\\common\\Loader.jsx",
+      "poshanai-frontend/src\\components\\common\\Modal.jsx",
+      "poshanai-frontend/src\\components\\common\\Skeleton.jsx",
+      "poshanai-frontend/src\\components\\common\\Toast.jsx",
+      "poshanai-frontend/src\\components\\dashboard\\CalorieTracker.jsx",
+      "poshanai-frontend/src\\components\\hero\\Hero.jsx",
+      "poshanai-frontend/src\\components\\hero\\Hero3D.jsx",
+      "poshanai-frontend/src\\components\\hero\\HeroFallback.jsx",
+      "poshanai-frontend/src\\components\\landing\\WhyPoshanAI.jsx",
+      "poshanai-frontend/src\\components\\layout\\Footer.jsx",
+      "poshanai-frontend/src\\components\\layout\\Layout.jsx",
+      "poshanai-frontend/src\\components\\layout\\Navbar.jsx",
+      "poshanai-frontend/src\\components\\library\\NutrientModal.jsx",
+      "poshanai-frontend/src\\components\\lifestyle\\OnboardingProgress.jsx",
+      "poshanai-frontend/src\\components\\lifestyle\\OptionControls.jsx",
+      "poshanai-frontend/src\\components\\lifestyle\\options.js",
+      "poshanai-frontend/src\\components\\lifestyle\\TestCard.jsx",
+      "poshanai-frontend/src\\components\\lifestyle\\TestIcon.jsx",
+      "poshanai-frontend/src\\components\\lifestyle\\WhyThisModal.jsx",
+      "poshanai-frontend/src\\components\\tracker\\AddFoodModal.jsx",
+      "poshanai-frontend/src\\components\\tracker\\CalorieRing.jsx",
+      "poshanai-frontend/src\\components\\tracker\\FoodLogList.jsx",
+      "poshanai-frontend/src\\components\\tracker\\MacroBar.jsx",
+      "poshanai-frontend/src\\components\\ui\\ClippedCircle.jsx",
+      "poshanai-frontend/src\\components\\ui\\cn.js",
+      "poshanai-frontend/src\\components\\ui\\koi-studies.css",
+      "poshanai-frontend/src\\components\\ui\\KoiStudies.jsx",
+      "poshanai-frontend/src\\components\\ui\\SmoothInput.jsx",
+      "poshanai-frontend/src\\components\\ui\\StickyCards.jsx",
+      "poshanai-frontend/src\\components\\ui\\threeui\\CompleteShelfLandingPage.jsx",
+      "poshanai-frontend/src\\components\\ui\\threeui\\ThreeDPaper.jsx",
+      "poshanai-frontend/src\\components\\ui\\threeui\\threeui.css",
+      "poshanai-frontend/src\\components\\ui\\threeui\\WarpFieldBackground.jsx",
+      "poshanai-frontend/src\\components\\ui\\threeui\\warpFieldRenderer.js",
+      "poshanai-frontend/src\\components\\ui\\Tilt.jsx",
+      "poshanai-frontend/src\\components\\ui\\TiltCard.jsx",
+      "poshanai-frontend/src\\components\\ui\\uplink-loader.css",
+      "poshanai-frontend/src\\components\\ui\\UplinkLoader.jsx",
+      "poshanai-frontend/src\\context\\AuthContext.jsx",
+      "poshanai-frontend/src\\context\\ThemeContext.jsx",
+      "poshanai-frontend/src\\data\\landingCards.js",
+      "poshanai-frontend/src\\data\\nutrientDetails.js",
+      "poshanai-frontend/src\\hooks\\useAuth.js",
+      "poshanai-frontend/src\\hooks\\useCachedFetch.js",
+      "poshanai-frontend/src\\hooks\\useDebounce.js",
+      "poshanai-frontend/src\\hooks\\useMediaQuery.js",
+      "poshanai-frontend/src\\hooks\\useThrottle.js",
+      "poshanai-frontend/src\\main.jsx",
+      "poshanai-frontend/src\\pages\\CalorieTracker.jsx",
+      "poshanai-frontend/src\\pages\\Dashboard.jsx",
+      "poshanai-frontend/src\\pages\\DietPlanResult.jsx",
+      "poshanai-frontend/src\\pages\\DietPlanWizard.jsx",
+      "poshanai-frontend/src\\pages\\Experts.jsx",
+      "poshanai-frontend/src\\pages\\FoodLibrary.jsx",
+      "poshanai-frontend/src\\pages\\Landing.jsx",
+      "poshanai-frontend/src\\pages\\LandingPage.jsx",
+      "poshanai-frontend/src\\pages\\Login.jsx",
+      "poshanai-frontend/src\\pages\\MealPlanView.jsx",
+      "poshanai-frontend/src\\pages\\NotFound.jsx",
+      "poshanai-frontend/src\\pages\\Onboarding.jsx",
+      "poshanai-frontend/src\\pages\\OtpLogin.jsx",
+      "poshanai-frontend/src\\pages\\Profile.jsx",
+      "poshanai-frontend/src\\pages\\Recommendations.jsx",
+      "poshanai-frontend/src\\pages\\Register.jsx",
+      "poshanai-frontend/src\\pages\\TwoFactorVerify.jsx",
+      "poshanai-frontend/src\\pages\\UploadReport.jsx",
+      "poshanai-frontend/src\\routes\\ProtectedRoute.jsx",
+      "poshanai-frontend/src\\store\\hooks.js",
+      "poshanai-frontend/src\\store\\index.js",
+      "poshanai-frontend/src\\store\\slices\\foodLogSlice.js",
+      "poshanai-frontend/src\\store\\slices\\mealPlanSlice.js",
+      "poshanai-frontend/src\\store\\slices\\reportSlice.js",
+      "poshanai-frontend/src\\store\\slices\\userSlice.js",
+      "poshanai-frontend/src\\styles.css",
+      "poshanai-frontend/src\\utils\\lifestyleSchemas.js",
+      "poshanai-frontend/src\\utils\\memoryCache.js",
+      "poshanai-frontend/src\\utils\\nutrition.js",
+      "poshanai-frontend/src\\utils\\throttle.js"
+    ]
+  }
+}

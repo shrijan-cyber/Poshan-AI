@@ -13,14 +13,14 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <main className="flex min-h-screen items-center justify-center bg-[#F9FBF9] p-6 font-minecraft text-black">
-          <section className="w-full max-w-xl border-4 border-black bg-white p-8 shadow-[6px_6px_0px_#000]">
-            <h1 className="mb-4 text-2xl font-bold text-[#1E5631]">The page hit a problem</h1>
-            <p className="mb-6">Reload PoshanAI to try again.</p>
+        <main className="flex min-h-screen items-center justify-center bg-paper p-6 font-sans text-ink dark:bg-slate-950 dark:text-slate-100">
+          <section className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-8 shadow-lg shadow-forest/10 dark:border-slate-700 dark:bg-slate-900">
+            <h1 className="mb-4 text-2xl font-bold text-forest dark:text-emerald-200">The page hit a problem</h1>
+            <p className="mb-6 text-slate-600 dark:text-slate-300">Reload PoshanAI to try again.</p>
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="border-4 border-black bg-[#1E5631] px-5 py-3 font-bold text-white shadow-[4px_4px_0px_#000]"
+              className="rounded-xl bg-forest px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-deepForest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2"
             >
               Reload page
             </button>

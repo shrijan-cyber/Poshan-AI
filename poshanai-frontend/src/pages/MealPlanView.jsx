@@ -2,13 +2,22 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getMealPlan, getMealPlanJobStatus } from '../api/mealPlanApi.js';
 import UplinkLoader from '../components/ui/UplinkLoader.jsx';
-import { ThreeDPaper } from '../components/ui/threeui/ThreeDPaper.jsx';
-import '../components/ui/threeui/threeui.css';
 
 const isJobId = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || '');
 
 function unwrap(value) {
   return value?.mealPlan ?? value?.plan ?? value?.data?.mealPlan ?? value?.data?.plan ?? value?.data ?? value;
+}
+
+function formatNutrient(value, unit) {
+  return Number.isFinite(Number(value)) && value !== null && value !== undefined
+    ? `${Number(value).toFixed(1)} ${unit}`
+    : 'Data unavailable';
+}
+
+function originalCarbFrom(description) {
+  return String(description ?? '').split(/[,.;\n]/).map((part) => part.trim())
+    .find((part) => /roti|chapati|phulka|rice|millet|bajra|jowar|ragi/i.test(part)) ?? '';
 }
 
 export default function MealPlanView() {
@@ -64,24 +73,22 @@ export default function MealPlanView() {
 
   if (viewStatus !== 'completed') {
     return (
-      <section className="mx-auto max-w-5xl">
-        <header className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-10">
-          <ThreeDPaper className="meal-plan-paper" variant="original" />
-          <div className="absolute inset-0 z-[1] bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/20" aria-hidden="true" />
-          <div className="relative z-10 flex min-h-[312px] flex-col justify-end">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">PoshanAI · your nutrition guide</p>
-            <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+      <section className="mx-auto max-w-5xl font-sans">
+        <header className="rounded-2xl border border-sage bg-gradient-to-br from-white to-sage/50 p-6 shadow-sm sm:p-10 dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
+          <div className="flex min-h-[260px] flex-col justify-center">
+            <p className="text-sm font-semibold text-forest dark:text-emerald-300">PoshanAI · your nutrition guide</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               {viewStatus === 'failed' ? 'Plan unavailable' : viewStatus === 'empty' ? 'Your meal plan' : 'Preparing your meal plan'}
             </h1>
             {viewStatus === 'failed' ? (
-              <div role="alert" className="mt-3 max-w-2xl text-red-100">
+              <div role="alert" className="mt-3 max-w-2xl text-red-700 dark:text-red-300">
                 <p>{error}</p>
                 <Link className="mt-4 inline-block font-semibold underline" to="/dashboard">Return to dashboard</Link>
               </div>
             ) : viewStatus === 'empty' ? (
               <div className="mt-3 max-w-2xl">
-                <p className="text-sm leading-6 text-white/85">Meal suggestions are educational and do not replace advice from a qualified healthcare professional.</p>
-                <Link className="mt-5 inline-flex rounded-xl bg-[#1E5631] px-5 py-3 font-semibold text-white hover:bg-[#173a2c]" to="/diet-plan">Create a basic diet plan</Link>
+                <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">Meal suggestions are educational and do not replace advice from a qualified healthcare professional.</p>
+                <Link className="mt-5 inline-flex rounded-xl bg-forest px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-deepForest" to="/diet-plan">Create a basic diet plan</Link>
               </div>
             ) : (
               <UplinkLoader className="mt-5" label={viewStatus === 'loading-plan' ? 'Opening your meal plan…' : 'Generating your personalized meal plan…'} />
@@ -93,22 +100,33 @@ export default function MealPlanView() {
   }
 
   const meals = Array.isArray(plan?.meals) ? plan.meals : [];
+  const originalCarb = originalCarbFrom(plan?.householdDiet);
   return (
-    <section className="mx-auto max-w-5xl space-y-6">
-      <header className="relative isolate min-h-[340px] overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-10">
-        <ThreeDPaper className="meal-plan-paper" variant="original" />
-        <div className="absolute inset-0 z-[1] bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/20" aria-hidden="true" />
-        <div className="relative z-10 flex min-h-[292px] flex-col justify-end">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-300">Personalized nutrition</p>
-          <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{plan?.title || 'Your meal plan'}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/85">{plan?.disclaimer || 'Nutrition suggestions are for awareness and do not replace advice from a qualified healthcare professional.'}</p>
+    <section className="mx-auto max-w-5xl space-y-6 font-sans">
+      <header className="rounded-2xl border border-sage bg-gradient-to-br from-white to-sage/50 p-6 shadow-sm sm:p-10 dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
+        <div className="flex min-h-[210px] flex-col justify-center">
+          <p className="text-sm font-semibold text-forest dark:text-emerald-300">Personalized nutrition</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{plan?.title || 'Your meal plan'}</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{plan?.disclaimer || 'Nutrition suggestions are for awareness and do not replace advice from a qualified healthcare professional.'}</p>
         </div>
       </header>
+      {plan?.householdDiet && (
+        <aside className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-950 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+          <h2 className="font-semibold">Built around your household routine</h2>
+          <p className="mt-1">Your usual day: {plan.householdDiet}</p>
+        </aside>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         {meals.map((meal, index) => (
-          <article key={`${meal.day}-${meal.mealType}-${index}`} className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs font-semibold uppercase tracking-wider text-orange-700">Day {meal.day} · {meal.mealType}</p>
-            <ul className="mt-3 space-y-2">{meal.items?.map((item) => <li key={`${item.ifctCode}-${item.foodName}`} className="flex justify-between gap-3 text-sm text-slate-700 dark:text-slate-200"><span>{item.foodName}</span><span className="shrink-0 text-slate-500">{item.quantityGrams} g</span></li>)}</ul>
+          <article key={`${meal.day}-${meal.mealType}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <p className="text-xs font-semibold uppercase tracking-wider text-forest dark:text-emerald-300">Day {meal.day} · {meal.mealType}</p>
+            {originalCarb && <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Your original carb: <span className="font-medium text-slate-900 dark:text-white">{originalCarb}</span></p>}
+            <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">Protein addition: <span className="font-semibold text-leaf dark:text-emerald-300">{meal.proteinSource || 'Data unavailable'}</span>{meal.items?.find((item) => item.foodName === meal.proteinSource)?.quantityGrams ? ` · ${meal.items.find((item) => item.foodName === meal.proteinSource).quantityGrams} g` : ''}</p>
+            <ul className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">{meal.items?.map((item) => <li key={`${item.ifctCode}-${item.foodName}`} className="py-3 text-sm text-slate-700 dark:text-slate-200"><div className="flex justify-between gap-3"><span>{item.foodName}</span><span className="shrink-0 text-slate-500">{item.quantityGrams} g</span></div><p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Protein {formatNutrient(item.nutrients?.protein, 'g')} · Carbs {formatNutrient(item.nutrients?.carbs, 'g')}</p></li>)}</ul>
+            <div className="mt-4 rounded-lg bg-slate-50 p-3 dark:bg-slate-800/70">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Cooking instructions</h3>
+              <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{meal.cookingInstructions || 'Instructions unavailable for this older plan.'}</p>
+            </div>
           </article>
         ))}
       </div>

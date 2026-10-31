@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "project": "PoshanAI",
     "purpose": "Repository-grounded project context for contributors and AI coding assistants.",
-    "usage_instruction": "Read this file before making project changes. Distinguish implemented behavior from planned specifications. Values marked proposed or unknown require confirmation before being treated as authoritative. Never add real secrets or credentials to this file."
+    "usage_instruction": "Read this file before making project changes, then read PROJECT_AI_GUIDE.json for the expanded architecture and workflow map. Distinguish implemented behavior from planned specifications. Source code and current Git state override stale documentation. Never add real secrets or credentials to either JSON file."
   },
   "project": {
     "name": "PoshanAI",
@@ -141,6 +141,7 @@
       "Express API startup, MongoDB connection, health endpoint, and error handling.",
       "Helmet, restricted credentialed CORS, JSON body-size limit, Mongo operator sanitization, and API rate limiting.",
       "User model and register/login/refresh/logout routes with access-token and refresh-cookie handling.",
+      "Authenticated user profile GET/PATCH APIs and a current-worktree POST /api/user/profile endpoint.",
       "Consent-first, four-step lifestyle onboarding with React Hook Form/Zod validation, persisted completion gating, and a recommendations page with medical disclaimers.",
       "Frontend API client modules and Redux slices for users, reports, and meal plans.",
       "Indexed Report model and authenticated report upload/list/get/delete endpoints with ownership checks.",
@@ -154,7 +155,6 @@
       "Authenticated MealPlan generation/list/detail/status endpoints with server-applied medical disclaimers."
     ],
     "pending": [
-      "User profile endpoints are currently placeholders returning NOT_IMPLEMENTED.",
       "Production IFCT RAG integration; the current meal-plan RAG service is a small replaceable stub.",
       "Automated integration tests against a running Redis instance.",
       "Resend email verification is Future Scope / Not in current MVP; `emailVerified` remains in the user schema and `ENABLE_EMAIL_VERIFICATION` defaults to false."
@@ -323,18 +323,12 @@
         "status": "Implemented; deletes an owned food log entry."
       }
     ],
-    "frontend_expected_but_backend_placeholder": [
+    "additional_implemented_endpoints": [
       {
-        "method": "GET",
-        "path": "/api/users/me",
+        "method": "POST",
+        "path": "/api/user/profile",
         "auth": "Access token",
-        "status": "Frontend client calls this; backend currently returns NOT_IMPLEMENTED."
-      },
-      {
-        "method": "PATCH",
-        "path": "/api/users/me",
-        "auth": "Access token",
-        "status": "Frontend client calls this; backend currently returns NOT_IMPLEMENTED."
+        "status": "Current worktree adds an authenticated profile update endpoint. Check git status to confirm whether it has been committed."
       },
       {
         "method": "POST",
@@ -406,7 +400,9 @@
         "emailVerified": "Boolean retained for future verification; defaults to true in the MVP.",
         "passwordHash": "String, required, excluded from normal queries.",
         "role": "String enum user/admin, defaults to user.",
-        "refreshTokenHash": "String or null, excluded from normal queries."
+        "profile": "Optional subdocument containing demographics, activity, diet type, and the current-worktree monthly food budget field.",
+        "refreshTokens": "Array of hashed refresh sessions; excluded from normal queries.",
+        "twoFactorEnabled": "Boolean for optional authenticator-based two-factor login."
       },
       "timestamps": true,
       "versionKey": false
@@ -634,7 +630,7 @@
     "Report tests run and any pre-existing failures accurately."
   ],
   "immediate_next_tasks": [
-    "Implement user profile endpoints and meal-plan endpoints expected by the frontend.",
+    "Review and verify the latest user profile endpoint, including its worktree/commit state.",
     "Resolve the frontend lint errors in useThrottle.js and confirm useCachedFetch.js warning behavior.",
     "Reconcile backend port defaults with Docker Compose and README instructions.",
     "Define and test schemas for MealPlan and DeficiencyLog before implementing their endpoints.",

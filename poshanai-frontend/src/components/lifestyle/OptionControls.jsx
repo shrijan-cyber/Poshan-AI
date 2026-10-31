@@ -1,6 +1,4 @@
 import { useId } from 'react';
-import { Button as RetroButton, Input as RetroInput } from 'pixel-retroui';
-
 const legendClass = 'mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100';
 const focusRing =
   'peer-focus-visible:ring-2 peer-focus-visible:ring-leaf peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-slate-900';
@@ -84,21 +82,17 @@ export function Stepper({ legend, value, min, max, onChange, unit }) {
     <div role="group" aria-label={legend}>
       <p className={legendClass}>{legend}</p>
       <div className="flex items-center gap-4">
-        <RetroButton
+        <button
           type="button"
-          bg="#1E5631"
-          textColor="#FFFFFF"
-          borderColor="#000000"
-          shadow="#000000"
-          className="mx-0 my-0 h-11 w-11 px-2 py-1 text-xl disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-11 w-11 rounded-lg bg-leaf text-xl font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={`Decrease ${legend}`}
           disabled={value <= min}
           onClick={() => onChange(value - 1)}
         >
           −
-        </RetroButton>
+        </button>
         <div className="flex min-w-32 items-center gap-2">
-          <RetroInput
+          <input
             aria-label={legend}
             type="number"
             min={min}
@@ -109,26 +103,19 @@ export function Stepper({ legend, value, min, max, onChange, unit }) {
               const nextValue = Number(event.target.value);
               if (Number.isFinite(nextValue)) onChange(Math.min(max, Math.max(min, nextValue)));
             }}
-            bg="#FFFFFF"
-            textColor="#1E5631"
-            borderColor="#000000"
-            className="w-20"
+            className="h-11 w-20 rounded-lg border border-slate-300 bg-white px-3 text-center text-slate-900 shadow-sm focus:border-leaf focus:outline-none focus:ring-2 focus:ring-leaf/30 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
           />
           <span className="text-sm font-medium text-slate-600 dark:text-slate-300">{unit}</span>
         </div>
-        <RetroButton
+        <button
           type="button"
-          bg="#1E5631"
-          textColor="#FFFFFF"
-          borderColor="#000000"
-          shadow="#000000"
-          className="mx-0 my-0 h-11 w-11 px-2 py-1 text-xl disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-11 w-11 rounded-lg bg-leaf text-xl font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={`Increase ${legend}`}
           disabled={value >= max}
           onClick={() => onChange(value + 1)}
         >
           +
-        </RetroButton>
+        </button>
       </div>
     </div>
   );

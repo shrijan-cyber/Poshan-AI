@@ -22,6 +22,7 @@ const profileSchema = new mongoose.Schema(
     heightCm: { type: Number },
     activityLevel: { type: String, enum: ['sedentary', 'moderate', 'active'] },
     dietType: { type: String, enum: ['veg', 'non-veg', 'vegan', 'eggetarian'] },
+    monthlyFoodBudget: { type: Number, min: 0 },
     region: { type: String },
   },
   { _id: false },

@@ -92,6 +92,7 @@ const apiRoutes = [
   ['/mealplans', mealPlanRoutes],
   ['/diet-plans', dietPlanRoutes],
   ['/users', userRoutes],
+  ['/user', userRoutes],
   ['/admin', adminRoutes],
   ['/lifestyle', lifestyleRoutes],
   ['/foods', foodRoutes],

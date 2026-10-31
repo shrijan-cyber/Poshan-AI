@@ -2,7 +2,7 @@ export default function Card({
   as: Component = 'div',
   padding = 'md',
   shadow = 'sm',
-  rounded = 'none',
+  rounded = 'md',
   className = '',
   children,
   ...props
@@ -10,14 +10,14 @@ export default function Card({
   const paddingStyles = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-8' };
   const shadowStyles = {
     none: '',
-    sm: 'shadow-[6px_6px_0px_#000]',
-    md: 'shadow-[6px_6px_0px_#000]',
-    lg: 'shadow-[6px_6px_0px_#000]',
+    sm: 'shadow-sm',
+    md: 'shadow-md shadow-forest/5',
+    lg: 'shadow-lg shadow-forest/10',
   };
-  const roundedStyles = { none: 'rounded-none', md: 'rounded-none', lg: 'rounded-none', full: 'rounded-none' };
+  const roundedStyles = { none: 'rounded-none', md: 'rounded-xl', lg: 'rounded-2xl', full: 'rounded-full' };
   return (
     <Component
-      className={`border-4 border-black bg-[#F9FBF9] font-minecraft dark:border-black dark:bg-slate-900 ${paddingStyles[padding] ?? paddingStyles.md} ${shadowStyles[shadow] ?? shadowStyles.sm} ${roundedStyles[rounded] ?? roundedStyles.none} ${className}`}
+      className={`border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${paddingStyles[padding] ?? paddingStyles.md} ${shadowStyles[shadow] ?? shadowStyles.sm} ${roundedStyles[rounded] ?? roundedStyles.md} ${className}`}
       {...props}
     >
       {children}

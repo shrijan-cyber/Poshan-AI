@@ -1,19 +1,11 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import httpError from '../utils/httpError.js';
-import logger from '../utils/logger.js';
-
-const datasetPath = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '../../data/ifct_2017.json',
-);
+import { getIfctFoods } from '../rag/ifctLoader.js';
 
 let foods = [];
 try {
-  foods = JSON.parse(fs.readFileSync(datasetPath, 'utf8'));
-} catch (error) {
-  logger.error('Failed to load IFCT dataset for food search', error);
+  foods = getIfctFoods();
+} catch {
+  // Fail closed through assertCatalogLoaded instead of serving invented records.
 }
 
 const foodsByCode = new Map(foods.map((food) => [food.ifctCode, food]));
@@ -32,6 +24,10 @@ const round1 = (value) => Math.round(value * 10) / 10;
 const toNumber = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
 
 /** Macro values per 100 g, as stored in the IFCT dataset. */
+const nullableNumber = (value) => value === null || value === undefined || !Number.isFinite(Number(value))
+  ? null
+  : Number(value);
+
 function publicFood({ ifctCode, foodName, category, nutrients, servingUnits }) {
   return {
     ifctCode,
@@ -39,10 +35,10 @@ function publicFood({ ifctCode, foodName, category, nutrients, servingUnits }) {
     category,
     ...(servingUnits ? { servingUnits } : {}),
     nutrients: {
-      calories: toNumber(nutrients?.calories),
-      protein: toNumber(nutrients?.protein),
-      carbs: toNumber(nutrients?.carbs),
-      fat: toNumber(nutrients?.fat),
+      calories: nullableNumber(nutrients?.calories),
+      protein: nullableNumber(nutrients?.protein),
+      carbs: nullableNumber(nutrients?.carbs),
+      fat: nullableNumber(nutrients?.fat),
     },
   };
 }
@@ -92,11 +88,14 @@ export function searchFoods(query, limit = 10, index = searchIndex) {
 /** Scales per-100 g macros to a portion size. Nutrition values are always computed server-side. */
 export function scaleNutrients(per100g, grams) {
   const factor = grams / 100;
+  const scale = (value) => value === null || value === undefined || !Number.isFinite(Number(value))
+    ? null
+    : round1(Number(value) * factor);
   return {
-    calories: round1(toNumber(per100g.calories) * factor),
-    protein: round1(toNumber(per100g.protein) * factor),
-    carbs: round1(toNumber(per100g.carbs) * factor),
-    fat: round1(toNumber(per100g.fat) * factor),
+    calories: scale(per100g.calories),
+    protein: scale(per100g.protein),
+    carbs: scale(per100g.carbs),
+    fat: scale(per100g.fat),
   };
 }
 
@@ -107,12 +106,12 @@ export function scaleFoodPortion(food, grams) {
 
 export function sumNutrients(entries) {
   const totals = entries.reduce(
-    (sum, entry) => ({
-      calories: sum.calories + toNumber(entry.calories),
-      protein: sum.protein + toNumber(entry.protein),
-      carbs: sum.carbs + toNumber(entry.carbs),
-      fat: sum.fat + toNumber(entry.fat),
-    }),
+    (sum, entry) => Object.fromEntries(['calories', 'protein', 'carbs', 'fat'].map((key) => [
+      key,
+      sum[key] === null || entry[key] === null
+        ? null
+        : sum[key] + toNumber(entry[key]),
+    ])),
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
   return {

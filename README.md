@@ -22,7 +22,7 @@ PoshanAI/
 
 1. Copy `poshanai-backend/.env.example` to `poshanai-backend/.env`. Set distinct JWT secrets of at least 32 characters and configure `MONGODB_URI`. Never commit `.env`.
 2. Run `docker compose up --build` and open `http://localhost:8080`. API health is available at `http://localhost:4000/health`.
-3. To run the JS apps directly, install dependencies in the root, `poshanai-backend`, and `poshanai-frontend`; run MongoDB locally and configure `poshanai-backend/.env`. Set `REDIS_URL=redis://127.0.0.1:6379` only if you want OCR to use the Redis queue; without Redis, uploads run OCR synchronously. Then run `npm run dev` at the root.
+3. To run the JS apps directly, install dependencies in the root, `poshanai-backend`, and `poshanai-frontend`; run MongoDB locally and configure `poshanai-backend/.env`. Redis is optional in local development. Without it, report OCR and meal-plan generation run synchronously; with it, OCR can use its queue. Then run `npm run dev` at the root.
 
 Run backend tests with `npm test --prefix poshanai-backend`, frontend lint with `npm run lint --prefix poshanai-frontend`, and build the frontend with `npm run build --prefix poshanai-frontend`. Backend tests use `mongodb-memory-server` and do not require a separately running MongoDB instance.
 
@@ -40,7 +40,7 @@ Set backend variables in `poshanai-backend/.env`. `poshanai-backend/.env.example
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`                                    | Separate access and refresh token signing secrets; each must be at least 32 characters.                  |
 | `JWT_ACCESS_EXPIRY`, `JWT_REFRESH_EXPIRY`                                    | Token lifetimes (defaults: `15m`, `7d`).                                                                 |
 | `CLIENT_URL`, `CLIENT_ORIGIN`                                                | Allowed frontend origin; `CLIENT_URL` takes precedence.                                                  |
-| `REDIS_URL`                                                                  | Optional Redis connection for queued OCR.                                                                |
+| `REDIS_URL`                                                                  | Optional for local synchronous flows; required in production for queued OCR and asynchronous meal-plan generation. |
 | `STORAGE_TYPE`                                                               | `local` in development or `s3` for object storage.                                                       |
 | `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_KMS_KEY_ID`  | S3 configuration. Access and secret keys must be set together; workload credentials may be used instead. |
 | `OMNIROUTE_URL`, `OMNIROUTE_MODEL`, `OMNIROUTE_API_KEY`                      | Optional model gateway endpoint, model name, and gateway credential.                                     |
@@ -94,7 +94,7 @@ For local Compose TLS, place a self-signed certificate and key at those same pat
 
 ## Current implementation
 
-The frontend includes a responsive landing page, authenticated dashboard, and consent-first lifestyle onboarding wizard with recommendations. The Express API connects to MongoDB and includes health endpoints, Helmet, restricted CORS, request-size limits, Mongo operator sanitization, API rate limiting, JWT authentication, and ownership-checked report and meal-plan endpoints. Report OCR uses Tesseract.js, with an optional Redis-backed queue and synchronous fallback. Meal plans retrieve foods from `poshanai-backend/data/ifct_2017.json` and use an OpenAI-compatible OmniRoute gateway configured with `OMNIROUTE_URL`, `OMNIROUTE_MODEL`, and optional `OMNIROUTE_API_KEY`. Nutrient amounts shown in a plan are calculated from the selected records and serving weights. The `ai-service` directories remain extension points.
+The frontend includes a responsive landing page, authenticated dashboard, and consent-first lifestyle onboarding wizard with recommendations. The Express API connects to MongoDB and includes health endpoints, Helmet, restricted CORS, request-size limits, Mongo operator sanitization, API rate limiting, JWT authentication, and ownership-checked report and meal-plan endpoints. Report OCR uses Tesseract.js, with an optional Redis-backed queue and synchronous fallback. Meal plans retrieve foods through the shared IFCT loader and use an OpenAI-compatible OmniRoute gateway configured with `OMNIROUTE_URL`, `OMNIROUTE_MODEL`, and optional `OMNIROUTE_API_KEY`. Local meal-plan generation is synchronous; production queues it with Redis and falls back synchronously if Redis is unavailable. Nutrient amounts shown in a plan are calculated from the selected records and serving weights. The `ai-service` directories remain extension points.
 
 PoshanAI is intended for nutrition awareness and food suggestions. It must not diagnose or replace advice from a qualified healthcare professional.
 
@@ -130,4 +130,6 @@ Meal-plan endpoints require a bearer access token. `POST /api/mealplans/generate
 | `GET`   | `/api/mealplans/:id`        | Get one owned plan.                                                         |
 | `PATCH` | `/api/mealplans/:id/status` | Set `status` to `active` or `completed`.                                    |
 
-Every plan response includes the disclaimer: “PoshanAI provides nutrition awareness and suggestions. It does not diagnose, treat, or replace advice from a qualified healthcare professional.” If OmniRoute is unavailable or returns an invalid plan, generation fails with a structured API error rather than returning a fabricated plan. The RAG service loads the bundled IFCT 2017 catalogue and leaves unavailable B12 values as `null`. Configure the model and any gateway credential only in the backend environment.
+Every plan response includes the disclaimer: “PoshanAI provides nutrition awareness and suggestions. It does not diagnose, treat, or replace advice from a qualified healthcare professional.” If OmniRoute is unavailable or returns an invalid plan, generation fails with a structured API error rather than returning a fabricated plan. Both RAG and basic diet generation use the same cached IFCT 2017 catalogue; unavailable nutrient values remain `null`, and an absent food record is never assigned invented nutrient values. Configure the model and any gateway credential only in the backend environment.
+
+Redis is optional for local development. `/api/mealplans/generate` runs synchronously outside production and falls back to synchronous generation if the production Redis queue cannot accept the job. Production deployments still require Redis for normal asynchronous meal-plan and OCR processing.

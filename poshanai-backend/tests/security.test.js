@@ -32,6 +32,8 @@ function createSampleMeals() {
   return Array.from({ length: 7 }, (_, i) => ({
     day: i + 1,
     mealType: 'breakfast',
+    proteinSource: 'Turmeric powder',
+    cookingInstructions: 'Add to the meal with minimal oil.',
     items: [
       {
         foodName: 'Turmeric powder',

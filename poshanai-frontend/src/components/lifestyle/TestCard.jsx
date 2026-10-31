@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Button, Card } from '../common/index.js';
+import { Button } from '../common/index.js';
 import TestIcon from './TestIcon.jsx';
 
 export default function TestCard({ test, index, onWhyThis }) {
@@ -11,7 +11,7 @@ export default function TestCard({ test, index, onWhyThis }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min(index, 6) * 0.07, ease: 'easeOut' }}
     >
-      <Card padding="sm" className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center">
         <div className="flex min-w-0 flex-1 items-start gap-3">
           <TestIcon testName={test.testName} />
           <div className="min-w-0">
@@ -35,7 +35,7 @@ export default function TestCard({ test, index, onWhyThis }) {
             Upload this report later
           </Link>
         </div>
-      </Card>
+      </div>
     </motion.li>
   );
 }

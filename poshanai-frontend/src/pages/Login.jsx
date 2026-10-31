@@ -2,9 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import Loader from '../components/common/Loader.jsx';
+import { Button } from '../components/common/index.js';
 import { useToast } from '../components/common/Toast.jsx';
-import { Button as RetroButton } from 'pixel-retroui';
 import SmoothInput from '../components/ui/SmoothInput.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -46,17 +45,17 @@ export default function Login() {
   };
 
   return (
-    <main className="retro-auth flex min-h-[70vh] items-center justify-center bg-[#f8f7f1] px-5 py-14 text-[#27362d] dark:bg-slate-950 dark:text-slate-100 sm:px-8 sm:py-20">
+    <main className="auth-page flex min-h-[70vh] items-center justify-center bg-paper px-5 py-14 text-ink dark:bg-slate-950 dark:text-slate-100 sm:px-8 sm:py-20">
       <section
         aria-labelledby="login-title"
-        className="retro-auth-card w-full max-w-md p-6 sm:p-9"
+        className="auth-card w-full max-w-md p-6 sm:p-9"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#728f5b] dark:text-emerald-300">
           Nutrition, made personal
         </p>
         <h1
           id="login-title"
-          className="mt-3 font-minecraft text-3xl font-bold tracking-tight text-[#1E5631] dark:text-white sm:text-4xl"
+          className="mt-3 text-3xl font-bold tracking-tight text-forest dark:text-white sm:text-4xl"
         >
           Sign in
         </h1>
@@ -77,7 +76,7 @@ export default function Login() {
             placeholder="you@example.com"
             {...register('email')}
             error={errors.email?.message}
-            className="font-minecraft"
+            className=""
           />
           <SmoothInput
             id="login-password"
@@ -86,29 +85,19 @@ export default function Login() {
             autoComplete="current-password"
             {...register('password')}
             error={errors.password?.message}
-            className="font-minecraft"
+            className=""
           />
           {errors.root?.serverError?.message && (
             <p
               role="alert"
-              className="border-4 border-black bg-red-100 p-3 text-sm text-red-800"
+              className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800"
             >
               {errors.root.serverError.message}
             </p>
           )}
-          <RetroButton
-            bg="#1E5631"
-            textColor="#FFFFFF"
-            borderColor="#000000"
-            shadow="#000000"
-            className="mx-0 my-0 mt-1 w-full px-5 py-3 font-minecraft"
-            type="submit"
-            disabled={isSubmitting}
-            aria-busy={isSubmitting}
-          >
-            {isSubmitting && <Loader size="sm" label="Signing in" className="border-current" />}
+          <Button type="submit" loading={isSubmitting} className="mt-1 w-full px-5 py-3">
             {isSubmitting ? 'Signing in…' : 'Sign in'}
-          </RetroButton>
+          </Button>
         </form>
         <p className="mt-6 text-sm text-[#58655a] dark:text-slate-300">
           <Link

@@ -2,16 +2,64 @@ import DietPlan from '../models/DietPlan.js';
 import MealPlan from '../models/MealPlan.js';
 import { enhanceDietPlan } from '../services/aiService.js';
 import { generateBasicDietPlan } from '../services/dietService.js';
+import { buildGroceryList } from '../services/groceryService.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import httpError from '../utils/httpError.js';
+import { assertNoHighRiskConditions } from '../services/medicalConditionPolicy.js';
+
+function publicDietPlan(dietPlan) {
+  const plan = typeof dietPlan.toObject === 'function' ? dietPlan.toObject() : dietPlan;
+  return {
+    ...plan,
+    meals: (plan.meals ?? []).map((meal) => ({
+      ...meal,
+      cookedHouseholdMeasure: meal.cookedHouseholdMeasure ?? meal.portionDescription ?? null,
+      items: (meal.items ?? []).map((item) => ({
+        ...item,
+        weightBasis: item.weightBasis ?? 'raw',
+        householdMeasure: item.householdMeasure ?? null,
+        rawIngredientWeight: item.rawIngredientWeight ?? {
+          quantityGrams: Number(item.quantity) || 0,
+          unit: 'g',
+        },
+      })),
+    })),
+  };
+}
 
 export const generateBasic = asyncHandler(async (req, res) => {
+  assertNoHighRiskConditions(req.body.conditions);
   const profile = {
     ...req.body,
     dietType: req.body.dietType === 'non-veg' ? 'nonveg' : req.body.dietType,
   };
   const generated = await enhanceDietPlan(generateBasicDietPlan(profile));
-  const dietPlan = await DietPlan.create({ ...generated, userId: req.user._id });
-  return res.status(201).json({ success: true, data: dietPlan });
+  const dietPlan = await DietPlan.create({
+    ...generated,
+    groceryList: buildGroceryList(generated),
+    conditions: req.body.conditions,
+    userId: req.user._id,
+  });
+  return res.status(201).json({ success: true, data: publicDietPlan(dietPlan) });
+});
+
+export const getGroceryList = asyncHandler(async (req, res) => {
+  const dietPlan = await DietPlan.findOne({ _id: req.params.id, userId: req.user._id });
+  if (!dietPlan) throw httpError(404, 'DIET_PLAN_NOT_FOUND', 'Diet plan not found.');
+
+  // Grocery data is derived from the saved portions, not nutrition. Rebuild from
+  // the single loaded document so older cached lists and newly structured meals
+  // both resolve to the same response contract without another database query.
+  const groceryList = buildGroceryList(dietPlan);
+  if (JSON.stringify(dietPlan.groceryList ?? []) !== JSON.stringify(groceryList)) {
+    dietPlan.groceryList = groceryList;
+    await dietPlan.save();
+  }
+
+  return res.json({
+    success: true,
+    data: { dietPlanId: String(dietPlan._id), groceryList },
+  });
 });
 
 export const list = asyncHandler(async (req, res) => {
@@ -21,10 +69,10 @@ export const list = asyncHandler(async (req, res) => {
     MealPlan.find(filter).sort({ createdAt: -1 }).limit(100).lean(),
   ]);
   const plans = [
-    ...basicPlans,
+    ...basicPlans.map(publicDietPlan),
     ...personalizedPlans.map((plan) => ({ ...plan, type: 'personalized' })),
   ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   return res.json({ success: true, data: { plans } });
 });
 
-export default { generateBasic, list };
+export default { generateBasic, getGroceryList, list };

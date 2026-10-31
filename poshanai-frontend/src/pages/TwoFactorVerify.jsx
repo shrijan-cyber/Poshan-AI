@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Button as RetroButton, Input as RetroInput } from 'pixel-retroui';
+import { Button } from '../components/common/index.js';
 import logo from '../assets/logo.svg';
-import Loader from '../components/common/Loader.jsx';
 import { useToast } from '../components/common/Toast.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 
@@ -62,7 +61,7 @@ export default function TwoFactorVerify() {
   };
 
   return (
-    <main className="font-minecraft relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-cream p-4 dark:bg-slate-950 sm:p-6">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-cream p-4 dark:bg-slate-950 sm:p-6">
       <section aria-labelledby="two-factor-title" className="relative z-10 w-full max-w-md rounded-2xl border border-white/70 bg-white/95 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/95 sm:p-8">
         <Link to="/login" onClick={cancelTwoFactor} className="mb-6 inline-flex items-center gap-3" aria-label="Back to PoshanAI sign in">
           <img src={logo} alt="" className="h-12 w-12 rounded-xl object-contain" />
@@ -83,7 +82,7 @@ export default function TwoFactorVerify() {
           <label htmlFor="two-factor-code" className="block text-sm font-medium text-slate-800 dark:text-slate-100">
             {useBackupCode ? 'Backup code' : 'Authenticator code'}
           </label>
-          <RetroInput
+          <input
             id="two-factor-code"
             type="text"
             inputMode={useBackupCode ? 'text' : 'numeric'}
@@ -97,16 +96,12 @@ export default function TwoFactorVerify() {
             placeholder={useBackupCode ? '10-character code' : '000000'}
             aria-describedby={error ? 'two-factor-error' : undefined}
             aria-invalid={Boolean(error)}
-            bg="#FFFFFF"
-            textColor="#1E5631"
-            borderColor={error ? '#DC2626' : '#000000'}
-            className="w-[calc(100%-0.5rem)] text-center text-xl tracking-[0.3em]"
+            className={`w-full rounded-xl border bg-white px-3 py-3 text-center text-xl text-slate-900 outline-none focus:ring-2 dark:bg-slate-800 dark:text-white ${error ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:border-forest focus:ring-forest/20 dark:border-slate-700'}`}
           />
           {error && <p id="two-factor-error" role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-          <RetroButton bg="#1E5631" textColor="#FFFFFF" borderColor="#000000" shadow="#000000" className="mx-0 my-0 w-full justify-center px-5 py-3" type="submit" disabled={isSubmitting || secondsLeft === 0 || code.length !== (useBackupCode ? 10 : 6)} aria-busy={isSubmitting}>
-            {isSubmitting && <Loader size="sm" label="Verifying code" className="border-current" />}
+          <Button className="w-full px-5 py-3" type="submit" loading={isSubmitting} disabled={secondsLeft === 0 || code.length !== (useBackupCode ? 10 : 6)}>
             {isSubmitting ? 'Verifying…' : 'Verify and sign in'}
-          </RetroButton>
+          </Button>
         </form>
 
         <button

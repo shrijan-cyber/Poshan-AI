@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const datasetPath = path.resolve(__dirname, '../../data/ifct_2017.json');
+let cachedFoods;
 
 const blockedEverydayAlternatives = /\b(?:barley)\b/i;
 const explicitlyRequestedOnly = /\b(?:amaranth|agathi|ragi|quinoa)\b/i;
@@ -28,12 +29,14 @@ const commonHouseholdFood = new RegExp([
 ].join('|'), 'i');
 
 const householdNameRules = [
+  [/\bTriticum aestivum\b/i, 'Wheat Roti'],
   [/^Rice flakes$/i, 'Poha'],
   [/^Rice puffed$/i, 'Puffed rice (murmura)'],
   [/^Rice,/i, 'Rice'],
-  [/^Wheat flour, atta$/i, 'Wheat atta (for roti)'],
+  [/^Wheat flour, atta$/i, 'Wheat Roti'],
   [/^Wheat flour, refined$/i, 'Wheat flour'],
-  [/^Wheat,/i, 'Wheat (roti staple)'],
+  [/^Wheat, whole$/i, 'Whole wheat (for roti)'],
+  [/^Wheat,/i, 'Wheat staple'],
   [/^Bengal gram, dal$/i, 'Chana dal'],
   [/^Bengal gram, whole$/i, 'Whole chana'],
   [/^Black gram, dal$/i, 'Urad dal'],
@@ -84,8 +87,7 @@ function isCommonHouseholdFood(food) {
 }
 
 export function getHouseholdFoodWhitelist(foods, requestText = '', limit = 100) {
-  const requested = foods.filter((food) => !blockedEverydayAlternatives.test(food.foodName)
-    && wasFoodExplicitlyRequested(food, requestText));
+  const requested = foods.filter((food) => wasFoodExplicitlyRequested(food, requestText));
   const common = foods.filter(isCommonHouseholdFood);
   const preferredCodes = [
     'A011', 'A012', 'A014', 'A015', 'A019', 'B001', 'B003', 'B010', 'B013', 'B018', 'B020', 'B021',
@@ -121,4 +123,67 @@ export function loadIfctDataset(filePath = datasetPath) {
   }));
 }
 
-export default { loadIfctDataset, getHouseholdFoodName, getHouseholdFoodWhitelist, wasFoodExplicitlyRequested };
+/** Load the catalog once so every backend service shares identical IFCT records. */
+export function getIfctFoods() {
+  if (!cachedFoods) {
+    cachedFoods = loadIfctDataset();
+    for (const food of cachedFoods) {
+      if (food.nutrients && !Object.isFrozen(food.nutrients)) Object.freeze(food.nutrients);
+      Object.freeze(food);
+    }
+    Object.freeze(cachedFoods);
+  }
+  return cachedFoods;
+}
+
+const foodNameKey = (value) => String(value ?? '').toLocaleLowerCase('en')
+  .normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+
+const safeFoodSubstitutions = new Map([
+  ['dahi', 'milk, whole, cow'],
+  ['curd', 'milk, whole, cow'],
+  ['yogurt', 'milk, whole, cow'],
+  ['yoghurt', 'milk, whole, cow'],
+  ['chole', 'bengal gram, whole'],
+  ['chickpeas', 'bengal gram, whole'],
+]);
+
+/** Resolve names only to real catalog records; substitutions are explicit and reported. */
+export function resolveIfctFoodReference(name, foods = getIfctFoods()) {
+  const requestedName = String(name ?? '').trim();
+  const key = foodNameKey(requestedName);
+  if (!key) return { requestedName, food: null, substituted: false, warning: 'Food name is empty.' };
+
+  const exact = foods.find((food) => foodNameKey(food.foodName) === key
+    || foodNameKey(getHouseholdFoodName(food)) === key);
+  if (exact) return { requestedName, food: exact, substituted: false, warning: null };
+
+  const substituteName = safeFoodSubstitutions.get(key);
+  const substituteKey = foodNameKey(substituteName);
+  const food = substituteName
+    ? foods.find((candidate) => foodNameKey(candidate.foodName) === substituteKey)
+    : null;
+  if (food) {
+    return {
+      requestedName,
+      food,
+      substituted: true,
+      warning: `No IFCT record for ${requestedName}; ${getHouseholdFoodName(food)} is an available catalog substitute.`,
+    };
+  }
+  return {
+    requestedName,
+    food: null,
+    substituted: false,
+    warning: `No IFCT record is available for ${requestedName}; nutrient values were not estimated.`,
+  };
+}
+
+export default {
+  loadIfctDataset,
+  getIfctFoods,
+  getHouseholdFoodName,
+  getHouseholdFoodWhitelist,
+  wasFoodExplicitlyRequested,
+  resolveIfctFoodReference,
+};

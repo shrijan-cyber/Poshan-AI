@@ -9,4 +9,9 @@ export async function getDietPlans() {
   return Array.isArray(data) ? data : (data?.plans ?? []);
 }
 
-export default { generateBasicDietPlan, getDietPlans };
+export async function getDietPlanGroceryList(id) {
+  const data = payloadFrom(await client.get(`/diet-plans/${encodeURIComponent(id)}/grocery-list`));
+  return data?.groceryList ?? [];
+}
+
+export default { generateBasicDietPlan, getDietPlans, getDietPlanGroceryList };

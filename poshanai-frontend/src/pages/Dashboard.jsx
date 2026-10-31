@@ -39,7 +39,7 @@ function formatDate(value) {
 
 function RequestError({ title, message, onRetry }) {
   return (
-    <Card className="dashboard-retro-card border-red-200 dark:border-red-900">
+    <Card className="dashboard-modern-card border-red-200 dark:border-red-900">
       <h3 className="font-semibold text-red-800 dark:text-red-300">{title}</h3>
       <p className="mt-2 text-sm text-red-700 dark:text-red-200">{message}</p>
       <Button className="mt-4" size="sm" variant="secondary" onClick={onRetry}>
@@ -69,7 +69,7 @@ function StatCard({ label, value, detail, loading, className }) {
 
 function ProfileSummary({ user }) {
   return (
-    <Card as="section" aria-labelledby="profile-summary-title" className="dashboard-retro-card h-full">
+    <Card as="section" aria-labelledby="profile-summary-title" className="dashboard-modern-card h-full">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 id="profile-summary-title" className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -176,7 +176,7 @@ function ReportList({ reports, isLoading, error, onRetry, hasMore, loadMore }) {
   };
 
   return (
-    <Card as="section" aria-labelledby="recent-reports-title" className="dashboard-retro-card">
+    <Card as="section" aria-labelledby="recent-reports-title" className="dashboard-modern-card">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="recent-reports-title" className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -347,7 +347,7 @@ export default function Dashboard() {
 
   return (
     <motion.div
-      className="dashboard-retro mx-auto max-w-6xl space-y-8"
+      className="dashboard-modern mx-auto max-w-6xl space-y-8"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
@@ -395,7 +395,7 @@ export default function Dashboard() {
       </section>
 
       {/* --- Report Review Section (Integrated from Member 2) --- */}
-      <section className="dashboard-retro-card p-6">
+      <section className="dashboard-modern-card rounded-2xl p-6">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Report review</h2>
         <p className="mt-1 text-sm text-slate-500">Confirm extracted lab values before generating a meal plan.</p>
         {reviewError && <p role="alert" className="mt-3 text-sm text-red-600">{reviewError}</p>}
@@ -444,13 +444,13 @@ export default function Dashboard() {
       <section aria-labelledby="quick-actions-title">
         <h2 id="quick-actions-title" className="text-xl font-semibold text-slate-900 dark:text-white">Quick actions</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card as="article" className="dashboard-retro-card h-full">
+          <Card as="article" className="dashboard-modern-card h-full">
             <h3 className="font-semibold text-slate-900 dark:text-white">Upload a report</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Add a PDF or image report to your account.</p>
             <Button as={Link} to="/upload" className="mt-4" size="sm">Upload report</Button>
           </Card>
 
-          <Card as="article" className="dashboard-retro-card h-full">
+          <Card as="article" className="dashboard-modern-card h-full">
             <h3 className="font-semibold text-slate-900 dark:text-white">View meal plans</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
               {latestMealPlanId ? 'Open your latest meal plan.' : 'No meal plan is available yet. Upload a report to get started.'}
@@ -460,7 +460,7 @@ export default function Dashboard() {
             </Button>
           </Card>
 
-          <Card as="article" className="dashboard-retro-card h-full">
+          <Card as="article" className="dashboard-modern-card h-full">
             <h3 className="font-semibold text-slate-900 dark:text-white">Complete your profile</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Review your account details and profile options.</p>
             <Button className="mt-4" size="sm" variant="secondary" onClick={() => navigate('/profile')}>View profile</Button>
@@ -468,7 +468,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <p className="border-4 border-black bg-amber-100 p-4 text-sm leading-6 text-amber-950 shadow-[6px_6px_0px_#000] dark:bg-amber-950 dark:text-amber-100">
+      <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100">
         PoshanAI provides nutrition awareness and food suggestions. It does not diagnose or replace advice from a qualified healthcare professional.
       </p>
     </motion.div>

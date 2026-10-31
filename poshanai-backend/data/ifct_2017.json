@@ -18,7 +18,8 @@
       "iron": 9.33,
       "calcium": 181,
       "vitaminD": 58.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -40,7 +41,8 @@
       "iron": 8.02,
       "calcium": 162,
       "vitaminD": 53.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -62,7 +64,8 @@
       "iron": 6.42,
       "calcium": 27.35,
       "vitaminD": 5.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -86,7 +89,8 @@
       "iron": 1.56,
       "calcium": 28.64,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -108,7 +112,8 @@
       "iron": 3.95,
       "calcium": 27.6,
       "vitaminD": 3.96,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -130,7 +135,8 @@
       "iron": 2.49,
       "calcium": 8.91,
       "vitaminD": 33.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -152,7 +158,8 @@
       "iron": 0.71,
       "calcium": 6.35,
       "vitaminD": 42.34,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -174,7 +181,8 @@
       "iron": 0.54,
       "calcium": 6.37,
       "vitaminD": 16.94,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -196,7 +204,8 @@
       "iron": 7.51,
       "calcium": 198,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -218,7 +227,8 @@
       "iron": 4.62,
       "calcium": 364,
       "vitaminD": 41.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -240,7 +250,8 @@
       "iron": 4.46,
       "calcium": 9.19,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -262,7 +273,8 @@
       "iron": 4.55,
       "calcium": 15.09,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -289,7 +301,8 @@
       "iron": 1.02,
       "calcium": 10.93,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -311,7 +324,8 @@
       "iron": 0.72,
       "calcium": 8.11,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -338,7 +352,8 @@
       "iron": 0.65,
       "calcium": 7.49,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -360,7 +375,8 @@
       "iron": 1.26,
       "calcium": 16.06,
       "vitaminD": 3.75,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -382,7 +398,8 @@
       "iron": 2.34,
       "calcium": 15.27,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -406,7 +423,8 @@
       "iron": 1.77,
       "calcium": 20.4,
       "vitaminD": 6.73,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -430,7 +448,8 @@
       "iron": 4.1,
       "calcium": 30.94,
       "vitaminD": 13.43,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -454,7 +473,8 @@
       "iron": 3.97,
       "calcium": 39.36,
       "vitaminD": 17.49,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -478,7 +498,8 @@
       "iron": 3.86,
       "calcium": 27.09,
       "vitaminD": 6.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -502,7 +523,8 @@
       "iron": 2.98,
       "calcium": 29.38,
       "vitaminD": 8.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -526,7 +548,8 @@
       "iron": 2.02,
       "calcium": 19.42,
       "vitaminD": 4.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -550,7 +573,8 @@
       "iron": 2.09,
       "calcium": 22.63,
       "vitaminD": 3.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -574,7 +598,8 @@
       "iron": 6.08,
       "calcium": 46.32,
       "vitaminD": 1.75,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -598,7 +623,8 @@
       "iron": 6.78,
       "calcium": 150,
       "vitaminD": 1.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -622,7 +648,8 @@
       "iron": 4.67,
       "calcium": 55.67,
       "vitaminD": 8.42,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -646,7 +673,8 @@
       "iron": 5.97,
       "calcium": 86.18,
       "vitaminD": 16.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -670,7 +698,8 @@
       "iron": 5.9,
       "calcium": 81.73,
       "vitaminD": 0.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -694,7 +723,8 @@
       "iron": 5.04,
       "calcium": 84.1,
       "vitaminD": 0.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -718,7 +748,8 @@
       "iron": 4.5,
       "calcium": 78.16,
       "vitaminD": 4.35,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -742,7 +773,8 @@
       "iron": 4.99,
       "calcium": 75.2,
       "vitaminD": 4.24,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -766,7 +798,8 @@
       "iron": 5.5,
       "calcium": 77.24,
       "vitaminD": 4.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -790,7 +823,8 @@
       "iron": 3.93,
       "calcium": 43.13,
       "vitaminD": 2.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -814,7 +848,8 @@
       "iron": 4.89,
       "calcium": 92.43,
       "vitaminD": 3.15,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -838,7 +873,8 @@
       "iron": 8.76,
       "calcium": 269,
       "vitaminD": 1.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -862,7 +898,8 @@
       "iron": 7.06,
       "calcium": 44.32,
       "vitaminD": 1.31,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -886,7 +923,8 @@
       "iron": 7.57,
       "calcium": 76.13,
       "vitaminD": 14.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -910,7 +948,8 @@
       "iron": 7.91,
       "calcium": 76.66,
       "vitaminD": 17.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -934,7 +973,8 @@
       "iron": 7.9,
       "calcium": 154,
       "vitaminD": 9.77,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -958,7 +998,8 @@
       "iron": 5.09,
       "calcium": 75.11,
       "vitaminD": 15.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -982,7 +1023,8 @@
       "iron": 6.17,
       "calcium": 134,
       "vitaminD": 27.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1006,7 +1048,8 @@
       "iron": 6.3,
       "calcium": 134,
       "vitaminD": 25.82,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1030,7 +1073,8 @@
       "iron": 6.13,
       "calcium": 126,
       "vitaminD": 26.73,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1054,7 +1098,8 @@
       "iron": 3.9,
       "calcium": 71.73,
       "vitaminD": 2.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1078,7 +1123,8 @@
       "iron": 5.37,
       "calcium": 139,
       "vitaminD": 2.78,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1102,7 +1148,8 @@
       "iron": 4.76,
       "calcium": 200,
       "vitaminD": 8.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1127,7 +1174,8 @@
       "iron": 8.29,
       "calcium": 239,
       "vitaminD": 66.22,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1152,7 +1200,8 @@
       "iron": 8.22,
       "calcium": 195,
       "vitaminD": 69.81,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1174,7 +1223,8 @@
       "iron": 4.36,
       "calcium": 901,
       "vitaminD": 4.02,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1196,7 +1246,8 @@
       "iron": 4.64,
       "calcium": 330,
       "vitaminD": 16.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1218,7 +1269,8 @@
       "iron": 7.25,
       "calcium": 245,
       "vitaminD": 15.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1240,7 +1292,8 @@
       "iron": 5.28,
       "calcium": 269,
       "vitaminD": 15.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1262,7 +1315,8 @@
       "iron": 6.37,
       "calcium": 359,
       "vitaminD": 15.23,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1284,7 +1338,8 @@
       "iron": 4.58,
       "calcium": 372,
       "vitaminD": 15.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1306,7 +1361,8 @@
       "iron": 4.2,
       "calcium": 93.89,
       "vitaminD": 9.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1328,7 +1384,8 @@
       "iron": 2.66,
       "calcium": 211,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1350,7 +1407,8 @@
       "iron": 5.8,
       "calcium": 151,
       "vitaminD": 1.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1372,7 +1430,8 @@
       "iron": 3,
       "calcium": 207,
       "vitaminD": 3.78,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1394,7 +1453,8 @@
       "iron": 2.87,
       "calcium": 196,
       "vitaminD": 2.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1416,7 +1476,8 @@
       "iron": 1.54,
       "calcium": 53.99,
       "vitaminD": 0.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1438,7 +1499,8 @@
       "iron": 0.39,
       "calcium": 58.46,
       "vitaminD": 0.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1460,7 +1522,8 @@
       "iron": 2.67,
       "calcium": 170,
       "vitaminD": 0.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1482,7 +1545,8 @@
       "iron": 0.35,
       "calcium": 51.76,
       "vitaminD": 0.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1504,7 +1568,8 @@
       "iron": 0.24,
       "calcium": 48,
       "vitaminD": 0.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1526,7 +1591,8 @@
       "iron": 2.42,
       "calcium": 96.7,
       "vitaminD": 4.15,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1548,7 +1614,8 @@
       "iron": 3.41,
       "calcium": 216,
       "vitaminD": 1.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1570,7 +1637,8 @@
       "iron": 4.56,
       "calcium": 314,
       "vitaminD": 14.33,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1592,7 +1660,8 @@
       "iron": 5.69,
       "calcium": 274,
       "vitaminD": 2.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1614,7 +1683,8 @@
       "iron": 6.19,
       "calcium": 217,
       "vitaminD": 0.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1636,7 +1706,8 @@
       "iron": 7.65,
       "calcium": 145,
       "vitaminD": 4.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1658,7 +1729,8 @@
       "iron": 9.56,
       "calcium": 129,
       "vitaminD": 4.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1680,7 +1752,8 @@
       "iron": 2.51,
       "calcium": 368,
       "vitaminD": 0.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1702,7 +1775,8 @@
       "iron": 2.73,
       "calcium": 56.71,
       "vitaminD": 0.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1724,7 +1798,8 @@
       "iron": 2.84,
       "calcium": 191,
       "vitaminD": 5.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1746,7 +1821,8 @@
       "iron": 3.78,
       "calcium": 150,
       "vitaminD": 0.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1768,7 +1844,8 @@
       "iron": 5.51,
       "calcium": 288,
       "vitaminD": 5.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1790,7 +1867,8 @@
       "iron": 3.88,
       "calcium": 388,
       "vitaminD": 0.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1812,7 +1890,8 @@
       "iron": 5.58,
       "calcium": 271,
       "vitaminD": 3.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1834,7 +1913,8 @@
       "iron": 3.82,
       "calcium": 234,
       "vitaminD": 1.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1856,7 +1936,8 @@
       "iron": 3.67,
       "calcium": 131,
       "vitaminD": 0.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1878,7 +1959,8 @@
       "iron": 2.95,
       "calcium": 82.29,
       "vitaminD": 0.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1900,7 +1982,8 @@
       "iron": 2.84,
       "calcium": 66.93,
       "vitaminD": 2.62,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1922,7 +2005,8 @@
       "iron": 0.47,
       "calcium": 19.39,
       "vitaminD": 1.35,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1944,7 +2028,8 @@
       "iron": 0.33,
       "calcium": 10,
       "vitaminD": 0.41,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1966,7 +2051,8 @@
       "iron": 0.73,
       "calcium": 43.48,
       "vitaminD": 1.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -1988,7 +2074,8 @@
       "iron": 1.15,
       "calcium": 21.36,
       "vitaminD": 1.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2010,7 +2097,8 @@
       "iron": 1.08,
       "calcium": 16.27,
       "vitaminD": 1.9,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2032,7 +2120,8 @@
       "iron": 1.28,
       "calcium": 17.62,
       "vitaminD": 1.83,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2054,7 +2143,8 @@
       "iron": 0.26,
       "calcium": 15.42,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2076,7 +2166,8 @@
       "iron": 0.28,
       "calcium": 15.05,
       "vitaminD": 0.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2098,7 +2189,8 @@
       "iron": 0.34,
       "calcium": 16.64,
       "vitaminD": 0.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2120,7 +2212,8 @@
       "iron": 0.49,
       "calcium": 22.17,
       "vitaminD": 0.85,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2142,7 +2235,8 @@
       "iron": 0.44,
       "calcium": 17.13,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2164,7 +2258,8 @@
       "iron": 0.34,
       "calcium": 14.58,
       "vitaminD": 1.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2186,7 +2281,8 @@
       "iron": 0.38,
       "calcium": 13.39,
       "vitaminD": 1.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2208,7 +2304,8 @@
       "iron": 0.36,
       "calcium": 17.03,
       "vitaminD": 1.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2230,7 +2327,8 @@
       "iron": 0.39,
       "calcium": 17.17,
       "vitaminD": 1.14,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2252,7 +2350,8 @@
       "iron": 0.27,
       "calcium": 19.95,
       "vitaminD": 0.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2274,7 +2373,8 @@
       "iron": 0.42,
       "calcium": 21,
       "vitaminD": 0.97,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2296,7 +2396,8 @@
       "iron": 0.38,
       "calcium": 18.79,
       "vitaminD": 1.02,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2318,7 +2419,8 @@
       "iron": 0.41,
       "calcium": 15.59,
       "vitaminD": 0.88,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2340,7 +2442,8 @@
       "iron": 0.37,
       "calcium": 15.92,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2362,7 +2465,8 @@
       "iron": 0.37,
       "calcium": 19.85,
       "vitaminD": 0.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2384,7 +2488,8 @@
       "iron": 0.32,
       "calcium": 18.95,
       "vitaminD": 1.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2406,7 +2511,8 @@
       "iron": 0.32,
       "calcium": 14.43,
       "vitaminD": 0.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2428,7 +2534,8 @@
       "iron": 0.36,
       "calcium": 17.82,
       "vitaminD": 1.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2450,7 +2557,8 @@
       "iron": 0.32,
       "calcium": 18.33,
       "vitaminD": 0.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2472,7 +2580,8 @@
       "iron": 0.5,
       "calcium": 20.83,
       "vitaminD": 1.33,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2494,7 +2603,8 @@
       "iron": 0.38,
       "calcium": 16.24,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2516,7 +2626,8 @@
       "iron": 0.32,
       "calcium": 16.1,
       "vitaminD": 1.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2538,7 +2649,8 @@
       "iron": 0.33,
       "calcium": 14.36,
       "vitaminD": 1.02,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2560,7 +2672,8 @@
       "iron": 0.34,
       "calcium": 15.27,
       "vitaminD": 0.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2582,7 +2695,8 @@
       "iron": 0.37,
       "calcium": 16.59,
       "vitaminD": 1.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2604,7 +2718,8 @@
       "iron": 0.94,
       "calcium": 64.37,
       "vitaminD": 11.58,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2626,7 +2741,8 @@
       "iron": 0.48,
       "calcium": 14.75,
       "vitaminD": 0.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2648,7 +2764,8 @@
       "iron": 0.38,
       "calcium": 15.76,
       "vitaminD": 0.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2670,7 +2787,8 @@
       "iron": 0.69,
       "calcium": 19.13,
       "vitaminD": 0.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2692,7 +2810,8 @@
       "iron": 0.96,
       "calcium": 25.16,
       "vitaminD": 1.32,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2714,7 +2833,8 @@
       "iron": 1.36,
       "calcium": 38.73,
       "vitaminD": 1.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2736,7 +2856,8 @@
       "iron": 0.48,
       "calcium": 18.64,
       "vitaminD": 5.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2758,7 +2879,8 @@
       "iron": 3.9,
       "calcium": 121,
       "vitaminD": 13.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2780,7 +2902,8 @@
       "iron": 0.77,
       "calcium": 29.46,
       "vitaminD": 0.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2802,7 +2925,8 @@
       "iron": 0.55,
       "calcium": 40.21,
       "vitaminD": 0.14,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2824,7 +2948,8 @@
       "iron": 1.45,
       "calcium": 76.51,
       "vitaminD": 31.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2846,7 +2971,8 @@
       "iron": 0.46,
       "calcium": 16.39,
       "vitaminD": 1.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2868,7 +2994,8 @@
       "iron": 0.59,
       "calcium": 19.25,
       "vitaminD": 1.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2890,7 +3017,8 @@
       "iron": 0.45,
       "calcium": 21.98,
       "vitaminD": 1.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2912,7 +3040,8 @@
       "iron": 0.73,
       "calcium": 33.3,
       "vitaminD": 1.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2934,7 +3063,8 @@
       "iron": 1.95,
       "calcium": 70.57,
       "vitaminD": 7.14,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2956,7 +3086,8 @@
       "iron": 1.48,
       "calcium": 58.59,
       "vitaminD": 7.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -2978,7 +3109,8 @@
       "iron": 1.25,
       "calcium": 55.99,
       "vitaminD": 1.82,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3000,7 +3132,8 @@
       "iron": 0.98,
       "calcium": 49.9,
       "vitaminD": 1.85,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3022,7 +3155,8 @@
       "iron": 0.31,
       "calcium": 45.74,
       "vitaminD": 6.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3044,7 +3178,8 @@
       "iron": 0.37,
       "calcium": 37.56,
       "vitaminD": 1.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3066,7 +3201,8 @@
       "iron": 0.24,
       "calcium": 35.26,
       "vitaminD": 0.32,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3088,7 +3224,8 @@
       "iron": 0.38,
       "calcium": 34.39,
       "vitaminD": 6.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3110,7 +3247,8 @@
       "iron": 0.29,
       "calcium": 37.12,
       "vitaminD": 6.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3132,7 +3270,8 @@
       "iron": 0.84,
       "calcium": 86.12,
       "vitaminD": 7.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3154,7 +3293,8 @@
       "iron": 0.4,
       "calcium": 27,
       "vitaminD": 7.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3176,7 +3316,8 @@
       "iron": 3.09,
       "calcium": 31.12,
       "vitaminD": 6.81,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3198,7 +3339,8 @@
       "iron": 0.2,
       "calcium": 22.72,
       "vitaminD": 7.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3220,7 +3362,8 @@
       "iron": 0.5,
       "calcium": 30.76,
       "vitaminD": 0.69,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3242,7 +3385,8 @@
       "iron": 1.58,
       "calcium": 28.24,
       "vitaminD": 12.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3264,7 +3408,8 @@
       "iron": 0.4,
       "calcium": 34.06,
       "vitaminD": 1.29,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3286,7 +3431,8 @@
       "iron": 0.34,
       "calcium": 13.8,
       "vitaminD": 0.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3308,7 +3454,8 @@
       "iron": 0.26,
       "calcium": 11.24,
       "vitaminD": 0.32,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3330,7 +3477,8 @@
       "iron": 0.29,
       "calcium": 24.1,
       "vitaminD": 1.07,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3352,7 +3500,8 @@
       "iron": 0.36,
       "calcium": 23.06,
       "vitaminD": 1.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3374,7 +3523,8 @@
       "iron": 1.18,
       "calcium": 58.58,
       "vitaminD": 28.96,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3396,7 +3546,8 @@
       "iron": 0.42,
       "calcium": 13.7,
       "vitaminD": 0.37,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3418,7 +3569,8 @@
       "iron": 0.5,
       "calcium": 14.96,
       "vitaminD": 0.34,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3440,7 +3592,8 @@
       "iron": 0.32,
       "calcium": 24.6,
       "vitaminD": 2.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3462,7 +3615,8 @@
       "iron": 0.47,
       "calcium": 27.11,
       "vitaminD": 3.08,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3484,7 +3638,8 @@
       "iron": 0.2,
       "calcium": 17.9,
       "vitaminD": 3.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3506,7 +3661,8 @@
       "iron": 0.41,
       "calcium": 19.68,
       "vitaminD": 2.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3528,7 +3684,8 @@
       "iron": 0.42,
       "calcium": 8.49,
       "vitaminD": 1.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3550,7 +3707,8 @@
       "iron": 0.22,
       "calcium": 8.9,
       "vitaminD": 11.83,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3572,7 +3730,8 @@
       "iron": 0.3,
       "calcium": 10.17,
       "vitaminD": 12.24,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3594,7 +3753,8 @@
       "iron": 0.52,
       "calcium": 17.26,
       "vitaminD": 0.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3616,7 +3776,8 @@
       "iron": 0.34,
       "calcium": 20.98,
       "vitaminD": 0.38,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3644,7 +3805,8 @@
       "iron": 0.26,
       "calcium": 13.68,
       "vitaminD": 1.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3672,7 +3834,8 @@
       "iron": 0.2,
       "calcium": 6.53,
       "vitaminD": 2.45,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3700,7 +3863,8 @@
       "iron": 0.25,
       "calcium": 5.39,
       "vitaminD": 1.86,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3728,7 +3892,8 @@
       "iron": 0.21,
       "calcium": 4.72,
       "vitaminD": 2.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3750,7 +3915,8 @@
       "iron": 2.5,
       "calcium": 28.57,
       "vitaminD": 3.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3772,7 +3938,8 @@
       "iron": 1.12,
       "calcium": 5.42,
       "vitaminD": 4.31,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3794,7 +3961,8 @@
       "iron": 0.81,
       "calcium": 28.48,
       "vitaminD": 2.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3816,7 +3984,8 @@
       "iron": 0.23,
       "calcium": 47.95,
       "vitaminD": 1.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3844,7 +4013,8 @@
       "iron": 0.4,
       "calcium": 6.77,
       "vitaminD": 0.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3872,7 +4042,8 @@
       "iron": 0.35,
       "calcium": 8.73,
       "vitaminD": 0.24,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3900,7 +4071,8 @@
       "iron": 0.24,
       "calcium": 9.56,
       "vitaminD": 0.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3928,7 +4100,8 @@
       "iron": 0.28,
       "calcium": 5.07,
       "vitaminD": 0.22,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3950,7 +4123,8 @@
       "iron": 0.63,
       "calcium": 23.81,
       "vitaminD": 14.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3972,7 +4146,8 @@
       "iron": 0.36,
       "calcium": 23.88,
       "vitaminD": 4.3,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -3994,7 +4169,8 @@
       "iron": 1.36,
       "calcium": 40.32,
       "vitaminD": 3.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4016,7 +4192,8 @@
       "iron": 0.42,
       "calcium": 28.2,
       "vitaminD": 0.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4038,7 +4215,8 @@
       "iron": 3.2,
       "calcium": 71.2,
       "vitaminD": 2.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4060,7 +4238,8 @@
       "iron": 4.79,
       "calcium": 66.13,
       "vitaminD": 0.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4082,7 +4261,8 @@
       "iron": 0.89,
       "calcium": 15.73,
       "vitaminD": 0.83,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4104,7 +4284,8 @@
       "iron": 0.69,
       "calcium": 78.52,
       "vitaminD": 1.47,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4126,7 +4307,8 @@
       "iron": 1.25,
       "calcium": 20.14,
       "vitaminD": 0.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4148,7 +4330,8 @@
       "iron": 0.22,
       "calcium": 10.57,
       "vitaminD": 6.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4170,7 +4353,8 @@
       "iron": 0.24,
       "calcium": 11.16,
       "vitaminD": 3.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4192,7 +4376,8 @@
       "iron": 0.33,
       "calcium": 11.27,
       "vitaminD": 6.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4214,7 +4399,8 @@
       "iron": 0.28,
       "calcium": 15.26,
       "vitaminD": 6.42,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4236,7 +4422,8 @@
       "iron": 0.24,
       "calcium": 14.22,
       "vitaminD": 3.54,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4258,7 +4445,8 @@
       "iron": 0.39,
       "calcium": 18.75,
       "vitaminD": 6.23,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4280,7 +4468,8 @@
       "iron": 0.32,
       "calcium": 18.52,
       "vitaminD": 1.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4302,7 +4491,8 @@
       "iron": 0.4,
       "calcium": 14.22,
       "vitaminD": 0.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4324,7 +4514,8 @@
       "iron": 0.36,
       "calcium": 35.03,
       "vitaminD": 7.49,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4346,7 +4537,8 @@
       "iron": 0.33,
       "calcium": 25.36,
       "vitaminD": 0.82,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4368,7 +4560,8 @@
       "iron": 0.87,
       "calcium": 10.81,
       "vitaminD": 1.43,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4385,12 +4578,21 @@
     "nutrients": {
       "calories": 36.57,
       "protein": 0.41,
-      "carbs": 0,
+      "carbs": 17.59,
       "fat": 0.75,
       "iron": 0.12,
       "calcium": 22.68,
       "vitaminD": 0.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
+    },
+    "nutrientImputations": {
+      "carbs": {
+        "method": "same-category arithmetic mean",
+        "category": "Fruits",
+        "donorCount": 67,
+        "originalValue": 0
+      }
     }
   },
   {
@@ -4412,7 +4614,8 @@
       "iron": 0.11,
       "calcium": 25.79,
       "vitaminD": 0.3,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4434,7 +4637,8 @@
       "iron": 0.79,
       "calcium": 5.77,
       "vitaminD": 0.33,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4456,7 +4660,8 @@
       "iron": 0.51,
       "calcium": 15.77,
       "vitaminD": 3.71,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4478,7 +4683,8 @@
       "iron": 0.38,
       "calcium": 19.33,
       "vitaminD": 3.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4500,7 +4706,8 @@
       "iron": 0.29,
       "calcium": 15.54,
       "vitaminD": 3.73,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4522,7 +4729,8 @@
       "iron": 0.43,
       "calcium": 15.74,
       "vitaminD": 3.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4544,7 +4752,8 @@
       "iron": 0.36,
       "calcium": 11.36,
       "vitaminD": 3.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4566,7 +4775,8 @@
       "iron": 0.51,
       "calcium": 15.11,
       "vitaminD": 3.62,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4588,7 +4798,8 @@
       "iron": 0.28,
       "calcium": 13.34,
       "vitaminD": 3.77,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4610,7 +4821,8 @@
       "iron": 0.28,
       "calcium": 4.69,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4632,7 +4844,8 @@
       "iron": 0.71,
       "calcium": 8.51,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4654,7 +4867,8 @@
       "iron": 0.18,
       "calcium": 9.8,
       "vitaminD": 4.41,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4676,7 +4890,8 @@
       "iron": 0.21,
       "calcium": 9.02,
       "vitaminD": 2.33,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4698,7 +4913,8 @@
       "iron": 0.81,
       "calcium": 19.52,
       "vitaminD": 0.34,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4717,10 +4933,25 @@
       "protein": 0.5,
       "carbs": 4.92,
       "fat": 0.12,
-      "iron": 0,
-      "calcium": 0,
+      "iron": 0.86,
+      "calcium": 23.93,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
+    },
+    "nutrientImputations": {
+      "iron": {
+        "method": "same-category arithmetic mean",
+        "category": "Fruits",
+        "donorCount": 67,
+        "originalValue": 0
+      },
+      "calcium": {
+        "method": "same-category arithmetic mean",
+        "category": "Fruits",
+        "donorCount": 67,
+        "originalValue": 0
+      }
     }
   },
   {
@@ -4742,7 +4973,8 @@
       "iron": 0.23,
       "calcium": 15.02,
       "vitaminD": 11.47,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4764,7 +4996,8 @@
       "iron": 0.35,
       "calcium": 6.98,
       "vitaminD": 2.41,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4786,7 +5019,8 @@
       "iron": 0.28,
       "calcium": 6.55,
       "vitaminD": 1.48,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4808,7 +5042,8 @@
       "iron": 2.01,
       "calcium": 153,
       "vitaminD": 1.34,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4830,7 +5065,8 @@
       "iron": 0.28,
       "calcium": 10.88,
       "vitaminD": 0.21,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4852,7 +5088,8 @@
       "iron": 0.25,
       "calcium": 7.61,
       "vitaminD": 3.32,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4874,7 +5111,8 @@
       "iron": 0.31,
       "calcium": 10.65,
       "vitaminD": 109,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4896,7 +5134,8 @@
       "iron": 0.06,
       "calcium": 14.03,
       "vitaminD": 0.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4918,7 +5157,8 @@
       "iron": 6.81,
       "calcium": 73.24,
       "vitaminD": 1.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4940,7 +5180,8 @@
       "iron": 4.26,
       "calcium": 51.83,
       "vitaminD": 11.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4962,7 +5203,8 @@
       "iron": 0.37,
       "calcium": 8.67,
       "vitaminD": 2.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -4984,7 +5226,8 @@
       "iron": 0.49,
       "calcium": 17.87,
       "vitaminD": 0.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5006,7 +5249,8 @@
       "iron": 0.29,
       "calcium": 10.05,
       "vitaminD": 3.24,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5028,7 +5272,8 @@
       "iron": 0.45,
       "calcium": 4.97,
       "vitaminD": 0.96,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5050,7 +5295,8 @@
       "iron": 0.36,
       "calcium": 15.28,
       "vitaminD": 3.95,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5072,7 +5318,8 @@
       "iron": 9.16,
       "calcium": 149,
       "vitaminD": 25.65,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5094,7 +5341,8 @@
       "iron": 0.22,
       "calcium": 5.29,
       "vitaminD": 0.56,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5116,7 +5364,8 @@
       "iron": 0.16,
       "calcium": 4.35,
       "vitaminD": 0.56,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5138,7 +5387,8 @@
       "iron": 0.45,
       "calcium": 55.71,
       "vitaminD": 28.71,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5160,7 +5410,8 @@
       "iron": 0.4,
       "calcium": 46.55,
       "vitaminD": 16.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5182,7 +5433,8 @@
       "iron": 0.76,
       "calcium": 17.28,
       "vitaminD": 0.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5204,7 +5456,8 @@
       "iron": 0.6,
       "calcium": 35.09,
       "vitaminD": 1.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5226,7 +5479,8 @@
       "iron": 0.71,
       "calcium": 41.06,
       "vitaminD": 1.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5248,7 +5502,8 @@
       "iron": 0.66,
       "calcium": 30.18,
       "vitaminD": 0.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5270,7 +5525,8 @@
       "iron": 3.34,
       "calcium": 37.71,
       "vitaminD": 0.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5292,7 +5548,8 @@
       "iron": 0.57,
       "calcium": 9.52,
       "vitaminD": 0.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5314,7 +5571,8 @@
       "iron": 0.53,
       "calcium": 8.53,
       "vitaminD": 0.22,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5336,7 +5594,8 @@
       "iron": 0.66,
       "calcium": 8.62,
       "vitaminD": 0.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5358,7 +5617,8 @@
       "iron": 0.37,
       "calcium": 28.44,
       "vitaminD": 0.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5380,7 +5640,8 @@
       "iron": 0.36,
       "calcium": 30.2,
       "vitaminD": 0.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5402,7 +5663,8 @@
       "iron": 0.42,
       "calcium": 35.76,
       "vitaminD": 0.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5424,7 +5686,8 @@
       "iron": 0.41,
       "calcium": 34.23,
       "vitaminD": 0.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5446,7 +5709,8 @@
       "iron": 0.35,
       "calcium": 27.5,
       "vitaminD": 1.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5468,7 +5732,8 @@
       "iron": 0.51,
       "calcium": 28.93,
       "vitaminD": 1.64,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5490,7 +5755,8 @@
       "iron": 0.81,
       "calcium": 25.89,
       "vitaminD": 0.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5512,7 +5778,8 @@
       "iron": 0.77,
       "calcium": 37.15,
       "vitaminD": 1.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5534,7 +5801,8 @@
       "iron": 1.22,
       "calcium": 46.91,
       "vitaminD": 1.3,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5556,7 +5824,8 @@
       "iron": 0.77,
       "calcium": 16.19,
       "vitaminD": 0.23,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5578,7 +5847,8 @@
       "iron": 1.04,
       "calcium": 44.13,
       "vitaminD": 1.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5600,7 +5870,8 @@
       "iron": 1.46,
       "calcium": 24.1,
       "vitaminD": 3.14,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5622,7 +5893,8 @@
       "iron": 1.24,
       "calcium": 16.86,
       "vitaminD": 3.49,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5644,7 +5916,8 @@
       "iron": 1.25,
       "calcium": 18.04,
       "vitaminD": 3.17,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5666,7 +5939,8 @@
       "iron": 1.08,
       "calcium": 15.87,
       "vitaminD": 2.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5688,7 +5962,8 @@
       "iron": 0.93,
       "calcium": 15.31,
       "vitaminD": 3.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5710,7 +5985,8 @@
       "iron": 0.75,
       "calcium": 24.82,
       "vitaminD": 2.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5732,7 +6008,8 @@
       "iron": 1.23,
       "calcium": 16.85,
       "vitaminD": 2.43,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5754,7 +6031,8 @@
       "iron": 1.2,
       "calcium": 18.45,
       "vitaminD": 3.11,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5776,7 +6054,8 @@
       "iron": 5.3,
       "calcium": 146,
       "vitaminD": 3.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5798,7 +6077,8 @@
       "iron": 8.67,
       "calcium": 659,
       "vitaminD": 117,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5820,7 +6100,8 @@
       "iron": 1.05,
       "calcium": 20.08,
       "vitaminD": 1.88,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5842,7 +6123,8 @@
       "iron": 0.88,
       "calcium": 17.63,
       "vitaminD": 1.97,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5864,7 +6146,8 @@
       "iron": 1.01,
       "calcium": 19,
       "vitaminD": 2.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5886,7 +6169,8 @@
       "iron": 1.9,
       "calcium": 18.88,
       "vitaminD": 4.09,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5908,7 +6192,8 @@
       "iron": 2.31,
       "calcium": 13.74,
       "vitaminD": 3.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5930,7 +6215,8 @@
       "iron": 8.56,
       "calcium": 205,
       "vitaminD": 3.37,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5952,7 +6238,8 @@
       "iron": 0.43,
       "calcium": 21.03,
       "vitaminD": 0.73,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5974,7 +6261,8 @@
       "iron": 0.53,
       "calcium": 19.92,
       "vitaminD": 0.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -5996,7 +6284,8 @@
       "iron": 15.68,
       "calcium": 266,
       "vitaminD": 12.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6018,7 +6307,8 @@
       "iron": 8.33,
       "calcium": 378,
       "vitaminD": 43.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6040,7 +6330,8 @@
       "iron": 7.94,
       "calcium": 312,
       "vitaminD": 43.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6062,7 +6353,8 @@
       "iron": 6.23,
       "calcium": 99.83,
       "vitaminD": 24.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6084,7 +6376,8 @@
       "iron": 9.41,
       "calcium": 567,
       "vitaminD": 45.07,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6106,7 +6399,8 @@
       "iron": 17.64,
       "calcium": 718,
       "vitaminD": 1.31,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6128,7 +6422,8 @@
       "iron": 20.58,
       "calcium": 878,
       "vitaminD": 12.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6150,7 +6445,8 @@
       "iron": 8.47,
       "calcium": 135,
       "vitaminD": 1.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6172,7 +6468,8 @@
       "iron": 22.69,
       "calcium": 174,
       "vitaminD": 44.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6194,7 +6491,8 @@
       "iron": 2.33,
       "calcium": 148,
       "vitaminD": 46.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6216,7 +6514,8 @@
       "iron": 13.65,
       "calcium": 1034,
       "vitaminD": 2.62,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6238,7 +6537,8 @@
       "iron": 7.99,
       "calcium": 414,
       "vitaminD": 118,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6260,7 +6560,8 @@
       "iron": 11.91,
       "calcium": 405,
       "vitaminD": 25.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6282,7 +6583,8 @@
       "iron": 10.13,
       "calcium": 1372,
       "vitaminD": 33.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6304,7 +6606,8 @@
       "iron": 46.08,
       "calcium": 122,
       "vitaminD": 18.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6328,7 +6631,8 @@
       "iron": 4.59,
       "calcium": 228,
       "vitaminD": 1.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6352,7 +6656,8 @@
       "iron": 2.74,
       "calcium": 61,
       "vitaminD": 12.77,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6376,7 +6681,8 @@
       "iron": 3.26,
       "calcium": 51,
       "vitaminD": 12.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6400,7 +6706,8 @@
       "iron": 1.04,
       "calcium": 34.03,
       "vitaminD": 11.03,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6424,7 +6731,8 @@
       "iron": 5.95,
       "calcium": 34,
       "vitaminD": 3.85,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6448,7 +6756,8 @@
       "iron": 3.13,
       "calcium": 32,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6472,7 +6781,8 @@
       "iron": 1.3,
       "calcium": 8,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6496,7 +6806,8 @@
       "iron": 17.2,
       "calcium": 318,
       "vitaminD": 1.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6520,7 +6831,8 @@
       "iron": 13.9,
       "calcium": 1664,
       "vitaminD": 67.83,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6544,7 +6856,8 @@
       "iron": 14.95,
       "calcium": 1174,
       "vitaminD": 76.51,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6568,7 +6881,8 @@
       "iron": 15.04,
       "calcium": 1283,
       "vitaminD": 62.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6592,7 +6906,8 @@
       "iron": 3.44,
       "calcium": 54,
       "vitaminD": 7.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6616,7 +6931,8 @@
       "iron": 13.49,
       "calcium": 402,
       "vitaminD": 31.79,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6640,7 +6956,8 @@
       "iron": 5.44,
       "calcium": 257,
       "vitaminD": 0.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6664,7 +6981,8 @@
       "iron": 18.19,
       "calcium": 572,
       "vitaminD": 2.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6688,7 +7006,8 @@
       "iron": 19.61,
       "calcium": 375,
       "vitaminD": 2.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6712,7 +7031,8 @@
       "iron": 4.5,
       "calcium": 17,
       "vitaminD": 0.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6736,7 +7056,8 @@
       "iron": 4.5,
       "calcium": 135,
       "vitaminD": 1.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6760,7 +7081,8 @@
       "iron": 4.06,
       "calcium": 211,
       "vitaminD": 1.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6784,7 +7106,8 @@
       "iron": 5.85,
       "calcium": 176,
       "vitaminD": 1.54,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6808,7 +7131,8 @@
       "iron": 3.21,
       "calcium": 105,
       "vitaminD": 46.31,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6830,7 +7154,8 @@
       "iron": 4.63,
       "calcium": 107,
       "vitaminD": 0.47,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6852,7 +7177,8 @@
       "iron": 1.12,
       "calcium": 18,
       "vitaminD": 0.41,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6876,7 +7202,8 @@
       "iron": 0.29,
       "calcium": 18.38,
       "vitaminD": 20.54,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6900,7 +7227,8 @@
       "iron": 0.3,
       "calcium": 4.83,
       "vitaminD": 27.58,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6924,7 +7252,8 @@
       "iron": 1.93,
       "calcium": 5.3,
       "vitaminD": 36.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6948,7 +7277,8 @@
       "iron": 3.58,
       "calcium": 23.61,
       "vitaminD": 109,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6970,7 +7300,8 @@
       "iron": 0.42,
       "calcium": 0.44,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -6992,7 +7323,8 @@
       "iron": 0.06,
       "calcium": 27.47,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7016,7 +7348,8 @@
       "iron": 0.16,
       "calcium": 121,
       "vitaminD": 1.63,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7040,7 +7373,8 @@
       "iron": 0.15,
       "calcium": 118,
       "vitaminD": 1.22,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7064,7 +7398,8 @@
       "iron": 0.9,
       "calcium": 476,
       "vitaminD": 0.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7088,7 +7423,8 @@
       "iron": 2.32,
       "calcium": 602,
       "vitaminD": 0.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7118,7 +7454,8 @@
       "iron": 1.82,
       "calcium": 49.44,
       "vitaminD": 0.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7142,7 +7479,8 @@
       "iron": 0.07,
       "calcium": 5.64,
       "vitaminD": 1.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7166,7 +7504,8 @@
       "iron": 3.17,
       "calcium": 116,
       "vitaminD": 3.29,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7196,7 +7535,8 @@
       "iron": 1.87,
       "calcium": 55.12,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7220,7 +7560,8 @@
       "iron": 0.15,
       "calcium": 8.07,
       "vitaminD": 0.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7244,7 +7585,8 @@
       "iron": 4.92,
       "calcium": 120,
       "vitaminD": 3.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7268,7 +7610,8 @@
       "iron": 2.16,
       "calcium": 53.26,
       "vitaminD": 2.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7292,7 +7635,8 @@
       "iron": 1.64,
       "calcium": 50.14,
       "vitaminD": 4.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7316,7 +7660,8 @@
       "iron": 1.73,
       "calcium": 57.79,
       "vitaminD": 2.99,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7340,7 +7685,8 @@
       "iron": 2.15,
       "calcium": 55.88,
       "vitaminD": 3.44,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7364,7 +7710,8 @@
       "iron": 2.61,
       "calcium": 56.12,
       "vitaminD": 1.9,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7388,7 +7735,8 @@
       "iron": 2.46,
       "calcium": 52.46,
       "vitaminD": 2.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7412,7 +7760,8 @@
       "iron": 3.28,
       "calcium": 71.79,
       "vitaminD": 2.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7436,7 +7785,8 @@
       "iron": 2.55,
       "calcium": 60.67,
       "vitaminD": 5.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7460,7 +7810,8 @@
       "iron": 2.63,
       "calcium": 61.35,
       "vitaminD": 4.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7482,7 +7833,8 @@
       "iron": 1.27,
       "calcium": 20.52,
       "vitaminD": 1.14,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7504,7 +7856,8 @@
       "iron": 1.11,
       "calcium": 18.37,
       "vitaminD": 1.24,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7526,7 +7879,8 @@
       "iron": 0.83,
       "calcium": 12.91,
       "vitaminD": 1.38,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7548,7 +7902,8 @@
       "iron": 1.38,
       "calcium": 28.13,
       "vitaminD": 1.11,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7570,7 +7925,8 @@
       "iron": 9.92,
       "calcium": 4.1,
       "vitaminD": 2.64,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7592,7 +7948,8 @@
       "iron": 3.19,
       "calcium": 5.46,
       "vitaminD": 1.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7614,7 +7971,8 @@
       "iron": 1.66,
       "calcium": 22.56,
       "vitaminD": 1.12,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7636,7 +7994,8 @@
       "iron": 1.4,
       "calcium": 20.12,
       "vitaminD": 1.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7658,7 +8017,8 @@
       "iron": 1.09,
       "calcium": 12.49,
       "vitaminD": 0.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7680,7 +8040,8 @@
       "iron": 1.45,
       "calcium": 35.46,
       "vitaminD": 0.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7702,7 +8063,8 @@
       "iron": 4.26,
       "calcium": 22.77,
       "vitaminD": 0.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7724,7 +8086,8 @@
       "iron": 3.95,
       "calcium": 7.4,
       "vitaminD": 0.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7746,7 +8109,8 @@
       "iron": 2.2,
       "calcium": 30.77,
       "vitaminD": 1.02,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7768,7 +8132,8 @@
       "iron": 3.81,
       "calcium": 18.11,
       "vitaminD": 1.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7790,7 +8155,8 @@
       "iron": 1.9,
       "calcium": 20.6,
       "vitaminD": 1.53,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7812,7 +8178,8 @@
       "iron": 2.01,
       "calcium": 20.44,
       "vitaminD": 0.5,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7834,7 +8201,8 @@
       "iron": 1.58,
       "calcium": 23.52,
       "vitaminD": 0.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7856,7 +8224,8 @@
       "iron": 1.01,
       "calcium": 14.35,
       "vitaminD": 0.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7878,7 +8247,8 @@
       "iron": 1,
       "calcium": 33.49,
       "vitaminD": 0.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7898,7 +8268,8 @@
       "iron": 1.48,
       "calcium": 6.18,
       "vitaminD": 0.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7918,7 +8289,8 @@
       "iron": 1.87,
       "calcium": 7.44,
       "vitaminD": 0.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7938,7 +8310,8 @@
       "iron": 1.77,
       "calcium": 5.76,
       "vitaminD": 0.32,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7958,7 +8331,8 @@
       "iron": 1.63,
       "calcium": 10.61,
       "vitaminD": 0.3,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7978,7 +8352,8 @@
       "iron": 2.09,
       "calcium": 7.11,
       "vitaminD": 0.35,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -7998,7 +8373,8 @@
       "iron": 7.1,
       "calcium": 10.44,
       "vitaminD": 1.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8018,7 +8394,8 @@
       "iron": 3.38,
       "calcium": 5.71,
       "vitaminD": 0.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8038,7 +8415,8 @@
       "iron": 6.56,
       "calcium": 6.09,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8058,7 +8436,8 @@
       "iron": 0.81,
       "calcium": 20.87,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8078,7 +8457,8 @@
       "iron": 51.41,
       "calcium": 8.35,
       "vitaminD": 0.46,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8098,7 +8478,8 @@
       "iron": 6.73,
       "calcium": 12.37,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8118,7 +8499,8 @@
       "iron": 2.21,
       "calcium": 27.52,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8138,7 +8520,8 @@
       "iron": 1.43,
       "calcium": 5.95,
       "vitaminD": 0.62,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8158,7 +8541,8 @@
       "iron": 1.63,
       "calcium": 5.46,
       "vitaminD": 0.07,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8178,7 +8562,8 @@
       "iron": 2.24,
       "calcium": 7.98,
       "vitaminD": 0.47,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8198,7 +8583,8 @@
       "iron": 1.54,
       "calcium": 6.87,
       "vitaminD": 2.79,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8218,7 +8604,8 @@
       "iron": 1.93,
       "calcium": 10.27,
       "vitaminD": 1.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8238,7 +8625,8 @@
       "iron": 2.46,
       "calcium": 8.05,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8258,7 +8646,8 @@
       "iron": 8.58,
       "calcium": 7.74,
       "vitaminD": 0.31,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8278,7 +8667,8 @@
       "iron": 3.07,
       "calcium": 6.79,
       "vitaminD": 0.8,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8298,7 +8688,8 @@
       "iron": 6.15,
       "calcium": 5.92,
       "vitaminD": 0.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8318,7 +8709,8 @@
       "iron": 0.9,
       "calcium": 14.85,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8338,7 +8730,8 @@
       "iron": 53.11,
       "calcium": 11.49,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8358,7 +8751,8 @@
       "iron": 6.11,
       "calcium": 14.15,
       "vitaminD": 0.44,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8378,7 +8772,8 @@
       "iron": 2.22,
       "calcium": 6.5,
       "vitaminD": 0.6,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8398,7 +8793,8 @@
       "iron": 1.95,
       "calcium": 4.64,
       "vitaminD": 0.52,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8418,7 +8814,8 @@
       "iron": 2.3,
       "calcium": 5.86,
       "vitaminD": 0.54,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8438,7 +8835,8 @@
       "iron": 2.15,
       "calcium": 11.38,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8458,7 +8856,8 @@
       "iron": 2.17,
       "calcium": 9.49,
       "vitaminD": 0.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8478,7 +8877,8 @@
       "iron": 6.85,
       "calcium": 9.31,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8498,7 +8898,8 @@
       "iron": 3.62,
       "calcium": 6.16,
       "vitaminD": 5.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8518,7 +8919,8 @@
       "iron": 14.82,
       "calcium": 5.46,
       "vitaminD": 4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8538,7 +8940,8 @@
       "iron": 0.84,
       "calcium": 15.3,
       "vitaminD": 4.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8558,7 +8961,8 @@
       "iron": 31.68,
       "calcium": 9.4,
       "vitaminD": 0.33,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8578,7 +8982,8 @@
       "iron": 4.71,
       "calcium": 15.31,
       "vitaminD": 0.64,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8598,7 +9003,8 @@
       "iron": 1.31,
       "calcium": 8.39,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8618,7 +9024,8 @@
       "iron": 1.2,
       "calcium": 9.27,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8638,7 +9045,8 @@
       "iron": 2.4,
       "calcium": 10.03,
       "vitaminD": 0.97,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8658,7 +9066,8 @@
       "iron": 1.44,
       "calcium": 10.53,
       "vitaminD": 8.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8678,7 +9087,8 @@
       "iron": 2.63,
       "calcium": 9.08,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8698,7 +9108,8 @@
       "iron": 4.66,
       "calcium": 6.48,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8718,7 +9129,8 @@
       "iron": 16.26,
       "calcium": 5.19,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8738,7 +9150,8 @@
       "iron": 25.42,
       "calcium": 10.56,
       "vitaminD": 0.29,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8758,7 +9171,8 @@
       "iron": 4.92,
       "calcium": 12.63,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8778,7 +9192,8 @@
       "iron": 2.05,
       "calcium": 4.27,
       "vitaminD": 0.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8798,7 +9213,8 @@
       "iron": 2.25,
       "calcium": 4.88,
       "vitaminD": 0.08,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8818,7 +9234,8 @@
       "iron": 2.18,
       "calcium": 5.32,
       "vitaminD": 0.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8838,7 +9255,8 @@
       "iron": 0.91,
       "calcium": 9.95,
       "vitaminD": 9.38,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8858,7 +9276,8 @@
       "iron": 1,
       "calcium": 8.12,
       "vitaminD": 7.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8878,7 +9297,8 @@
       "iron": 1.27,
       "calcium": 7.4,
       "vitaminD": 5.85,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8898,7 +9318,8 @@
       "iron": 6.76,
       "calcium": 10.3,
       "vitaminD": 2.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8918,7 +9339,8 @@
       "iron": 3.97,
       "calcium": 4.74,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8938,7 +9360,8 @@
       "iron": 20.74,
       "calcium": 5.52,
       "vitaminD": 3.2,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8958,7 +9381,8 @@
       "iron": 1.92,
       "calcium": 11.75,
       "vitaminD": 0.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8978,7 +9402,8 @@
       "iron": 27.21,
       "calcium": 6.98,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -8998,7 +9423,8 @@
       "iron": 6.26,
       "calcium": 6.71,
       "vitaminD": 3.16,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9018,7 +9444,8 @@
       "iron": 2.83,
       "calcium": 16.05,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9038,7 +9465,8 @@
       "iron": 2.98,
       "calcium": 57.51,
       "vitaminD": 0.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9058,7 +9486,8 @@
       "iron": 2.78,
       "calcium": 38.36,
       "vitaminD": 0.09,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9078,7 +9507,8 @@
       "iron": 2.46,
       "calcium": 53.02,
       "vitaminD": 0.08,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9098,7 +9528,8 @@
       "iron": 1.74,
       "calcium": 46.37,
       "vitaminD": 0.57,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9118,7 +9549,8 @@
       "iron": 2.42,
       "calcium": 25.48,
       "vitaminD": 0.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9138,7 +9570,8 @@
       "iron": 1.21,
       "calcium": 22.31,
       "vitaminD": 0.43,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9161,7 +9594,8 @@
       "iron": 0.62,
       "calcium": 13.78,
       "vitaminD": 1.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9184,7 +9618,8 @@
       "iron": 0.42,
       "calcium": 11.32,
       "vitaminD": 1.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9207,7 +9642,8 @@
       "iron": 0.54,
       "calcium": 36.6,
       "vitaminD": 2.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9230,7 +9666,8 @@
       "iron": 0.47,
       "calcium": 4.36,
       "vitaminD": 1.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9253,7 +9690,8 @@
       "iron": 0.31,
       "calcium": 8.84,
       "vitaminD": 1.11,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9276,7 +9714,8 @@
       "iron": 0.56,
       "calcium": 9.91,
       "vitaminD": 1.49,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9299,7 +9738,8 @@
       "iron": 0.81,
       "calcium": 159,
       "vitaminD": 1.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9322,7 +9762,8 @@
       "iron": 0.43,
       "calcium": 47.33,
       "vitaminD": 3.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9345,7 +9786,8 @@
       "iron": 0.72,
       "calcium": 5.54,
       "vitaminD": 1.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9368,7 +9810,8 @@
       "iron": 0.41,
       "calcium": 6.55,
       "vitaminD": 2.15,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9391,7 +9834,8 @@
       "iron": 1.29,
       "calcium": 10.22,
       "vitaminD": 0.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9414,7 +9858,8 @@
       "iron": 0.67,
       "calcium": 8.17,
       "vitaminD": 1.03,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9437,7 +9882,8 @@
       "iron": 0.31,
       "calcium": 23.72,
       "vitaminD": 0.88,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9460,7 +9906,8 @@
       "iron": 0.46,
       "calcium": 12.45,
       "vitaminD": 0.34,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9483,7 +9930,8 @@
       "iron": 0.36,
       "calcium": 24.18,
       "vitaminD": 0.15,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9506,7 +9954,8 @@
       "iron": 0.44,
       "calcium": 17.32,
       "vitaminD": 0.42,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9529,7 +9978,8 @@
       "iron": 1.19,
       "calcium": 19.82,
       "vitaminD": 5.98,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9552,7 +10002,8 @@
       "iron": 0.46,
       "calcium": 14.73,
       "vitaminD": 0.97,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9575,7 +10026,8 @@
       "iron": 0.28,
       "calcium": 6.65,
       "vitaminD": 1.03,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9598,7 +10050,8 @@
       "iron": 0.31,
       "calcium": 73.92,
       "vitaminD": 1.62,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9621,7 +10074,8 @@
       "iron": 0.38,
       "calcium": 8.62,
       "vitaminD": 1.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9644,7 +10098,8 @@
       "iron": 0.5,
       "calcium": 7.54,
       "vitaminD": 1.5,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9667,7 +10122,8 @@
       "iron": 0.26,
       "calcium": 10.66,
       "vitaminD": 1.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9690,7 +10146,8 @@
       "iron": 0.36,
       "calcium": 7.72,
       "vitaminD": 1.16,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9713,7 +10170,8 @@
       "iron": 0.31,
       "calcium": 9.04,
       "vitaminD": 0.29,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9736,7 +10194,8 @@
       "iron": 0.6,
       "calcium": 11.73,
       "vitaminD": 1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9759,7 +10218,8 @@
       "iron": 0.44,
       "calcium": 60.03,
       "vitaminD": 1.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9782,7 +10242,8 @@
       "iron": 0.98,
       "calcium": 6,
       "vitaminD": 3.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9805,7 +10266,8 @@
       "iron": 1,
       "calcium": 19.42,
       "vitaminD": 0.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9828,7 +10290,8 @@
       "iron": 1.38,
       "calcium": 11.02,
       "vitaminD": 0.04,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9851,7 +10314,8 @@
       "iron": 0.73,
       "calcium": 11.12,
       "vitaminD": 0.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9874,7 +10338,8 @@
       "iron": 0.5,
       "calcium": 15.17,
       "vitaminD": 2.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9897,7 +10362,8 @@
       "iron": 0.23,
       "calcium": 8.42,
       "vitaminD": 1.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9920,7 +10386,8 @@
       "iron": 1.46,
       "calcium": 31.27,
       "vitaminD": 0.45,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9943,7 +10410,8 @@
       "iron": 0.43,
       "calcium": 11.48,
       "vitaminD": 1.91,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9966,7 +10434,8 @@
       "iron": 0.32,
       "calcium": 14.02,
       "vitaminD": 2.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -9989,7 +10458,8 @@
       "iron": 1.35,
       "calcium": 29.18,
       "vitaminD": 1.22,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10012,7 +10482,8 @@
       "iron": 1.67,
       "calcium": 29.18,
       "vitaminD": 0.57,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10035,7 +10506,8 @@
       "iron": 1.31,
       "calcium": 35.2,
       "vitaminD": 0.5,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10058,7 +10530,8 @@
       "iron": 0.24,
       "calcium": 8.61,
       "vitaminD": 0.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10081,7 +10554,8 @@
       "iron": 1.2,
       "calcium": 7.2,
       "vitaminD": 0.4,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10104,7 +10578,8 @@
       "iron": 0.31,
       "calcium": 9.04,
       "vitaminD": 0.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10127,7 +10602,8 @@
       "iron": 1.11,
       "calcium": 7.21,
       "vitaminD": 0.39,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10150,7 +10626,8 @@
       "iron": 0.69,
       "calcium": 13.52,
       "vitaminD": 1.78,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10173,7 +10650,8 @@
       "iron": 0.33,
       "calcium": 9.83,
       "vitaminD": 0.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10196,7 +10674,8 @@
       "iron": 0.42,
       "calcium": 17.03,
       "vitaminD": 0.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10219,7 +10698,8 @@
       "iron": 0.38,
       "calcium": 16.53,
       "vitaminD": 1.35,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10242,7 +10722,8 @@
       "iron": 0.47,
       "calcium": 12.18,
       "vitaminD": 0.3,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10265,7 +10746,8 @@
       "iron": 3.58,
       "calcium": 29.12,
       "vitaminD": 1.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10288,7 +10770,8 @@
       "iron": 0.28,
       "calcium": 21.08,
       "vitaminD": 0.77,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10311,7 +10794,8 @@
       "iron": 0.38,
       "calcium": 9.21,
       "vitaminD": 0.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10334,7 +10818,8 @@
       "iron": 0.29,
       "calcium": 7.25,
       "vitaminD": 0.44,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10357,7 +10842,8 @@
       "iron": 0.47,
       "calcium": 9.32,
       "vitaminD": 0.68,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10380,7 +10866,8 @@
       "iron": 0.5,
       "calcium": 14.85,
       "vitaminD": 1.15,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10403,7 +10890,8 @@
       "iron": 0.78,
       "calcium": 18.1,
       "vitaminD": 2.94,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10426,7 +10914,8 @@
       "iron": 0.41,
       "calcium": 6.57,
       "vitaminD": 0.59,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10449,7 +10938,8 @@
       "iron": 0.31,
       "calcium": 13.64,
       "vitaminD": 0.71,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10472,7 +10962,8 @@
       "iron": 0.41,
       "calcium": 21.88,
       "vitaminD": 0.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10495,7 +10986,8 @@
       "iron": 0.35,
       "calcium": 21.84,
       "vitaminD": 1.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10518,7 +11010,8 @@
       "iron": 0.49,
       "calcium": 5.75,
       "vitaminD": 0.19,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10541,7 +11034,8 @@
       "iron": 0.46,
       "calcium": 11.09,
       "vitaminD": 3.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10564,7 +11058,8 @@
       "iron": 0.36,
       "calcium": 8.72,
       "vitaminD": 1.23,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10587,7 +11082,8 @@
       "iron": 0.87,
       "calcium": 37.9,
       "vitaminD": 1.9,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10610,7 +11106,8 @@
       "iron": 0.25,
       "calcium": 9.64,
       "vitaminD": 0.83,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10633,7 +11130,8 @@
       "iron": 0.37,
       "calcium": 8.39,
       "vitaminD": 2.37,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10656,7 +11154,8 @@
       "iron": 0.57,
       "calcium": 17.43,
       "vitaminD": 3.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10679,7 +11178,8 @@
       "iron": 0.47,
       "calcium": 9.08,
       "vitaminD": 1.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10702,7 +11202,8 @@
       "iron": 0.98,
       "calcium": 24.3,
       "vitaminD": 0.94,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10725,7 +11226,8 @@
       "iron": 0.99,
       "calcium": 7.9,
       "vitaminD": 1.05,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10748,7 +11250,8 @@
       "iron": 0.99,
       "calcium": 6.03,
       "vitaminD": 0.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10771,7 +11274,8 @@
       "iron": 0.83,
       "calcium": 42.26,
       "vitaminD": 3.51,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10794,7 +11298,8 @@
       "iron": 0.38,
       "calcium": 8.44,
       "vitaminD": 0.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10817,7 +11322,8 @@
       "iron": 0.86,
       "calcium": 7.92,
       "vitaminD": 0.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10840,7 +11346,8 @@
       "iron": 0.54,
       "calcium": 8.1,
       "vitaminD": 1.37,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10863,7 +11370,8 @@
       "iron": 0.52,
       "calcium": 11.42,
       "vitaminD": 1.87,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10886,7 +11394,8 @@
       "iron": 0.56,
       "calcium": 28.82,
       "vitaminD": 0.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10909,7 +11418,8 @@
       "iron": 0.3,
       "calcium": 10.46,
       "vitaminD": 0.72,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10932,7 +11442,8 @@
       "iron": 0.58,
       "calcium": 85.55,
       "vitaminD": 0.86,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10955,7 +11466,8 @@
       "iron": 0.33,
       "calcium": 47.28,
       "vitaminD": 1.13,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -10978,7 +11490,8 @@
       "iron": 0.74,
       "calcium": 9.16,
       "vitaminD": 0.9,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11001,7 +11514,8 @@
       "iron": 0.53,
       "calcium": 11.68,
       "vitaminD": 2.36,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11024,7 +11538,8 @@
       "iron": 0.6,
       "calcium": 11.4,
       "vitaminD": 3.55,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11047,7 +11562,8 @@
       "iron": 2.84,
       "calcium": 99.39,
       "vitaminD": 0.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11070,7 +11586,8 @@
       "iron": 1.6,
       "calcium": 9.82,
       "vitaminD": 0.74,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11093,7 +11610,8 @@
       "iron": 1.43,
       "calcium": 6.45,
       "vitaminD": 0.7,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11116,7 +11634,8 @@
       "iron": 0.24,
       "calcium": 37.06,
       "vitaminD": 0.26,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11139,7 +11658,8 @@
       "iron": 0.41,
       "calcium": 9.85,
       "vitaminD": 1.64,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11162,7 +11682,8 @@
       "iron": 0.64,
       "calcium": 14.9,
       "vitaminD": 0.92,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11185,7 +11706,8 @@
       "iron": 0.27,
       "calcium": 7.64,
       "vitaminD": 0.76,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11208,7 +11730,8 @@
       "iron": 0.33,
       "calcium": 8.32,
       "vitaminD": 2.17,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11231,7 +11754,8 @@
       "iron": 0.54,
       "calcium": 12.08,
       "vitaminD": 0.09,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11254,7 +11778,8 @@
       "iron": 6.65,
       "calcium": 61.69,
       "vitaminD": 3.27,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11277,7 +11802,8 @@
       "iron": 1.1,
       "calcium": 128,
       "vitaminD": 0.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11300,7 +11826,8 @@
       "iron": 0.98,
       "calcium": 333,
       "vitaminD": 0.73,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11323,7 +11850,8 @@
       "iron": 0.77,
       "calcium": 73.06,
       "vitaminD": 0.84,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11346,7 +11874,8 @@
       "iron": 0.35,
       "calcium": 66.44,
       "vitaminD": 0.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11369,7 +11898,8 @@
       "iron": 0.87,
       "calcium": 201,
       "vitaminD": 1.08,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11392,7 +11922,8 @@
       "iron": 0.9,
       "calcium": 126,
       "vitaminD": 0.86,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11415,7 +11946,8 @@
       "iron": 0.73,
       "calcium": 37.81,
       "vitaminD": 1.53,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11438,7 +11970,8 @@
       "iron": 0.39,
       "calcium": 71.89,
       "vitaminD": 2.25,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11461,7 +11994,8 @@
       "iron": 1.01,
       "calcium": 121,
       "vitaminD": 0.93,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11484,7 +12018,8 @@
       "iron": 0.94,
       "calcium": 50,
       "vitaminD": 2.18,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11507,7 +12042,8 @@
       "iron": 1.08,
       "calcium": 22.1,
       "vitaminD": 0.67,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11530,7 +12066,8 @@
       "iron": 0.5,
       "calcium": 22.98,
       "vitaminD": 0.89,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11553,7 +12090,8 @@
       "iron": 0.62,
       "calcium": 8.73,
       "vitaminD": 1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11576,7 +12114,8 @@
       "iron": 0.26,
       "calcium": 14.15,
       "vitaminD": 1.23,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11599,7 +12138,8 @@
       "iron": 0.39,
       "calcium": 36.46,
       "vitaminD": 0.71,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11622,7 +12162,8 @@
       "iron": 0.82,
       "calcium": 21.99,
       "vitaminD": 1.48,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11645,7 +12186,8 @@
       "iron": 1.14,
       "calcium": 43.53,
       "vitaminD": 2.06,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11668,7 +12210,8 @@
       "iron": 1.54,
       "calcium": 52.99,
       "vitaminD": 4.38,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11691,7 +12234,8 @@
       "iron": 0.76,
       "calcium": 47.89,
       "vitaminD": 0.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11714,7 +12258,8 @@
       "iron": 0.69,
       "calcium": 11.19,
       "vitaminD": 0.28,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11737,7 +12282,8 @@
       "iron": 1.04,
       "calcium": 39.37,
       "vitaminD": 1.01,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11760,7 +12306,8 @@
       "iron": 1.1,
       "calcium": 199,
       "vitaminD": 1.37,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11783,7 +12330,8 @@
       "iron": 0.78,
       "calcium": 48.55,
       "vitaminD": 0.45,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11806,7 +12354,8 @@
       "iron": 0.87,
       "calcium": 67.99,
       "vitaminD": 1.1,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11829,7 +12378,8 @@
       "iron": 0.84,
       "calcium": 57.9,
       "vitaminD": 1.61,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11851,7 +12401,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11873,7 +12424,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11895,7 +12447,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11917,7 +12470,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11939,7 +12493,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11961,7 +12516,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -11983,7 +12539,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12005,7 +12562,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12027,7 +12585,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12049,7 +12608,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12071,7 +12631,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12093,7 +12654,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12115,7 +12677,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   },
   {
@@ -12137,7 +12700,8 @@
       "iron": 0,
       "calcium": 0,
       "vitaminD": 0,
-      "vitaminB12": null
+      "vitaminB12": null,
+      "fiber": null
     }
   }
 ]

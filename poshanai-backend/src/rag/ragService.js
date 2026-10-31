@@ -3,14 +3,19 @@ import { buildMealPlanPrompt } from './promptBuilder.js';
 import {
   getHouseholdFoodName,
   getHouseholdFoodWhitelist,
-  loadIfctDataset,
+  getIfctFoods,
+  resolveIfctFoodReference,
+  wasFoodExplicitlyRequested,
 } from './ifctLoader.js';
+import { foodMatchesAnyRestriction } from '../services/foodRestrictions.js';
 
 export { buildMealPlanPrompt };
 
 let foodRecords = [];
+let foodRecordsByCode = new Map();
 try {
-  foodRecords = loadIfctDataset();
+  foodRecords = getIfctFoods();
+  foodRecordsByCode = new Map(foodRecords.map((food) => [food.ifctCode.toUpperCase(), food]));
   logger.info(`Loaded ${foodRecords.length} IFCT foods from dataset`);
 } catch (error) {
   logger.error('Failed to load IFCT dataset from data/ifct_2017.json', error);
@@ -56,31 +61,16 @@ const rdaNorm = {
   vitaminB12: 2.2,
 };
 
-const allergyAliases = {
-  nuts: ['nuts'],
-  peanut: ['peanuts', 'nuts'],
-  peanuts: ['peanuts', 'nuts'],
-  dairy: ['dairy'],
-  milk: ['dairy'],
-  eggs: ['eggs'],
-  egg: ['eggs'],
-  fish: ['fish'],
-  shellfish: ['shellfish'],
-  soy: ['soy'],
-  gluten: ['gluten'],
-  wheat: ['gluten'],
-  legumes: ['legumes'],
-  poultry: ['poultry'],
-  mushrooms: ['mushrooms'],
-  sesame: ['sesame'],
-  seeds: ['seeds'],
-};
-
 const round = (value) => (value === null || value === undefined ? null : Math.round(Number(value) * 100) / 100);
 
 export function getFoodByIfctCode(ifctCode) {
   const normalizedCode = String(ifctCode ?? '').trim().toUpperCase();
-  return foodRecords.find((food) => food.ifctCode.toUpperCase() === normalizedCode) ?? null;
+  return foodRecordsByCode.get(normalizedCode) ?? null;
+}
+
+/** Return a real IFCT match, explicit substitute, or null with an explanation. */
+export function resolveFoodReference(foodName) {
+  return resolveIfctFoodReference(foodName, foodRecords);
 }
 
 export function searchIfctFoods(query, limit = 20) {
@@ -117,14 +107,14 @@ export function getIfctNutrientAvailability() {
 export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}) {
   const dietType = preferences.dietType ?? 'veg';
   const householdDiet = String(preferences.householdDiet ?? '');
-  const excludedAllergens = new Set(
-    (preferences.allergies ?? []).flatMap((allergy) => allergyAliases[allergy.toLowerCase()] ?? [allergy.toLowerCase()]),
-  );
+  const excludedAllergens = preferences.allergies ?? [];
   const requestedRegion = preferences.region ? regionCodes.get(preferences.region.toLowerCase()) : null;
   const relevantNutrients = deficiencies
     .map((deficiency) => nutrientByDeficiency[deficiency.nutrient])
     .filter(Boolean);
 
+  // Keep retrieval inside the household whitelist, while allowing an explicit
+  // user request to add a normally excluded IFCT food to the candidate set.
   const householdFoods = getHouseholdFoodWhitelist(foodRecords, householdDiet);
   const filtered = householdFoods
     .filter((food) => {
@@ -136,7 +126,7 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
       }
       return true; // nonveg allows all foods
     })
-    .filter((food) => !food.allergens.some((allergen) => excludedAllergens.has(allergen)));
+    .filter((food) => !foodMatchesAnyRestriction(excludedAllergens, food));
 
   // Rank foods by nutrient density for target deficiencies with regional prioritization
   const scored = filtered.map((food) => {
@@ -174,6 +164,13 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
   const limit = Math.max(16, Math.min(20, preferences.limit ?? 18));
 
   const selectedFoods = scored.slice(0, limit).map(({ food }) => food);
+  for (const food of filtered) {
+    if (wasFoodExplicitlyRequested(food, householdDiet)
+      && selectedFoods.length < 30
+      && !selectedFoods.some((candidate) => candidate.ifctCode === food.ifctCode)) {
+      selectedFoods.push(food);
+    }
+  }
   const stapleGroups = [
     { mention: /roti|chapati|phulka|wheat|atta/i, food: /wheat flour, atta/i },
     { mention: /rice/i, food: /rice, (?:raw, milled|parboiled, milled|raw, brown)/i },
@@ -199,7 +196,7 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
   };
   const proteinFood = (proteinCodesByDiet[dietType] ?? proteinCodesByDiet.veg)
     .map((code) => filtered.find((food) => food.ifctCode === code))
-    .find((food) => food && Number(food.nutrients?.protein) >= 10);
+    .find((food) => food && Number(food.nutrients?.protein) > 0);
   if (proteinFood && !selectedFoods.some((food) => food.ifctCode === proteinFood.ifctCode) && selectedFoods.length < 30) {
     selectedFoods.push(proteinFood);
   }
@@ -223,6 +220,7 @@ export function getMedicalDisclaimer() {
 export default {
   retrieveFoodsForDeficiencies,
   getFoodByIfctCode,
+  resolveFoodReference,
   searchIfctFoods,
   getIfctFoodCatalog,
   getIfctNutrientAvailability,

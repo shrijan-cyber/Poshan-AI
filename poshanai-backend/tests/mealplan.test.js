@@ -10,7 +10,6 @@ import User from '../src/models/User.js';
 import Report from '../src/models/Report.js';
 import MealPlan from '../src/models/MealPlan.js';
 import LifestyleProfile from '../src/models/LifestyleProfile.js';
-import { retrieveFoodsForDeficiencies } from '../src/rag/ragService.js';
 
 let mongod;
 let ipCounter = 200;
@@ -29,24 +28,32 @@ async function createAuthenticatedUser(name, email) {
   return { token: res.body.data.accessToken, user: res.body.data.user, ip };
 }
 
-function mockAiCompletion() {
-  const foods = retrieveFoodsForDeficiencies([{ nutrient: 'Iron' }], { dietType: 'veg' });
-  const proteinFood = foods.find((food) => food.nutrients.protein > 0) ?? foods[0];
-  const chosenCode = proteinFood?.ifctCode || 'G033';
+function mockAiCompletion(prompt) {
+  const marker = 'Allowed IFCT foods and their per-100g nutrient values (this is the complete allowed food list):\n';
+  const markerIndex = prompt.lastIndexOf(marker);
+  const foods = JSON.parse(prompt.slice(markerIndex + marker.length));
+  const byCode = new Map(foods.map((food) => [food.ifctCode, food]));
+  const preferred = ['A015', 'L003', 'C033'].map((code) => byCode.get(code)).filter(Boolean);
+  const chosenFoods = preferred.length === 3
+    ? preferred
+    : [...preferred, ...foods.filter((food) => !preferred.some((entry) => entry.ifctCode === food.ifctCode))]
+      .sort((a, b) => Number(b.nutrients.calories ?? 0) - Number(a.nutrients.calories ?? 0))
+      .slice(0, 3);
+  const proteinFood = chosenFoods.find((food) => Number(food.nutrients.protein) > 0);
 
   return {
-    meals: Array.from({ length: 7 }, (_, index) => ({
+    meals: Array.from({ length: 7 }, (_, index) => ['breakfast', 'lunch', 'dinner'].map((mealType) => ({
       day: index + 1,
-      mealType: 'breakfast',
+      mealType,
       nutrientTargets: ['Iron'],
       proteinSource: proteinFood?.foodName,
       cookingInstructions: 'Pressure-cook with minimal oil.',
-      items: [{
-        ifctCode: chosenCode,
-        foodName: foods.find((food) => food.ifctCode === chosenCode)?.foodName,
+      items: chosenFoods.map((food) => ({
+        ifctCode: food.ifctCode,
+        foodName: food.foodName,
         quantityGrams: 100,
-      }],
-    })),
+      })),
+    }))).flat(),
     disclaimer: 'This is nutrition information to discuss with a qualified professional.',
   };
 }
@@ -105,7 +112,7 @@ before(async () => {
         choices: [
           {
             message: {
-              content: JSON.stringify(mockAiCompletion()),
+              content: JSON.stringify(mockAiCompletion(lastAiPrompt)),
             },
           },
         ],
@@ -174,24 +181,39 @@ describe('Meal Plan API (/api/mealplans)', () => {
           preferences: { dietType: 'veg' },
         });
 
-      assert.equal(res.status, 201);
+      assert.equal(res.status, 201, JSON.stringify(res.body));
       assert.equal(res.body.success, true);
       assert.ok(res.body.data._id);
       assert.equal(res.body.data.status, 'draft');
       assert.equal(res.body.data.planDurationDays, 7);
-      assert.equal(res.body.data.meals.length, 7);
+      assert.equal(res.body.data.meals.length, 21);
       assert.match(res.body.data.meals[0].cookingInstructions, /minimal oil/i);
       assert.ok(res.body.data.meals[0].proteinSource);
       assert.equal(res.body.data.householdDiet, 'rice; dal; 2 rotis, 1 bowl dal, rice and sabzi');
       assert.ok(res.body.data.meals.every((meal) => meal.items.every((item) => !/\b(?:amaranth|agathi|ragi|quinoa|barley)\b/i.test(item.foodName))));
-      assert.match(lastAiPrompt, /2 rotis, 1 bowl dal, rice and sabzi/);
-      assert.match(lastAiPrompt, /rice; dal; 2 rotis, 1 bowl dal, rice and sabzi/);
+      assert.doesNotMatch(lastAiPrompt, /2 rotis, 1 bowl dal, rice and sabzi/);
+      assert.doesNotMatch(lastAiPrompt, /42\s+ug\/dL/i);
+      assert.match(lastAiPrompt, /Roti\/chapati/);
+      assert.doesNotMatch(lastAiPrompt, /"age"|"weight"/);
       assert.ok(res.body.data.disclaimer);
 
       const inDb = await MealPlan.findById(res.body.data._id);
       assert.ok(inDb);
       assert.equal(inDb.userId.toString(), user.id);
       assert.deepEqual(inDb.meals[0].nutrientTargets, ['Iron']);
+
+      const recipes = await request(app)
+        .get(`/api/mealplans/${res.body.data._id}/recipes`)
+        .set('Authorization', `Bearer ${token}`)
+        .set('X-Forwarded-For', ip);
+      assert.equal(recipes.status, 200);
+      assert.deepEqual(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight, {
+        quantityGrams: 100,
+        unit: 'g',
+        basis: 'raw',
+      });
+      assert.equal(recipes.body.data.recipes[0].ingredients[0].cookedHouseholdMeasure, null);
+      assert.equal(recipes.body.data.recipes[0].cookedHouseholdMeasure, null);
     });
 
     it('generates Iron-targeted meals and severe B12 clinician guidance from a low Iron and B12 report', async () => {
@@ -220,8 +242,9 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.ok(res.body.data.meals.every((meal) => meal.nutrientTargets.includes('Iron')));
       assert.match(res.body.data.supplementGuidance, /clinician-supervised vitamin B12 supplement/i);
       assert.match(res.body.data.disclaimer, /does not diagnose, treat, or replace advice/i);
-      assert.match(lastAiPrompt, /The user is deficient in Iron \(LOW, 8 µg\/dL\); Vitamin B12 \(LOW, 120 pg\/mL\)/);
-      assert.match(lastAiPrompt, /SEVERE VITAMIN B12 DEFICIENCY/);
+      assert.match(lastAiPrompt, /Iron: target intake 17 mg\/day/);
+      assert.match(lastAiPrompt, /Vitamin B12: target intake 2\.2 µg\/day/);
+      assert.doesNotMatch(lastAiPrompt, /8 µg\/dL|120 pg\/mL|SEVERE VITAMIN B12 DEFICIENCY/);
       assert.match(lastAiPrompt, /nutrientTargets/);
     });
 
@@ -237,6 +260,22 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.equal(res.status, 400);
       assert.equal(res.body.success, false);
       assert.equal(res.body.error.code, 'VALIDATION_ERROR');
+    });
+
+    it('rejects high-risk conditions provided directly to the API', async () => {
+      const { token, ip } = await createAuthenticatedUser('Condition User', 'condition-user@example.com');
+      const res = await request(app)
+        .post('/api/mealplans/generate')
+        .set('Authorization', `Bearer ${token}`)
+        .set('X-Forwarded-For', ip)
+        .send({
+          reportId: new mongoose.Types.ObjectId().toString(),
+          preferences: { dietType: 'veg', conditions: ['chronic kidney disease'] },
+        });
+
+      assert.equal(res.status, 422);
+      assert.equal(res.body.error.code, 'PROFESSIONAL_REVIEW_REQUIRED');
+      assert.match(res.body.error.message, /qualified healthcare professional/i);
     });
 
     it('rejects generation when report belongs to another user (not owned)', async () => {

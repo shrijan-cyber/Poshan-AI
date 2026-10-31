@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getRecommendations } from '../api/lifestyleApi.js';
-import { Button, Card, Skeleton } from '../components/common/index.js';
+import { Button, Skeleton } from '../components/common/index.js';
 import TestCard from '../components/lifestyle/TestCard.jsx';
 import WhyThisModal from '../components/lifestyle/WhyThisModal.jsx';
 
@@ -9,6 +9,7 @@ const primaryLink =
   'inline-flex w-full items-center justify-center rounded-lg bg-leaf px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf focus-visible:ring-offset-2 sm:w-auto';
 const secondaryLink =
   'inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:text-white sm:w-auto';
+const cardClass = 'rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900';
 
 // Turns an API failure into a human message plus a small technical detail for debugging.
 function describeFailure(error) {
@@ -27,14 +28,14 @@ function LoadingList() {
     <ul className="mt-6 space-y-3" aria-label="Loading your recommendations" role="status">
       {[0, 1, 2].map((key) => (
         <li key={key}>
-          <Card padding="sm" className="flex items-start gap-3">
+          <div className={`${cardClass} flex items-start gap-3 p-4`}>
             <Skeleton width="48px" height="12" rounded="xl" className="w-12 shrink-0" />
             <div className="flex-1 space-y-2">
               <Skeleton width="40" height="5" />
               <Skeleton height="4" />
               <Skeleton width="threeQuarters" height="4" />
             </div>
-          </Card>
+          </div>
         </li>
       ))}
     </ul>
@@ -81,7 +82,7 @@ export default function Recommendations() {
   const tests = Array.isArray(state.data) ? state.data : state.data?.recommendations ?? [];
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="mx-auto w-full max-w-3xl font-sans">
       <header>
         <p className="text-sm font-semibold text-leaf dark:text-emerald-300">Your lifestyle check</p>
         <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
@@ -95,7 +96,7 @@ export default function Recommendations() {
       {state.status === 'loading' && <LoadingList />}
 
       {state.status === 'error' && (
-        <Card className="mt-6 text-center" role="alert">
+        <div className={`${cardClass} mt-6 text-center`} role="alert">
           <p className="text-3xl" aria-hidden="true">⚠️</p>
           <p className="font-semibold text-slate-900 dark:text-white">We could not load your tests.</p>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
@@ -104,30 +105,30 @@ export default function Recommendations() {
             <Button className="w-full sm:w-auto" onClick={retry}>Try again</Button>
             <Link to="/onboarding" className={secondaryLink}>Complete Lifestyle Profile</Link>
           </div>
-        </Card>
+        </div>
       )}
 
       {state.status === 'needs-onboarding' && (
-        <Card className="mt-6 text-center" role="alert">
+        <div className={`${cardClass} mt-6 text-center`} role="alert">
           <p className="text-3xl" aria-hidden="true">📝</p>
           <p className="mt-2 font-semibold text-slate-900 dark:text-white">Your lifestyle profile is not complete yet</p>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             Answer a few quick questions and we will suggest tests worth discussing with your doctor. It takes about two minutes.
           </p>
           <Link to="/onboarding" className={`${primaryLink} mt-4`}>Complete Lifestyle Profile</Link>
-        </Card>
+        </div>
       )}
 
       {state.status === 'ready' && (
         <>
           {tests.length === 0 ? (
-            <Card className="mt-6 text-center">
+            <div className={`${cardClass} mt-6 text-center`}>
               <p className="text-3xl" aria-hidden="true">✅</p>
               <p className="mt-2 font-semibold text-slate-900 dark:text-white">No specific tests suggested</p>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                 Your answers did not match any of our suggestions. Talk to your doctor about routine check-ups.
               </p>
-            </Card>
+            </div>
           ) : (
             <>
               <p className="mt-5 text-sm font-medium text-slate-700 dark:text-slate-200" aria-live="polite">
