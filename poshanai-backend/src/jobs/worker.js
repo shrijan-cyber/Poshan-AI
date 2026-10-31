@@ -113,6 +113,7 @@ async function startWorker() {
     async (job) => {
       if (job.name !== 'generate-meal-plan') throw new Error('Unknown meal-plan job.');
       const plan = await generateMealPlan(job.data.userId, job.data.reportId, job.data.preferences);
+      if (plan.status === 'unachievable') return { status: plan.status, message: plan.message };
       return { planId: String(plan._id) };
     },
     { connection: redisConnection(null), concurrency: 2 },

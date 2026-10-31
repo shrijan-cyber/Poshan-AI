@@ -115,7 +115,7 @@ export default function DietPlanResult() {
             <article key={`${meal.mealName}-${index}`} className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-emerald-950/5">
               <div className="flex items-start justify-between gap-3"><div><h3 className="text-lg font-bold text-slate-900">{meal.mealName}</h3><p className="mt-1 text-sm text-slate-500">{Number(meal.calories).toFixed(0)} kcal</p></div><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">Meal {index + 1}</span></div>
               <ul className="mt-4 space-y-2 border-t border-slate-100 pt-4">
-                {(meal.items ?? []).map((item) => <li key={item.ifctCode} className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-700">{item.foodName}</span><span className="shrink-0 font-medium text-slate-500">{Number(item.quantity).toFixed(0)} g</span></li>)}
+                {(meal.items ?? []).map((item) => <li key={item.ifctCode} className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-700">{item.foodName}<span className="block text-xs text-slate-500">{item.cookedServingDescription ?? 'Cooked weight unavailable'}</span></span><span className="shrink-0 text-right font-medium text-slate-500">{Number(item.rawWeightGrams ?? item.quantity).toFixed(0)} g raw</span></li>)}
               </ul>
               {meal.swapSuggestion && <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm leading-5 text-emerald-900"><span className="font-semibold">Optional swap:</span> {meal.swapSuggestion}</p>}
             </article>

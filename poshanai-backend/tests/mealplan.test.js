@@ -197,6 +197,9 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.ok(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight.quantityGrams > 0);
       assert.equal(recipes.body.data.recipes[0].ingredients[0].rawIngredientWeight.basis, 'raw');
       assert.equal(recipes.body.data.recipes[0].ingredients[0].cookedHouseholdMeasure, null);
+      assert.ok(recipes.body.data.recipes[0].ingredients[0].rawWeightGrams > 0);
+      assert.ok(recipes.body.data.recipes[0].ingredients[0].cookedWeightGrams > 0);
+      assert.match(recipes.body.data.recipes[0].ingredients[0].cookedServingDescription, /cooked/i);
       assert.ok(recipes.body.data.recipes[0].dishName);
     });
 

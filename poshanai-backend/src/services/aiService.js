@@ -364,6 +364,7 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
 
   logger.info('Deterministic recipe-plan generation started.');
   const composedPlan = composeRecipeMealPlan(recipeProfile, { days: 7 });
+  if (composedPlan.status === 'unachievable') return composedPlan;
   const instructedMeals = await enhanceRecipeInstructions(composedPlan.meals);
   const nutrientTargets = [...new Set(deficiencies.map(({ nutrient }) => nutrient))].slice(0, 5);
   const meals = instructedMeals.map((meal) => {

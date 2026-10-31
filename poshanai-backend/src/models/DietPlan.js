@@ -10,6 +10,10 @@ const itemSchema = new mongoose.Schema({
     quantityGrams: { type: Number, min: 1, max: 2000 },
     unit: { type: String, enum: ['g'], default: 'g' },
   },
+  rawWeightGrams: { type: Number, min: 0.001, max: 2000, default: null },
+  yieldFactor: { type: Number, min: 0.001, max: 10, default: null },
+  cookedWeightGrams: { type: Number, min: 0.001, max: 10000, default: null },
+  cookedServingDescription: { type: String, trim: true, default: null },
 }, { _id: false });
 
 // Optional structured recipe ingredients. Legacy meal.items remain the source for
@@ -19,6 +23,10 @@ const recipeIngredientSchema = new mongoose.Schema({
   canonicalName: { type: String, trim: true, required: true },
   quantity: { type: Number, required: true, min: 0.001 },
   rawQuantityGrams: { type: Number, min: 0.001, default: null },
+  rawWeightGrams: { type: Number, min: 0.001, default: null },
+  yieldFactor: { type: Number, min: 0.001, max: 10, default: null },
+  cookedWeightGrams: { type: Number, min: 0.001, default: null },
+  cookedServingDescription: { type: String, trim: true, default: null },
   unit: { type: String, required: true, trim: true },
   householdMeasure: { type: String, trim: true, default: null },
   state: { type: String, enum: ['raw', 'cooked'], default: null },
@@ -35,6 +43,7 @@ const mealSchema = new mongoose.Schema({
   dietaryCompatibility: { type: [String], default: [] },
   portionDescription: { type: String, trim: true, default: null },
   cookedHouseholdMeasure: { type: String, trim: true, default: null },
+  cookedServingDescription: { type: String, trim: true, default: null },
   servings: { type: Number, min: 0.1, default: null },
   prepTime: { type: Number, min: 0, default: null },
   cookTime: { type: Number, min: 0, default: null },

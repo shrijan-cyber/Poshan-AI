@@ -14,10 +14,15 @@ function publicDietPlan(dietPlan) {
     meals: (plan.meals ?? []).map((meal) => ({
       ...meal,
       cookedHouseholdMeasure: meal.cookedHouseholdMeasure ?? meal.portionDescription ?? null,
+      cookedServingDescription: meal.cookedServingDescription ?? null,
       items: (meal.items ?? []).map((item) => ({
         ...item,
         weightBasis: item.weightBasis ?? 'raw',
         householdMeasure: item.householdMeasure ?? null,
+        rawWeightGrams: item.rawWeightGrams ?? item.rawIngredientWeight?.quantityGrams ?? (Number(item.quantity) || null),
+        cookedWeightGrams: item.cookedWeightGrams ?? null,
+        yieldFactor: item.yieldFactor ?? null,
+        cookedServingDescription: item.cookedServingDescription ?? null,
         rawIngredientWeight: item.rawIngredientWeight ?? {
           quantityGrams: Number(item.quantity) || 0,
           unit: 'g',
@@ -33,7 +38,16 @@ export const generateBasic = asyncHandler(async (req, res) => {
     ...req.body,
     dietType: req.body.dietType === 'non-veg' ? 'nonveg' : req.body.dietType,
   };
-  const generated = await enhanceDietPlan(generateBasicDietPlan(profile));
+  const composed = generateBasicDietPlan(profile);
+  if (composed.status === 'unachievable') {
+    return res.status(422).json({
+      success: false,
+      status: 'unachievable',
+      message: composed.message,
+      error: { code: 'RECIPE_TARGET_UNACHIEVABLE', message: composed.message, requestId: req.id },
+    });
+  }
+  const generated = await enhanceDietPlan(composed);
   const dietPlan = await DietPlan.create({
     ...generated,
     groceryList: buildGroceryList(generated),

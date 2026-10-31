@@ -75,6 +75,55 @@ beforeEach(async () => {
 });
 
 describe('GET /api/diet-plans/:id/grocery-list', () => {
+  it('keeps the basic plan response shape and adds raw and cooked ingredient fields', async () => {
+    const owner = await createAuthenticatedUser('Recipe plan', 'recipe-plan@example.com');
+    const response = await request(app)
+      .post('/api/diet-plans/generate-basic')
+      .set('Authorization', `Bearer ${owner.token}`)
+      .set('X-Forwarded-For', owner.ip)
+      .send({
+        age: 35,
+        gender: 'female',
+        weightKg: 60,
+        heightCm: 165,
+        activityLevel: 'moderate',
+        goal: 'maintain',
+        dietType: 'veg',
+        mealsPerDay: 3,
+      });
+
+    assert.equal(response.status, 201, JSON.stringify(response.body));
+    assert.equal(response.body.success, true);
+    assert.equal(response.body.data.type, 'basic');
+    assert.equal(response.body.data.meals.length, 3);
+    const item = response.body.data.meals[0].items[0];
+    assert.equal(typeof item.quantity, 'number');
+    assert.equal(item.weightBasis, 'raw');
+    assert.ok(item.rawWeightGrams > 0);
+    assert.ok(item.cookedWeightGrams > 0);
+    assert.match(item.cookedServingDescription, /cooked/i);
+    assert.equal(typeof response.body.data.meals[0].calories, 'number');
+    assert.equal(typeof response.body.data.meals[0].macros.protein, 'number');
+
+    const extreme = await request(app)
+      .post('/api/diet-plans/generate-basic')
+      .set('Authorization', `Bearer ${owner.token}`)
+      .set('X-Forwarded-For', owner.ip)
+      .send({
+        age: 20,
+        gender: 'male',
+        weightKg: 200,
+        heightCm: 250,
+        activityLevel: 'active',
+        goal: 'gain',
+        dietType: 'veg',
+        mealsPerDay: 3,
+      });
+    assert.equal(extreme.status, 422);
+    assert.equal(extreme.body.status, 'unachievable');
+    assert.equal(extreme.body.error.code, 'RECIPE_TARGET_UNACHIEVABLE');
+  });
+
   it('requires authentication and validates the plan ID', async () => {
     const unauthenticated = await request(app).get('/api/diet-plans/507f1f77bcf86cd799439011/grocery-list');
     assert.equal(unauthenticated.status, 401);

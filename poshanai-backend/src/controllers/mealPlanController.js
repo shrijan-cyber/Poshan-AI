@@ -48,6 +48,10 @@ function storedRecipeIngredients(meal) {
         basis: 'raw',
       },
       cookedHouseholdMeasure: null,
+      rawWeightGrams: Number(ingredient.rawWeightGrams ?? ingredient.rawQuantityGrams ?? ingredient.quantity) || 0,
+      cookedWeightGrams: ingredient.cookedWeightGrams ?? null,
+      yieldFactor: ingredient.yieldFactor ?? null,
+      cookedServingDescription: ingredient.cookedServingDescription ?? null,
     }));
   }
   return (meal.items ?? []).map((item) => ({
@@ -58,11 +62,23 @@ function storedRecipeIngredients(meal) {
     unit: 'g',
     state: item.weightBasis ?? 'raw',
     householdMeasure: item.householdMeasure ?? null,
+    rawWeightGrams: Number(item.rawWeightGrams ?? item.rawIngredientWeight?.quantityGrams ?? item.quantityGrams) || 0,
+    cookedWeightGrams: item.cookedWeightGrams ?? null,
+    yieldFactor: item.yieldFactor ?? null,
+    cookedServingDescription: item.cookedServingDescription ?? null,
   }));
 }
 
 async function generateSynchronously(req, res) {
   const mealPlan = await generateMealPlan(req.user._id, req.body.reportId, req.body.preferences);
+  if (mealPlan.status === 'unachievable') {
+    return res.status(422).json({
+      success: false,
+      status: 'unachievable',
+      message: mealPlan.message,
+      error: { code: 'RECIPE_TARGET_UNACHIEVABLE', message: mealPlan.message, requestId: req.id },
+    });
+  }
   return res.status(201).json({ success: true, data: publicMealPlan(mealPlan) });
 }
 
@@ -79,8 +95,13 @@ function publicMealPlan(mealPlan) {
     meals: plan.meals.map((meal) => ({
       ...meal,
       cookedHouseholdMeasure: meal.cookedHouseholdMeasure ?? meal.portionDescription ?? null,
+      cookedServingDescription: meal.cookedServingDescription ?? null,
       items: meal.items.map((item) => ({
         ...item,
+        rawWeightGrams: item.rawWeightGrams ?? item.rawIngredientWeight?.quantityGrams ?? (Number(item.quantityGrams) || 0),
+        cookedWeightGrams: item.cookedWeightGrams ?? null,
+        yieldFactor: item.yieldFactor ?? null,
+        cookedServingDescription: item.cookedServingDescription ?? null,
         rawIngredientWeight: item.rawIngredientWeight ?? {
           quantityGrams: Number(item.quantityGrams) || 0,
           unit: 'g',
@@ -118,7 +139,9 @@ export const getGenerationStatus = asyncHandler(async (req, res) => {
   const payload = {
     jobId: job.id,
     status: state === 'completed' ? 'completed' : state === 'failed' ? 'failed' : state,
-    ...(state === 'completed' ? { planId: job.returnvalue?.planId } : {}),
+    ...(state === 'completed' && job.returnvalue?.status === 'unachievable'
+      ? { status: 'unachievable', message: job.returnvalue.message }
+      : state === 'completed' ? { planId: job.returnvalue?.planId } : {}),
     ...(state === 'failed' ? { message: 'Meal-plan generation failed. Please try again.' } : {}),
   };
   return res.json({ success: true, data: payload });
@@ -159,14 +182,15 @@ export const getGroceryList = asyncHandler(async (req, res) => {
       ? meal.ingredients.map((ingredient) => ({
         ...ingredient,
         foodName: ingredient.canonicalName,
-        quantityGrams: ingredient.rawQuantityGrams ?? ingredient.quantity,
+        quantityGrams: ingredient.rawWeightGrams ?? ingredient.rawQuantityGrams ?? ingredient.quantity,
       }))
       : meal.items;
     for (const item of items) {
       const food = getFoodByIfctCode(item.ifctCode);
       const name = food ? getHouseholdFoodName(food) : item.foodName;
       const category = groceryCategoryForIfct(food?.category);
-      const key = `${category}:${item.ifctCode || name.toLowerCase()}`;
+      const normalizedName = name.toLocaleLowerCase('en').replace(/[^a-z0-9]+/g, ' ').trim();
+      const key = `${item.ifctCode || 'unmapped'}:${normalizedName}`;
       const current = groupedItems.get(key) ?? { category, name, grams: 0 };
       current.grams += Number(item.quantityGrams) || 0;
       groupedItems.set(key, current);

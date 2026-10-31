@@ -3,6 +3,8 @@ import Joi from 'joi';
 const recipeIngredientSchema = Joi.object({
   ifctCode: Joi.string().trim().uppercase().pattern(/^[A-Z]\d{3}$/).required(),
   rawQuantityGrams: Joi.number().positive().max(1000).required(),
+  yieldFactor: Joi.number().positive().max(10).required(),
+  cookedWeightGrams: Joi.number().positive().max(10000).required(),
   householdMeasure: Joi.string().trim().min(1).max(80).required(),
 }).unknown(false);
 
