@@ -62,10 +62,20 @@ const rdaNorm = {
 };
 
 const round = (value) => (value === null || value === undefined ? null : Math.round(Number(value) * 100) / 100);
+const getAvailableEnergy = (food) => food.nutrients.calories === 0
+  && Number.isFinite(food.nutrients.fat)
+  && food.nutrients.fat > 0
+  ? null
+  : food.nutrients.calories;
 
 export function getFoodByIfctCode(ifctCode) {
   const normalizedCode = String(ifctCode ?? '').trim().toUpperCase();
-  return foodRecordsByCode.get(normalizedCode) ?? null;
+  const food = foodRecordsByCode.get(normalizedCode);
+  if (!food) return null;
+  return {
+    ...food,
+    nutrients: { ...food.nutrients, calories: getAvailableEnergy(food) },
+  };
 }
 
 /** Return a real IFCT match, explicit substitute, or null with an explanation. */
@@ -84,7 +94,7 @@ export function searchIfctFoods(query, limit = 20) {
       ifctCode: food.ifctCode,
       foodName: food.foodName,
       nutrients: {
-        calories: food.nutrients.calories,
+        calories: getAvailableEnergy(food),
         protein: food.nutrients.protein,
         carbs: food.nutrients.carbs,
         fat: food.nutrients.fat,
@@ -207,7 +217,10 @@ export function retrieveFoodsForDeficiencies(deficiencies = [], preferences = {}
     householdName: getHouseholdFoodName(food),
     category: food.category,
     nutrients: Object.fromEntries(
-      Object.entries(food.nutrients).map(([name, value]) => [name, value === null ? null : round(value)]),
+      Object.entries(food.nutrients).map(([name, value]) => [
+        name,
+        name === 'calories' ? round(getAvailableEnergy(food)) : (value === null ? null : round(value)),
+      ]),
     ),
     servingSize: 100,
   }));

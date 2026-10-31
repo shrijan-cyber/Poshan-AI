@@ -1,11 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import logger from '../utils/logger.js';
+import {
+  auditIfctFoods,
+  validateDatasetChecksum,
+  validateIfctManifest,
+} from './ifctDataValidation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const datasetPath = path.resolve(__dirname, '../../data/ifct_2017.json');
+const manifestPath = path.resolve(__dirname, '../data/ifct-manifest.json');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 let cachedFoods;
+let cachedValidationReport;
 
 const blockedEverydayAlternatives = /\b(?:barley)\b/i;
 const explicitlyRequestedOnly = /\b(?:amaranth|agathi|ragi|quinoa)\b/i;
@@ -105,28 +114,44 @@ export function getHouseholdFoodWhitelist(foods, requestText = '', limit = 100) 
   return [...byCode.values()];
 }
 
-export function loadIfctDataset(filePath = datasetPath) {
-  const foods = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+function parseIfctDataset(content, filePath) {
+  const foods = JSON.parse(content);
   if (!Array.isArray(foods) || foods.length === 0) {
     throw new Error(`IFCT dataset must be a non-empty array: ${filePath}`);
   }
 
-  return foods.map((food) => ({
-    ...food,
-    nutrients: {
-      ...food.nutrients,
-      // The original IFCT build encoded missing oil energy as 0 despite 100 g fat.
-      calories: food.nutrients?.calories === 0 && food.nutrients?.fat > 0
-        ? null
-        : food.nutrients?.calories,
-    },
-  }));
+  // Preserve all source values, including suspicious zeros; validation reports anomalies
+  // separately so loading never rewrites source data or conflates zero with missing.
+  return foods.map((food) => ({ ...food, nutrients: { ...food.nutrients } }));
+}
+
+export function loadIfctDataset(filePath = datasetPath) {
+  return parseIfctDataset(fs.readFileSync(filePath, 'utf8'), filePath);
 }
 
 /** Load the catalog once so every backend service shares identical IFCT records. */
 export function getIfctFoods() {
   if (!cachedFoods) {
-    cachedFoods = loadIfctDataset();
+    const validation = validateIfctManifest(manifest);
+    if (!validation.valid) {
+      throw new Error(`IFCT manifest is invalid: ${validation.errors.join(' ')}`);
+    }
+    const content = fs.readFileSync(datasetPath, 'utf8');
+    const checksum = validateDatasetChecksum(content, manifest.dataset.sha256);
+    if (!checksum.valid) {
+      throw new Error(`IFCT dataset checksum validation failed: ${checksum.error}`);
+    }
+    cachedFoods = parseIfctDataset(content, datasetPath);
+    cachedValidationReport = auditIfctFoods(cachedFoods, manifest);
+    if (!cachedValidationReport.valid) {
+      throw new Error(`IFCT dataset validation failed: ${cachedValidationReport.errors.join(' ')}`);
+    }
+    if (cachedValidationReport.suspiciousEnergyCodes.length) {
+      logger.warn('IFCT data audit flagged zero-energy records with positive fat.', {
+        code: 'IFCT_ENERGY_DATA_UNRESOLVED',
+        ifctCodes: cachedValidationReport.suspiciousEnergyCodes,
+      });
+    }
     for (const food of cachedFoods) {
       if (food.nutrients && !Object.isFrozen(food.nutrients)) Object.freeze(food.nutrients);
       Object.freeze(food);
@@ -134,6 +159,11 @@ export function getIfctFoods() {
     Object.freeze(cachedFoods);
   }
   return cachedFoods;
+}
+
+export function getIfctValidationReport() {
+  getIfctFoods();
+  return structuredClone(cachedValidationReport);
 }
 
 const foodNameKey = (value) => String(value ?? '').toLocaleLowerCase('en')
@@ -182,6 +212,7 @@ export function resolveIfctFoodReference(name, foods = getIfctFoods()) {
 export default {
   loadIfctDataset,
   getIfctFoods,
+  getIfctValidationReport,
   getHouseholdFoodName,
   getHouseholdFoodWhitelist,
   wasFoodExplicitlyRequested,

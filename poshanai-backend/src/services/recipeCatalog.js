@@ -34,6 +34,9 @@ function createValidatedCatalog(templates = recipeTemplates, foods = getIfctFood
           throw new Error(`Recipe ${value.recipeId} uses ${ingredient.ifctCode} without IFCT ${nutrient} data.`);
         }
       }
+      if (food.nutrients.calories === 0 && food.nutrients.fat > 0) {
+        throw new Error(`Recipe ${value.recipeId} uses ${ingredient.ifctCode} with unresolved zero-energy and positive-fat data.`);
+      }
     }
     const recipeNutrition = value.ingredients.reduce((totals, ingredient) => {
       const nutrients = foodsByCode.get(ingredient.ifctCode).nutrients;

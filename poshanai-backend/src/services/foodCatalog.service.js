@@ -21,12 +21,14 @@ export const MIN_GRAMS = 1;
 export const MAX_GRAMS = 2000;
 
 const round1 = (value) => Math.round(value * 10) / 10;
-const toNumber = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
-
 /** Macro values per 100 g, as stored in the IFCT dataset. */
 const nullableNumber = (value) => value === null || value === undefined || !Number.isFinite(Number(value))
   ? null
   : Number(value);
+
+const hasUnresolvedEnergy = (nutrients) => nutrients?.calories === 0
+  && Number.isFinite(nutrients?.fat)
+  && nutrients.fat > 0;
 
 function publicFood({ ifctCode, foodName, category, nutrients, servingUnits }) {
   return {
@@ -35,7 +37,9 @@ function publicFood({ ifctCode, foodName, category, nutrients, servingUnits }) {
     category,
     ...(servingUnits ? { servingUnits } : {}),
     nutrients: {
-      calories: nullableNumber(nutrients?.calories),
+      // Preserve the existing API contract: known-invalid oil energy is unavailable,
+      // while the underlying IFCT source record remains unchanged at zero.
+      calories: hasUnresolvedEnergy(nutrients) ? null : nullableNumber(nutrients?.calories),
       protein: nullableNumber(nutrients?.protein),
       carbs: nullableNumber(nutrients?.carbs),
       fat: nullableNumber(nutrients?.fat),
@@ -101,6 +105,9 @@ export function scaleNutrients(per100g, grams) {
 
 /** Scales all macros from IFCT per-100 g values to the final portion size. */
 export function scaleFoodPortion(food, grams) {
+  if (hasUnresolvedEnergy(food?.nutrients)) {
+    throw httpError(422, 'IFCT_ENERGY_UNRESOLVED', 'This IFCT food has unresolved energy data and cannot be used for nutrition calculations.');
+  }
   return scaleNutrients(food.nutrients, grams);
 }
 
@@ -108,17 +115,20 @@ export function sumNutrients(entries) {
   const totals = entries.reduce(
     (sum, entry) => Object.fromEntries(['calories', 'protein', 'carbs', 'fat'].map((key) => [
       key,
-      sum[key] === null || entry[key] === null
+      sum[key] === null || sum[key] === undefined
+        || entry[key] === null || entry[key] === undefined
+        || !Number.isFinite(Number(entry[key]))
         ? null
-        : sum[key] + toNumber(entry[key]),
+        : sum[key] + Number(entry[key]),
     ])),
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
+  const roundNullable = (value) => (value === null || value === undefined ? null : round1(value));
   return {
-    calories: round1(totals.calories),
-    protein: round1(totals.protein),
-    carbs: round1(totals.carbs),
-    fat: round1(totals.fat),
+    calories: roundNullable(totals.calories),
+    protein: roundNullable(totals.protein),
+    carbs: roundNullable(totals.carbs),
+    fat: roundNullable(totals.fat),
   };
 }
 

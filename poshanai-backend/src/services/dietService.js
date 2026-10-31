@@ -150,6 +150,9 @@ export function calculateIfctNutrition(food, rawWeightGrams) {
   if (!food || !Number.isFinite(Number(rawWeightGrams)) || Number(rawWeightGrams) < 0) {
     throw httpError(422, 'IFCT_NUTRITION_INPUT_INVALID', 'A validated IFCT food and non-negative raw weight are required.');
   }
+  if (food.nutrients?.calories === 0 && Number(food.nutrients?.fat) > 0) {
+    throw httpError(422, 'IFCT_ENERGY_UNRESOLVED', 'This IFCT food has unresolved energy data and cannot be used for nutrition calculations.');
+  }
   return Object.fromEntries(nutrientKeys.map((key) => [key, scaledValue(food.nutrients?.[key], Number(rawWeightGrams))]));
 }
 

@@ -1,0 +1,60 @@
+{
+  "manifestVersion": 1,
+  "dataset": {
+    "name": "Indian Food Composition Tables 2017 application subset",
+    "source": {
+      "name": "ICMR-NIN Indian Food Composition Tables 2017",
+      "version": "2017",
+      "url": "https://www.nin.res.in/ebooks/IFCT2017.pdf",
+      "officialReference": "Longvah et al. (2017), Indian Food Composition Tables 2017, National Institute of Nutrition, ICMR, Hyderabad.",
+      "sourceFilePath": "poshanai-backend/package/index.csv",
+      "sourceFileAvailable": false,
+      "sourceFileSha256": null,
+      "sourceColumnMappingVerified": false,
+      "reusePermission": "Not confirmed for electronic storage or product redistribution; obtain written permission from ICMR-NIN."
+    },
+    "runtimeFile": "poshanai-backend/data/ifct_2017.json",
+    "recordCount": 542,
+    "officialReportedFoodCount": 528,
+    "sha256": "fe3ad3f3a250f0c23fc3ace7906097fcdbe19f8d80bd1cfe113b5b41d15bdc2e",
+    "lastVerified": "2026-11-01",
+    "buildScript": "src/scripts/buildIfctData.js",
+    "buildScriptVersion": "1.0.0"
+  },
+  "nutrientBasis": {
+    "value": "per 100 g edible portion",
+    "verification": "Verified as the IFCT 2017 table basis; record-level source matching remains unavailable until the source CSV and verified column map are supplied."
+  },
+  "nutrientFields": {
+    "calories": { "applicationUnit": "kcal", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "protein": { "applicationUnit": "g", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "carbs": { "applicationUnit": "g", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "fat": { "applicationUnit": "g", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "iron": { "applicationUnit": "mg", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "calcium": { "applicationUnit": "mg", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "vitaminD": { "applicationUnit": "µg", "sourceUnit": null, "mappingStatus": "unverified", "dataStatus": "unknown" },
+    "vitaminB12": { "applicationUnit": null, "sourceUnit": null, "mappingStatus": "unavailable-in-application-subset", "dataStatus": "missing" },
+    "fiber": { "applicationUnit": null, "sourceUnit": null, "mappingStatus": "unavailable-in-application-subset", "dataStatus": "missing" }
+  },
+  "energyConversion": {
+    "sourceUnit": null,
+    "applicationUnit": "kcal",
+    "existingBuilderFormula": "kJ / 4.184 (as documented in the legacy builder)",
+    "officialIfctFormula": "1 kcal = 4.18 kJ",
+    "status": "unverified-source-column; resolve against authorized source rows before rebuilding"
+  },
+  "foodState": {
+    "generalIfctBasis": "Raw foods except poultry and egg, per IFCT 2017 methodology.",
+    "recordLevelStateAvailable": false,
+    "poultryAndEggRecordStates": "Require record-level verification; do not assume raw or cooked from category alone."
+  },
+  "dataStatuses": ["analytical", "derived", "label_reported", "estimated", "missing"],
+  "knownIssues": [
+    { "code": "SOURCE_CSV_UNAVAILABLE", "status": "unresolved", "detail": "The authorized source CSV and verified header/unit mapping are not present in this checkout." },
+    { "code": "APPLICATION_COUNT_DIFFERS_FROM_IFCT_2017", "status": "unresolved", "applicationRecordCount": 542, "publishedIfctFoodCount": 528, "detail": "All application codes are unique, but the application subset has 14 more records than IFCT 2017 reports. Source-level reconciliation is unavailable." },
+    { "code": "DUPLICATE_NORMALIZED_FOOD_NAMES", "status": "review", "groups": [{ "foodName": "cat fish", "ifctCodes": ["P009", "S001"] }, { "foodName": "crab", "ifctCodes": ["Q001", "S007"] }], "detail": "Identical normalized English names occur under separate IFCT codes/categories; confirm whether these refer to identical or distinct sampled food items before merging." },
+    { "code": "OIL_ENERGY_ZERO_WITH_POSITIVE_FAT", "status": "unresolved", "ifctCodes": ["T001", "T002", "T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014"] },
+    { "code": "VITAMIN_B12_MISSING_IN_APPLICATION_DATA", "status": "missing", "recordCount": 542 },
+    { "code": "FIBER_MISSING_IN_APPLICATION_DATA", "status": "missing", "recordCount": 542 }
+  ]
+}
