@@ -7,13 +7,11 @@ import { useAuth } from '../hooks/useAuth.js';
 const modes = [
   { value: 'login', label: 'Sign in' },
   { value: 'reset-password', label: 'Reset password' },
-  { value: 'verify-email', label: 'Verify email' },
 ];
 
 const modeCopy = {
   login: { title: 'Sign in with email code', action: 'Send sign-in code' },
   'reset-password': { title: 'Reset your password', action: 'Send reset code' },
-  'verify-email': { title: 'Verify your email', action: 'Send verification code' },
 };
 
 export default function OtpLogin() {
@@ -84,9 +82,6 @@ export default function OtpLogin() {
         setMessage('Code verified. Choose a new password.');
         return;
       }
-
-      setStep('done');
-      setMessage('Your email is verified.');
     } catch (verificationError) {
       setError(verificationError?.apiError?.message ?? 'That code could not be verified.');
     } finally {
@@ -127,7 +122,7 @@ export default function OtpLogin() {
         <h1 id="otp-title" className="mt-3 font-serif text-3xl font-semibold tracking-tight text-[#244b36] dark:text-white sm:text-4xl">
           {modeCopy[purpose].title}
         </h1>
-        <div className="mt-6 grid grid-cols-3 gap-2 rounded-lg bg-[#f1f2e9] p-1 dark:bg-slate-800" aria-label="Email code purpose">
+        <div className="mt-6 grid grid-cols-2 gap-2 rounded-lg bg-[#f1f2e9] p-1 dark:bg-slate-800" aria-label="Email code purpose">
           {modes.map((mode) => (
             <button
               key={mode.value}

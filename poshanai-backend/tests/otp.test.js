@@ -57,6 +57,12 @@ beforeEach(async () => {
 });
 
 describe('Email OTP API', () => {
+  it('defaults new users to email verified while email verification is out of MVP scope', async () => {
+    const user = await createUser('otp-default-verified@example.com');
+    assert.equal(user.emailVerified, true);
+    assert.equal((await User.findById(user._id)).emailVerified, true);
+  });
+
   it('stores only a bcrypt hash, expires in five minutes, and does not reveal account existence', async () => {
     await createUser('otp-login@example.com');
     const response = await requestCode('otp-login@example.com', 'login');
@@ -180,15 +186,13 @@ describe('Email OTP API', () => {
     assert.equal(reset.body.error.code, 'RESET_TOKEN_INVALID');
   });
 
-  it('marks an email verified only after a valid verification-purpose code', async () => {
-    const user = await createUser('otp-verify@example.com');
-    const requested = await requestCode('otp-verify@example.com', 'verify-email');
-    assert.equal((await User.findById(user._id)).emailVerified, false);
+  it('rejects the removed verify-email OTP purpose', async () => {
+    await createUser('otp-verify@example.com');
+    const request = await requestCode('otp-verify@example.com', 'verify-email');
+    assert.equal(request.status, 400);
 
-    const verified = await verifyCode('otp-verify@example.com', 'verify-email', requested.body.data.dev_otp);
-    assert.equal(verified.status, 200);
-    assert.equal(verified.body.data.emailVerified, true);
-    assert.equal((await User.findById(user._id)).emailVerified, true);
+    const verify = await verifyCode('otp-verify@example.com', 'verify-email', '123456');
+    assert.equal(verify.status, 400);
   });
 
   it('validates purposes and codes and has the required MongoDB TTL index', async () => {
@@ -198,6 +202,11 @@ describe('Email OTP API', () => {
       .post('/api/v1/auth/otp/request')
       .send({ email: 'otp-validation@example.com', purpose: 'admin' });
     assert.equal(invalidPurpose.status, 400);
+
+    const removedPurpose = await request(app)
+      .post('/api/v1/auth/otp/request')
+      .send({ email: 'otp-validation@example.com', purpose: 'verify-email' });
+    assert.equal(removedPurpose.status, 400);
 
     const invalidCode = await request(app)
       .post('/api/v1/auth/otp/verify')

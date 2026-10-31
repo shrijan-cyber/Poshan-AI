@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-    emailVerified: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: true },
     passwordHash: { type: String, required: true, select: false },
     passwordResetTokenHash: { type: String, select: false, index: true },
     passwordResetTokenExpiresAt: { type: Date, select: false },
@@ -72,6 +72,9 @@ userSchema.plugin(encrypt, {
   encryptionKey: env.encryptionKey,
   signingKey: env.signingKey,
   encryptedFields: ['twoFactorSecret'],
+  // Accept legacy accounts created before mongoose-encryption added `_ac` signatures.
+  // New and already-signed documents continue to be authenticated normally.
+  requireAuthenticationCode: false,
 });
 
 userSchema.methods.setPassword = async function setPassword(password) {

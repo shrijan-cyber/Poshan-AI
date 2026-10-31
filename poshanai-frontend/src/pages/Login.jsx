@@ -28,10 +28,10 @@ export default function Login() {
     defaultValues: { email: '', password: '' },
   });
 
-  const onSubmit = async (credentials) => {
+  const onSubmit = async ({ email, password }) => {
     clearErrors('root.serverError');
     try {
-      const result = await login(credentials);
+      const result = await login({ email, password });
       if (result?.requiresTwoFactor) {
         navigate('/two-factor-verify', { replace: true });
         return;

@@ -39,7 +39,7 @@ const loginLimiter = process.env.NODE_ENV === 'test'
   keyGenerator: (req) => {
     const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
     const emailHash = createHash('sha256').update(email).digest('hex');
-    return `${req.ip}:${emailHash}`;
+    return `${ipKeyGenerator(req.ip)}:${emailHash}`;
   },
   });
 

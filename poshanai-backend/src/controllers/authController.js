@@ -150,6 +150,7 @@ export const register = asyncHandler(async (req, res) => {
   const user = new User({
     name: req.body.name,
     email,
+    emailVerified: true,
     profile: {
       age: req.body.age,
       gender: req.body.gender,
@@ -200,9 +201,10 @@ export async function issueAuthenticatedSession(user, req, res, action = 'login'
 }
 
 export const login = asyncHandler(async (req, res) => {
-  const user = await User.findOne({ email: req.body.email.toLowerCase() })
+  const { email, password } = req.body;
+  const user = await User.findOne({ email: email.toLowerCase() })
     .select('+passwordHash +tokenVersion +twoFactorLockUntil');
-  if (!user || !(await user.verifyPassword(req.body.password))) {
+  if (!user || !(await user.verifyPassword(password))) {
     throw httpError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.');
   }
 

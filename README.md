@@ -80,6 +80,10 @@ Protected endpoints require `Authorization: Bearer <accessToken>` unless noted o
 
 New accounts must complete the consent and lifestyle questionnaire before accessing the dashboard. The recommendations endpoint returns only entries configured in `poshanai-backend/data/testRules.json`; that file currently contains no reviewed suggestions, so users may see an empty result. Do not add clinical test rules without appropriate review.
 
+## Future scope / not in current MVP
+
+Resend email verification is Future Scope / Not in current MVP. Signup and password login remain available, and the `emailVerified` field is retained for a future reintroduction. OTP sign-in/reset emails can use Gmail SMTP when configured; retest reminders remain in-app. See [the email OTP notes](docs/EMAIL_OTP.md) for the re-enable steps.
+
 `POST /api/logs/add-food` accepts `mealType`, `ifctCode`, and `quantityGrams`; macros are scaled from the IFCT per-100-g values. `GET /api/logs/today` returns the UTC date, food entries, nutrient totals, and a `calorieComparison` with consumed, target, and remaining calories. The target is `null` until the user profile has the fields required by the calorie calculator. `DELETE /api/logs/:logId` takes the food entry's embedded `_id` returned by the add-food endpoint.
 
 ## Production Compose

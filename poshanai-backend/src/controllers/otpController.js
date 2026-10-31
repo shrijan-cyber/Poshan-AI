@@ -13,7 +13,6 @@ import { sendEmail } from '../utils/sendEmail.js';
 const purposeLabels = Object.freeze({
   login: 'sign-in',
   'reset-password': 'password reset',
-  'verify-email': 'email verification',
 });
 
 const genericOtpError = () => httpError(400, 'OTP_INVALID_OR_EXPIRED', 'The code is invalid or expired. Request a new code.');
@@ -38,8 +37,8 @@ export const requestOTP = asyncHandler(async (req, res) => {
   const user = await User.findOne({
     email,
     status: { $nin: ['pending_deletion', 'deleted'] },
-  }).select('emailVerified');
-  const eligible = user && (purpose !== 'verify-email' || !user.emailVerified);
+  });
+  const eligible = Boolean(user);
   let otp = null;
 
   if (eligible) {
@@ -147,9 +146,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     });
   }
 
-  user.emailVerified = true;
-  await user.save();
-  return res.json({ success: true, data: { emailVerified: true } });
+  throw genericOtpError();
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {

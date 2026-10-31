@@ -110,4 +110,5 @@ export const env = {
   signingKey,
   otpExpiryMinutes,
   otpMaxAttempts,
+  enableEmailVerification: process.env.ENABLE_EMAIL_VERIFICATION === 'true',
 };

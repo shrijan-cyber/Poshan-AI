@@ -7,7 +7,9 @@ function readSession(response) {
 }
 
 export async function login(credentials) {
-  const payload = payloadFrom(await client.post('/auth/login', credentials));
+  // Password login uses only these credentials; never forward legacy verification fields.
+  const { email, password } = credentials ?? {};
+  const payload = payloadFrom(await client.post('/auth/login', { email, password }));
   if (payload?.requiresTwoFactor) {
     return {
       requiresTwoFactor: true,

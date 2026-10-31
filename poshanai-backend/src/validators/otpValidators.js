@@ -3,12 +3,12 @@ import validationError from '../utils/validationError.js';
 
 const requestOtpSchema = Joi.object({
   email: Joi.string().trim().lowercase().email().max(254).required(),
-  purpose: Joi.string().valid('login', 'reset-password', 'verify-email').required(),
+  purpose: Joi.string().valid('login', 'reset-password').required(),
 }).required();
 
 const verifyOtpSchema = Joi.object({
   email: Joi.string().trim().lowercase().email().max(254).required(),
-  purpose: Joi.string().valid('login', 'reset-password', 'verify-email').required(),
+  purpose: Joi.string().valid('login', 'reset-password').required(),
   otp: Joi.string().pattern(/^\d{6}$/).required(),
 }).required();
 

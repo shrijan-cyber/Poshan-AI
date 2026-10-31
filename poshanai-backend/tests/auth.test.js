@@ -134,9 +134,11 @@ describe('Authentication API (/api/auth)', () => {
       assert.equal(res.body.success, true);
       assert.equal(res.body.data.user.consent.given, true);
       assert.equal(res.body.data.user.consent.version, '1.0');
+      assert.equal(res.body.data.user.emailVerified, true);
 
       const userInDb = await User.findOne({ email: 'consent@example.com' });
       assert.ok(userInDb);
+      assert.equal(userInDb.emailVerified, true);
       assert.equal(userInDb.consent.given, true);
       assert.ok(userInDb.consent.givenAt instanceof Date);
       assert.equal(userInDb.consent.version, '1.0');
@@ -161,6 +163,24 @@ describe('Authentication API (/api/auth)', () => {
       assert.ok(res.body.data.accessToken);
       assert.equal(res.body.data.user.email, 'charlie@example.com');
       assertRefreshCookie(res);
+    });
+
+    it('allows existing users with emailVerified false to sign in', async () => {
+      const ip = nextIp();
+      await request(app)
+        .post('/api/auth/register')
+        .set('X-Forwarded-For', ip)
+        .send({ name: 'Legacy User', email: 'legacy@example.com', password: 'password123', consent: true });
+      await User.updateOne({ email: 'legacy@example.com' }, { $set: { emailVerified: false } });
+
+      const res = await request(app)
+        .post('/api/auth/login')
+        .set('X-Forwarded-For', ip)
+        .send({ email: 'legacy@example.com', password: 'password123' });
+
+      assert.equal(res.status, 200);
+      assert.ok(res.body.data.accessToken);
+      assert.equal(res.body.data.user.emailVerified, false);
     });
 
     it('rejects wrong password with 401 INVALID_CREDENTIALS', async () => {

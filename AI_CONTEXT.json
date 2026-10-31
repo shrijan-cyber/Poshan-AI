@@ -156,7 +156,8 @@
     "pending": [
       "User profile endpoints are currently placeholders returning NOT_IMPLEMENTED.",
       "Production IFCT RAG integration; the current meal-plan RAG service is a small replaceable stub.",
-      "Automated integration tests against a running Redis instance."
+      "Automated integration tests against a running Redis instance.",
+      "Resend email verification is Future Scope / Not in current MVP; `emailVerified` remains in the user schema and `ENABLE_EMAIL_VERIFICATION` defaults to false."
     ],
     "source_note": "Status is inferred from the checked-in source. Re-check implementation before relying on this section."
   },
@@ -177,6 +178,7 @@
       "OMNIROUTE_URL": "OpenAI-compatible chat-completions endpoint; defaults to http://localhost:20128/v1/chat/completions.",
       "OMNIROUTE_MODEL": "Model identifier configured in the OmniRoute gateway; defaults to gemini-2.0-flash.",
       "OMNIROUTE_API_KEY": "Optional gateway credential; keep secret and server-side.",
+      "ENABLE_EMAIL_VERIFICATION": "Feature flag reserved for future email verification; defaults to false and no verification route is currently enabled.",
       "REDIS_URL": "Optional. When configured and available, report OCR is queued; otherwise uploads run OCR synchronously. Default Compose configuration points to its Redis service."
     },
     "frontend_env": {
@@ -401,6 +403,7 @@
       "fields": {
         "name": "String, required, trimmed, 2-80 characters.",
         "email": "String, required, unique, lowercase, trimmed, indexed.",
+        "emailVerified": "Boolean retained for future verification; defaults to true in the MVP.",
         "passwordHash": "String, required, excluded from normal queries.",
         "role": "String enum user/admin, defaults to user.",
         "refreshTokenHash": "String or null, excluded from normal queries."
