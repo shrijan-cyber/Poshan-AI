@@ -18,27 +18,26 @@ export async function runRetestReminderSweep({ now = new Date() } = {}) {
 
   let remindersCreated = 0;
   for (const report of reports) {
-    const userExists = await User.exists({ _id: report.userId, status: 'active' });
-    if (!userExists) continue;
+    const user = await User.findOne({ _id: report.userId, status: 'active' }).select('email').lean();
+    if (!user?.email) continue;
 
-    try {
-      await Notification.updateOne(
-        { userId: report.userId, type: 'retest_reminder', reportId: report._id },
-        {
-          $setOnInsert: {
-            title: 'Retest reminder',
-            message: 'This report is over 90 days old. Consider discussing whether follow-up testing is appropriate with your doctor.',
-            readAt: null,
-          },
+    await Notification.findOneAndUpdate(
+      { userId: report.userId, dedupeKey: `retest:${report._id}` },
+      {
+        $setOnInsert: {
+          type: 'retest_reminder',
+          reportId: report._id,
+          dedupeKey: `retest:${report._id}`,
+          title: 'Retest reminder',
+          message: 'This report is over 90 days old. Consider discussing whether follow-up testing is appropriate with your doctor.',
+          isRead: false,
+          readAt: null,
         },
-        { upsert: true, runValidators: true },
-      );
-    } catch (error) {
-      if (error?.code !== 11000) throw error;
-    }
-
+      },
+      { upsert: true, new: true, runValidators: true },
+    );
     const updated = await Report.updateOne(
-      { _id: report._id, retestReminderSentAt: null },
+      { _id: report._id, userId: report.userId, retestReminderSentAt: null },
       { $set: { retestReminderSentAt: now } },
     );
     if (updated.modifiedCount > 0) remindersCreated++;

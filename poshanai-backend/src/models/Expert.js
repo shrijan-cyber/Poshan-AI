@@ -6,6 +6,8 @@ const expertSchema = new mongoose.Schema({
   role: { type: String, enum: ['doctor', 'dietitian', 'nutritionist'], required: true, index: true },
   experienceYears: { type: Number, required: true, min: 0, max: 80 },
   specialization: { type: String, required: true, trim: true, minlength: 2, maxlength: 120 },
+  availableSlots: { type: [Date], default: [] },
+  // Retained for the existing expert directory and appointment API.
   availability: { type: [Date], default: [] },
   rating: { type: Number, min: 0, max: 5, default: 0 },
   fees: { type: Number, required: true, min: 0 },

@@ -104,6 +104,11 @@ describe('GET /api/diet-plans/:id/grocery-list', () => {
     assert.match(item.cookedServingDescription, /cooked/i);
     assert.equal(typeof response.body.data.meals[0].calories, 'number');
     assert.equal(typeof response.body.data.meals[0].macros.protein, 'number');
+    assert.equal(response.body.data.dailyNutrition.length, 1);
+    assert.equal(response.body.data.dailyNutrition[0].day, 1);
+    assert.equal(typeof response.body.data.dailyNutrition[0].calories, 'number');
+    const stored = await DietPlan.findById(response.body.data._id).lean();
+    assert.equal(stored.dailyNutrition[0].calories, response.body.data.dailyNutrition[0].calories);
 
     const extreme = await request(app)
       .post('/api/diet-plans/generate-basic')
@@ -158,6 +163,26 @@ describe('GET /api/diet-plans/:id/grocery-list', () => {
       .set('X-Forwarded-For', other.ip);
     assert.equal(forbiddenByNotFound.status, 404);
     assert.equal(forbiddenByNotFound.body.error.code, 'DIET_PLAN_NOT_FOUND');
+  });
+
+  it('exposes saved-versus-unavailable nutrition status for a legacy plan without daily totals', async () => {
+    const owner = await createAuthenticatedUser('Legacy nutrition', 'legacy-nutrition@example.com');
+    const plan = await createPlan(owner.user.id, [legacyMeal([
+      { foodName: 'Onion, big', ifctCode: 'G017', quantity: 200 },
+    ])]);
+
+    const response = await request(app)
+      .get('/api/diet-plans')
+      .set('Authorization', `Bearer ${owner.token}`)
+      .set('X-Forwarded-For', owner.ip);
+
+    assert.equal(response.status, 200);
+    const savedPlan = response.body.data.plans.find(({ _id }) => _id === String(plan._id));
+    assert.equal(savedPlan.nutritionAvailability.status, 'incomplete');
+    assert.equal(savedPlan.nutritionAvailability.daily, 'unavailable');
+    assert.equal(savedPlan.nutritionAvailability.meals, 'stored');
+    assert.equal(savedPlan.meals[0].nutritionStatus, 'stored');
+    assert.equal(savedPlan.nutritionAvailability.recalculation.status, 'unavailable');
   });
 
   it('aggregates duplicate legacy gram ingredients and persists the derived list', async () => {

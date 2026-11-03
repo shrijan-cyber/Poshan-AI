@@ -82,6 +82,20 @@ describe('Email OTP API', () => {
     assert.equal(unknown.body.data.dev_otp, undefined);
   });
 
+  it('never returns OTP codes from staging-like environments', async () => {
+    const previousEnvironment = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'staging';
+    try {
+      await createUser('otp-staging@example.com');
+      const response = await requestCode('otp-staging@example.com', 'login');
+      assert.equal(response.status, 200);
+      assert.equal(response.body.data.dev_otp, undefined);
+      assert.ok(await Otp.exists({ email: 'otp-staging@example.com', purpose: 'login' }));
+    } finally {
+      process.env.NODE_ENV = previousEnvironment;
+    }
+  });
+
   it('consumes a valid login OTP once and issues the existing JWT and refresh-cookie session', async () => {
     await createUser('otp-login@example.com');
     const requested = await requestCode('otp-login@example.com', 'login');
@@ -158,10 +172,11 @@ describe('Email OTP API', () => {
       .send({ resetToken: verified.body.data.resetToken, password: 'updatedPassword456' });
     assert.equal(reset.status, 200);
 
-    const updated = await User.findById(user._id).select('+passwordHash +passwordResetTokenHash +refreshTokens');
+    const updated = await User.findById(user._id).select('+passwordHash +passwordResetTokenHash +refreshTokens +tokenVersion');
     assert.equal(await updated.verifyPassword('originalPassword123'), false);
     assert.equal(await updated.verifyPassword('updatedPassword456'), true);
     assert.equal(updated.refreshTokens.length, 0);
+    assert.equal(updated.tokenVersion, 1);
     assert.equal(updated.passwordResetTokenHash, undefined);
 
     const replay = await request(app)

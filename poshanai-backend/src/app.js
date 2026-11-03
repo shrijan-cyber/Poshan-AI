@@ -22,9 +22,11 @@ import dailyLogRoutes from './routes/dailyLogRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import supplementRoutes from './routes/supplementRoutes.js';
 import expertRoutes from './routes/expertRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import requestLogger from './middleware/requestLogger.js';
-import { getHealthStatus } from './services/healthService.js';
+import { createSensitiveRateLimitStore } from './middleware/sensitiveRateLimiter.js';
+import { getHealthStatus, getLivenessStatus } from './services/healthService.js';
 import { RATE_LIMITS } from './config/constants.js';
 
 const app = express();
@@ -56,6 +58,9 @@ const apiLimiter = process.env.NODE_ENV === 'test'
   : rateLimit({
     windowMs: RATE_LIMITS.apiWindowMs,
     limit: RATE_LIMITS.apiRequests,
+    // Keep limits consistent across API replicas in production. Redis is
+    // required there; development and tests retain the default local store.
+    store: createSensitiveRateLimitStore('api'),
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     handler: (_req, res) => res.status(429).json({
@@ -75,15 +80,22 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 app.use('/api', apiLimiter);
 
-// Public liveness/readiness probe; it returns service status only.
-app.get('/health', async (_req, res, next) => {
+// Liveness is independent of MongoDB and Redis so orchestrators do not restart
+// a healthy process during a dependency outage.
+app.get('/health/live', (_req, res) => res.status(200).json(getLivenessStatus()));
+
+// /health remains a backwards-compatible readiness alias.
+async function readinessHandler(_req, res, next) {
   try {
     const health = await getHealthStatus();
     return res.status(health.status === 'ok' || health.status === 'degraded' ? 200 : 503).json(health);
   } catch (error) {
     return next(error);
   }
-});
+}
+
+app.get('/health/ready', readinessHandler);
+app.get('/health', readinessHandler);
 
 const apiRoutes = [
   ['/auth', authRoutes],
@@ -100,8 +112,10 @@ const apiRoutes = [
   ['/notifications', notificationRoutes],
   ['/supplements', supplementRoutes],
   ['/experts', expertRoutes],
+  ['/bookings', bookingRoutes],
+  // Keep the legacy FoodLog API on /logs and the current DailyLog API separate;
+  // both expose /add-food with different validated request contracts.
   ['/logs', logRoutes],
-  ['/logs', dailyLogRoutes],
   ['/daily-logs', dailyLogRoutes],
 ];
 

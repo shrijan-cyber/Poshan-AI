@@ -5,8 +5,8 @@ import {
   hasCalorieData,
   MAX_GRAMS,
   MIN_GRAMS,
+  searchFoodPage,
   scaleFoodPortion,
-  searchFoods,
   sumNutrients,
 } from '../services/foodCatalog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -34,9 +34,10 @@ function publicEntry(entry) {
 
 export const searchFoodCatalog = asyncHandler(async (req, res) => {
   assertCatalogLoaded();
-  const foods = searchFoods(req.query.q, Math.min(Number(req.query.limit) || 20, 20))
-    .map(({ nutrients, ...food }) => ({ ...food, ...nutrients, nutrients }));
-  return res.json({ success: true, data: foods });
+  const result = searchFoodPage(req.query.q, req.query);
+  const foods = result.foods.map(({ nutrients, ...food }) => ({ ...food, ...nutrients, nutrients }));
+  // Keep `data` as the existing array contract; pagination and facets are additive.
+  return res.json({ success: true, data: foods, pagination: result.pagination, filters: { categories: result.categories } });
 });
 
 export const addFood = asyncHandler(async (req, res) => {

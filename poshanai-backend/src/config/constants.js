@@ -89,7 +89,15 @@ export const OCR_SETTINGS = Object.freeze({
 export const RETEST_REMINDER_SETTINGS = Object.freeze({
   queueName: 'retest-reminders',
   schedule: '0 9 * * *',
-  timezone: 'UTC',
+  timezone: 'Asia/Kolkata',
+});
+
+export const NOTIFICATION_SETTINGS = Object.freeze({
+  queueName: 'user-notifications',
+  timezone: 'Asia/Kolkata',
+  waterReminderSchedule: '0 9-21/2 * * *',
+  mealReminderSchedule: '0 10,14,21 * * *',
+  retestReminderSchedule: '0 9 * * *',
 });
 
 export const COMPLIANCE_SETTINGS = Object.freeze({

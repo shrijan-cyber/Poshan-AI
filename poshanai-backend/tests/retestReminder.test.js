@@ -63,6 +63,7 @@ test('creates one doctor-discussion reminder for completed reports at least 90 d
   assert.equal(notifications.length, 1);
   assert.equal(notifications[0].reportId.toString(), oldReport._id.toString());
   assert.match(notifications[0].message, /discussing.*doctor/i);
+  assert.equal(notifications[0].emailSentAt, null);
   assert.equal(await Report.countDocuments({ retestReminderSentAt: { $ne: null } }), 1);
 });
 

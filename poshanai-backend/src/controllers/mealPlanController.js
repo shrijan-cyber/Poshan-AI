@@ -8,6 +8,7 @@ import { enqueueMealPlanGeneration, getMealPlanJob } from '../jobs/mealPlanQueue
 import { getFoodByIfctCode } from '../rag/ragService.js';
 import { getHouseholdFoodName } from '../rag/ifctLoader.js';
 import { assertNoHighRiskConditions } from '../services/medicalConditionPolicy.js';
+import { addMealPlanNutritionAvailability } from '../services/planNutritionCompatibility.js';
 
 const groceryCategoryForIfct = (category) => {
   if (category === 'Milk and Milk Products') return 'Dairy';
@@ -90,7 +91,7 @@ async function findOwnedMealPlan(id, userId) {
 
 function publicMealPlan(mealPlan) {
   const plan = mealPlan.toObject();
-  return {
+  return addMealPlanNutritionAvailability({
     ...plan,
     meals: plan.meals.map((meal) => ({
       ...meal,
@@ -109,7 +110,7 @@ function publicMealPlan(mealPlan) {
       })),
     })),
     disclaimer: plan.disclaimer ?? getMedicalDisclaimer(),
-  };
+  });
 }
 
 export const generate = asyncHandler(async (req, res) => {

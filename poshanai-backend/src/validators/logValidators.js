@@ -20,7 +20,11 @@ const dateField = Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).custom(nearToday).
 
 const searchSchema = Joi.object({
   q: Joi.string().trim().min(2).max(60).required(),
-  limit: Joi.number().integer().min(1).max(20).default(10),
+  page: Joi.number().integer().min(1).max(1000).default(1),
+  limit: Joi.number().integer().min(1).max(50).default(10),
+  category: Joi.string().trim().min(1).max(80),
+  source: Joi.string().trim().min(1).max(80),
+  state: Joi.string().trim().valid('raw', 'cooked', 'processed'),
 }).unknown(false);
 
 const addFoodSchema = Joi.object({

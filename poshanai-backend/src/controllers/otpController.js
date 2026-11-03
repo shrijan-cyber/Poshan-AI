@@ -67,7 +67,9 @@ export const requestOTP = asyncHandler(async (req, res) => {
   const data = {
     message: 'If the email is eligible, a code will be sent shortly.',
   };
-  if (otp && process.env.NODE_ENV !== 'production') data.dev_otp = otp;
+  // Never expose OTPs from staging or other non-production environments.
+  // Returning the code is limited to isolated local development and tests.
+  if (otp && ['development', 'test'].includes(process.env.NODE_ENV)) data.dev_otp = otp;
   return res.json({ success: true, data });
 });
 
@@ -159,6 +161,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     },
     {
       $set: { passwordHash, refreshTokens: [], emailVerified: true },
+      $inc: { tokenVersion: 1 },
       $unset: { passwordResetTokenHash: 1, passwordResetTokenExpiresAt: 1 },
     },
   );

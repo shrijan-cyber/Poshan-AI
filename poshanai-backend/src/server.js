@@ -6,6 +6,7 @@ import { closeOcrQueue } from './jobs/queue.js';
 import { closeHealthRedis } from './services/healthService.js';
 import { runAllSweepers } from './jobs/sweeper.js';
 import { closeMealPlanQueue } from './jobs/mealPlanQueue.js';
+import { closeSensitiveRateLimitRedis } from './middleware/sensitiveRateLimiter.js';
 
 let server;
 let shuttingDown = false;
@@ -33,13 +34,19 @@ async function shutdown(reason, error) {
   if (shuttingDown) return;
   shuttingDown = true;
   if (maintenanceTimer) clearInterval(maintenanceTimer);
-  logger.error(reason, error);
+  // Log only safe error metadata: raw Redis errors may contain connection data.
+  logger.error(reason, { name: error?.name, code: error?.code });
 
   if (server) {
     await new Promise((resolve) => server.close(resolve));
   }
 
-  await Promise.all([closeOcrQueue(), closeMealPlanQueue(), closeHealthRedis()]);
+  await Promise.allSettled([
+    closeOcrQueue(),
+    closeMealPlanQueue(),
+    closeHealthRedis(),
+    closeSensitiveRateLimitRedis(),
+  ]);
   process.exit(1);
 }
 
@@ -56,7 +63,12 @@ async function gracefulShutdown() {
   shuttingDown = true;
   if (maintenanceTimer) clearInterval(maintenanceTimer);
   if (server) await new Promise((resolve) => server.close(resolve));
-  await Promise.all([closeOcrQueue(), closeMealPlanQueue(), closeHealthRedis()]);
+  await Promise.allSettled([
+    closeOcrQueue(),
+    closeMealPlanQueue(),
+    closeHealthRedis(),
+    closeSensitiveRateLimitRedis(),
+  ]);
   process.exit(0);
 }
 

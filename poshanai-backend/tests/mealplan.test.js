@@ -175,6 +175,12 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.equal(res.body.data.meals.length, 21);
       assert.ok(res.body.data.meals[0].cookingInstructions.length > 0);
       assert.ok(res.body.data.meals[0].proteinSource);
+      assert.ok(res.body.data.meals.every((meal) => Number.isFinite(meal.calories) && meal.calories >= 0));
+      assert.ok(res.body.data.meals.every((meal) => (
+        Number.isFinite(meal.macros?.protein)
+        && Number.isFinite(meal.macros?.carbs)
+        && Number.isFinite(meal.macros?.fat)
+      )));
       assert.equal(res.body.data.householdDiet, 'rice; dal; 2 rotis, 1 bowl dal, rice and sabzi');
       assert.ok(res.body.data.meals.every((meal) => meal.items.every((item) => !/\b(?:amaranth|agathi|ragi|quinoa|barley)\b/i.test(item.foodName))));
       assert.doesNotMatch(lastAiPrompt, /2 rotis, 1 bowl dal, rice and sabzi/);
@@ -188,6 +194,8 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.ok(inDb);
       assert.equal(inDb.userId.toString(), user.id);
       assert.deepEqual(inDb.meals[0].nutrientTargets, ['Iron']);
+      assert.ok(Number.isFinite(inDb.meals[0].calories));
+      assert.ok(Number.isFinite(inDb.meals[0].macros.protein));
 
       const recipes = await request(app)
         .get(`/api/mealplans/${res.body.data._id}/recipes`)

@@ -166,6 +166,11 @@ export function getIfctValidationReport() {
   return structuredClone(cachedValidationReport);
 }
 
+/** Dataset-level provenance only; individual IFCT row mappings are not available. */
+export function getIfctManifest() {
+  return structuredClone(manifest);
+}
+
 const foodNameKey = (value) => String(value ?? '').toLocaleLowerCase('en')
   .normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
@@ -213,6 +218,7 @@ export default {
   loadIfctDataset,
   getIfctFoods,
   getIfctValidationReport,
+  getIfctManifest,
   getHouseholdFoodName,
   getHouseholdFoodWhitelist,
   wasFoodExplicitlyRequested,

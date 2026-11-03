@@ -30,6 +30,14 @@ export async function scheduleRetestReminderSweep() {
   );
 }
 
+export async function removeLegacyRetestReminderSchedules() {
+  if (!queue) return;
+  const recurringJobs = await queue.getJobSchedulers();
+  await Promise.all(recurringJobs
+    .filter((job) => job.name === 'check-retest-reminders')
+    .map((job) => queue.removeJobScheduler(job.key)));
+}
+
 export async function closeRetestReminderQueue() {
   await queue?.close();
   queue = null;

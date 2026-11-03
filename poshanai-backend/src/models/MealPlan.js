@@ -69,6 +69,14 @@ const mealSchema = new mongoose.Schema(
     region: { type: String, enum: ['North', 'South', 'East', 'West', 'All'], default: null },
     dietaryCompatibility: { type: [String], default: [] },
     servings: { type: Number, min: 0.1, default: null },
+    // Additive persisted totals from the deterministic IFCT composer. Optional
+    // so existing meal-plan documents remain readable without a migration.
+    calories: { type: Number, min: 0, default: null },
+    macros: {
+      protein: { type: Number, min: 0, default: null },
+      carbs: { type: Number, min: 0, default: null },
+      fat: { type: Number, min: 0, default: null },
+    },
     mealType: {
       type: String,
       required: true,

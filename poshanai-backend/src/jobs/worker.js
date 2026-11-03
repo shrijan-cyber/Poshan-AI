@@ -12,14 +12,13 @@ import {
 import Report from '../models/Report.js';
 import { processReportOcr } from '../services/ocrProcessor.js';
 import logger from '../utils/logger.js';
-import { OCR_SETTINGS, RETEST_REMINDER_SETTINGS } from '../config/constants.js';
-import { closeRetestReminderQueue, scheduleRetestReminderSweep } from './retestReminderQueue.js';
-import { runRetestReminderSweep } from '../services/retestReminderService.js';
+import { OCR_SETTINGS } from '../config/constants.js';
+import { closeRetestReminderQueue, getRetestReminderQueue, removeLegacyRetestReminderSchedules } from './retestReminderQueue.js';
 import { generateMealPlan } from '../services/aiService.js';
 import { mealPlanQueueName } from './mealPlanQueue.js';
+import { startNotificationWorker, stopNotificationWorker } from './notificationWorker.js';
 
 let worker;
-let retestReminderWorker;
 let mealPlanWorker;
 let sweepTimer;
 let sweepInProgress = false;
@@ -81,7 +80,9 @@ async function startWorker() {
   if (!env.redisUrl) throw new Error('REDIS_URL must be configured to run the OCR worker.');
   await connectDB();
   getReportQueue();
-  await scheduleRetestReminderSweep();
+  await getRetestReminderQueue();
+  await removeLegacyRetestReminderSchedules();
+  await startNotificationWorker();
   worker = new Worker(queueName, processReportOcr, {
     connection: redisConnection(null),
     concurrency: OCR_SETTINGS.workerConcurrency,
@@ -96,17 +97,6 @@ async function startWorker() {
     }
   });
   worker.on('error', () => logger.error('The OCR worker encountered a Redis or processing error.'));
-
-  retestReminderWorker = new Worker(
-    RETEST_REMINDER_SETTINGS.queueName,
-    async (job) => {
-      if (job.name !== 'check-retest-reminders') throw new Error('Unknown retest reminder job.');
-      return runRetestReminderSweep();
-    },
-    { connection: redisConnection(null), concurrency: 1 },
-  );
-  retestReminderWorker.on('failed', () => logger.error('The retest reminder sweep failed.'));
-  retestReminderWorker.on('error', () => logger.error('The retest reminder worker encountered a Redis or processing error.'));
 
   mealPlanWorker = new Worker(
     mealPlanQueueName,
@@ -135,7 +125,7 @@ async function startWorker() {
 async function stopWorker() {
   if (sweepTimer) clearInterval(sweepTimer);
   await worker?.close();
-  await retestReminderWorker?.close();
+  await stopNotificationWorker();
   await mealPlanWorker?.close();
   await Promise.all([closeOcrQueue(), closeRetestReminderQueue()]);
   await mongoose.disconnect();
@@ -149,7 +139,9 @@ process.once('SIGTERM', () => {
 });
 
 startWorker().catch((error) => {
-  logger.error(`OCR worker startup failed: ${error.message}`);
+  // The low-level Redis error may include connection details; keep credentials
+  // and URLs out of logs while still reporting a stable error code.
+  logger.error('OCR worker startup failed.', { code: error?.code });
   void stopWorker().catch(() => {});
   process.exitCode = 1;
 });

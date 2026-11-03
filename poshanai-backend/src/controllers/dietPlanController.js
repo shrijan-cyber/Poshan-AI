@@ -6,10 +6,11 @@ import { buildGroceryList } from '../services/groceryService.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import httpError from '../utils/httpError.js';
 import { assertNoHighRiskConditions } from '../services/medicalConditionPolicy.js';
+import { addDietPlanNutritionAvailability } from '../services/planNutritionCompatibility.js';
 
 function publicDietPlan(dietPlan) {
   const plan = typeof dietPlan.toObject === 'function' ? dietPlan.toObject() : dietPlan;
-  return {
+  return addDietPlanNutritionAvailability({
     ...plan,
     meals: (plan.meals ?? []).map((meal) => ({
       ...meal,
@@ -29,7 +30,7 @@ function publicDietPlan(dietPlan) {
         },
       })),
     })),
-  };
+  });
 }
 
 export const generateBasic = asyncHandler(async (req, res) => {

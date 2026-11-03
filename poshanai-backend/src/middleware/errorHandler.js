@@ -1,5 +1,4 @@
 import logger from '../utils/logger.js';
-import { env } from '../config/env.js';
 
 export function notFoundHandler(req, res) {
   return res.status(404).json({
@@ -23,7 +22,7 @@ export function errorHandler(error, req, res, _next) {
       : 'INTERNAL_SERVER_ERROR';
   const message = duplicateKey
     ? 'A resource with these details already exists.'
-    : status < 500 || !env.isProduction
+    : status < 500
       ? error.message
       : 'An unexpected error occurred.';
 

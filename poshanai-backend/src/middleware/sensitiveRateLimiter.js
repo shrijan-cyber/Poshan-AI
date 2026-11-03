@@ -4,6 +4,13 @@ import { env } from '../config/env.js';
 
 let redisClient;
 
+function unavailableError() {
+  const error = new Error('Request protection is temporarily unavailable. Please try again.');
+  error.statusCode = 503;
+  error.code = 'RATE_LIMIT_STORE_UNAVAILABLE';
+  return error;
+}
+
 function getRedisClient() {
   if (!redisClient) {
     redisClient = new Redis(env.redisUrl, {
@@ -18,9 +25,10 @@ function getRedisClient() {
   return redisClient;
 }
 
-class RedisWindowStore {
-  constructor(prefix) {
+export class RedisWindowStore {
+  constructor(prefix, clientProvider = getRedisClient) {
     this.prefix = `poshanai:ratelimit:${prefix}:`;
+    this.clientProvider = clientProvider;
   }
 
   init({ windowMs }) {
@@ -35,7 +43,7 @@ class RedisWindowStore {
     ].join('\n');
 
     try {
-      const [totalHits, ttl] = await getRedisClient().eval(
+      const [totalHits, ttl] = await this.clientProvider().eval(
         script,
         1,
         `${this.prefix}${key}`,
@@ -46,20 +54,32 @@ class RedisWindowStore {
         resetTime: new Date(Date.now() + Math.max(Number(ttl), 0)),
       };
     } catch {
-      const error = new Error('Request protection is temporarily unavailable. Please try again.');
-      error.statusCode = 503;
-      error.code = 'RATE_LIMIT_STORE_UNAVAILABLE';
-      throw error;
+      throw unavailableError();
     }
   }
 
   async decrement(key) {
-    await getRedisClient().decr(`${this.prefix}${key}`);
+    try {
+      await this.clientProvider().decr(`${this.prefix}${key}`);
+    } catch {
+      throw unavailableError();
+    }
   }
 
   async resetKey(key) {
-    await getRedisClient().del(`${this.prefix}${key}`);
+    try {
+      await this.clientProvider().del(`${this.prefix}${key}`);
+    } catch {
+      throw unavailableError();
+    }
   }
+}
+
+export async function closeSensitiveRateLimitRedis() {
+  if (!redisClient) return;
+  const client = redisClient;
+  redisClient = undefined;
+  client.disconnect();
 }
 
 export function createSensitiveRateLimitStore(name) {

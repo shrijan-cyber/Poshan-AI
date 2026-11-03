@@ -87,6 +87,14 @@ const groceryCategorySchema = new mongoose.Schema({
   items: { type: [groceryItemSchema], required: true, validate: (items) => items.length > 0 },
 }, { _id: false });
 
+const dailyNutritionSchema = new mongoose.Schema({
+  day: { type: Number, min: 1, default: null },
+  calories: { type: Number, min: 0, default: null },
+  protein: { type: Number, min: 0, default: null },
+  carbs: { type: Number, min: 0, default: null },
+  fat: { type: Number, min: 0, default: null },
+}, { _id: false });
+
 const dietPlanSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -102,6 +110,9 @@ const dietPlanSchema = new mongoose.Schema({
     carbs: { type: Number, required: true, min: 0 },
     fat: { type: Number, required: true, min: 0 },
   },
+  // Stored deterministic IFCT totals for the generated days. Optional so
+  // existing plans remain readable without backfilling or recalculating.
+  dailyNutrition: { type: [dailyNutritionSchema], default: undefined },
   macroTargets: {
     protein: { type: Number, min: 0, default: null },
     carbs: { type: Number, min: 0, default: null },

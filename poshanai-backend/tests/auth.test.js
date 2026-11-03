@@ -378,8 +378,9 @@ describe('Authentication API (/api/auth)', () => {
       assert.equal(res.status, 200);
       assert.equal(res.body.data.message, 'Logged out of all devices.');
 
-      user = await User.findOne({ email: 'grace@example.com' }).select('+refreshTokens');
+      user = await User.findOne({ email: 'grace@example.com' }).select('+refreshTokens +tokenVersion');
       assert.equal(user.refreshTokens.length, 0);
+      assert.equal(user.tokenVersion, 2);
     });
   });
 });

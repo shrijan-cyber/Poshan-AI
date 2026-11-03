@@ -6,6 +6,25 @@ import logger from '../utils/logger.js';
 
 let healthRedis;
 
+export function evaluateHealthStatus({ mongo, redis, isProduction, uptime }) {
+  const status = !mongo || (isProduction && !redis) ? 'unhealthy' : redis ? 'ok' : 'degraded';
+  const warning = !redis && mongo
+    ? isProduction
+      ? 'Redis is unavailable. Distributed rate limits and background jobs are not ready.'
+      : 'Redis is offline. OCR will use synchronous fallback in this environment.'
+    : undefined;
+
+  return {
+    status,
+    checks: { mongo, redis, uptime },
+    ...(warning ? { warning } : {}),
+  };
+}
+
+export function getLivenessStatus() {
+  return { status: 'ok', checks: { process: true, uptime: process.uptime() } };
+}
+
 function getHealthRedis() {
   if (!env.redisUrl) return null;
   if (!healthRedis || healthRedis.status === 'end') {
@@ -13,9 +32,11 @@ function getHealthRedis() {
       lazyConnect: true,
       connectTimeout: 1000,
       commandTimeout: 1500,
-      retryStrategy: () => null,
+      retryStrategy: (attempt) => (attempt <= 2 ? attempt * 100 : null),
     }));
-    healthRedis.on('error', (error) => logger.error('Redis health check failed.', error));
+    // Avoid logging the Redis error object because client errors can include
+    // connection details. Readiness reports only a boolean dependency state.
+    healthRedis.on('error', () => logger.error('Redis health check failed.'));
   }
   return healthRedis;
 }
@@ -44,12 +65,7 @@ async function checkRedis() {
 
 export async function getHealthStatus() {
   const [mongo, redis] = await Promise.all([checkMongo(), checkRedis()]);
-  const status = !mongo ? 'unhealthy' : redis ? 'ok' : 'degraded';
-  return {
-    status,
-    checks: { mongo, redis, uptime: process.uptime() },
-    ...(!redis && mongo ? { warning: 'Redis is offline. OCR will use synchronous fallback.' } : {}),
-  };
+  return evaluateHealthStatus({ mongo, redis, isProduction: env.isProduction, uptime: process.uptime() });
 }
 
 export async function closeHealthRedis() {

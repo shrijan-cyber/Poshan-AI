@@ -310,7 +310,7 @@ export const logout = asyncHandler(async (req, res) => {
 export const logoutAll = asyncHandler(async (req, res) => {
   const result = await User.updateOne(
     { _id: req.user.id },
-    { $set: { refreshTokens: [] } },
+    { $set: { refreshTokens: [] }, $inc: { tokenVersion: 1 } },
   );
   if (result.matchedCount !== 1) {
     throw httpError(404, 'USER_NOT_FOUND', 'User not found.');

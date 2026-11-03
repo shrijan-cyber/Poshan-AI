@@ -5,6 +5,7 @@ import request from 'supertest';
 
 import {
   getFoodByCode, hasCalorieData, scaleNutrients, searchFoods, sumNutrients,
+  searchFoodPage,
 } from '../src/services/foodCatalog.service.js';
 
 // ---------- catalog service ----------
@@ -35,13 +36,29 @@ test('IFCT search includes configured serving units', () => {
   assert.equal(searchFoods('banana', 1)[0].servingUnits.defaultUnit, 'medium');
 });
 
+test('food search pages are bounded, stable, and filter only recorded metadata', () => {
+  const first = searchFoodPage('rice', { page: 1, limit: 2 });
+  const second = searchFoodPage('rice', { page: 2, limit: 2 });
+  assert.equal(first.pagination.total, second.pagination.total);
+  assert.equal(first.foods.length, 2);
+  assert.equal(first.pagination.pages, Math.ceil(first.pagination.total / 2));
+  assert.equal(new Set([...first.foods, ...second.foods].map((food) => food.ifctCode)).size, 4);
+
+  const category = searchFoodPage('rice', { page: 1, limit: 20, category: first.foods[0].category });
+  assert.ok(category.foods.every((food) => food.category === first.foods[0].category));
+  const source = searchFoodPage('rice', { page: 1, limit: 20, source: 'ICMR-NIN Indian Food Composition Tables 2017' });
+  assert.ok(source.foods.length > 0);
+  assert.equal(source.foods[0].source.recordLevelMappingAvailable, false);
+  assert.deepEqual(searchFoodPage('rice', { page: 1, limit: 20, state: 'cooked' }).foods, []);
+});
+
 test('scaleNutrients scales per-100 g values to the portion and rounds to 1 decimal', () => {
   assert.deepEqual(
     scaleNutrients({ calories: 356.12, protein: 14.59, carbs: 59.98, fat: 5.74 }, 150),
     { calories: 534.2, protein: 21.9, carbs: 90, fat: 8.6 },
   );
   assert.deepEqual(sumNutrients([{ calories: 100.04, protein: 1, carbs: 2, fat: 3 }, { calories: 50.01 }]),
-    { calories: 150.1, protein: 1, carbs: 2, fat: 3 });
+    { calories: 150.1, protein: null, carbs: null, fat: null });
 });
 
 // ---------- HTTP routes (Mongo-free: the FoodLog model is replaced by an in-memory fake) ----------
@@ -106,6 +123,20 @@ test('GET /api/foods/search returns IFCT foods and validates the query', async (
   assert.ok(res.body.data.every((f) => f.ifctCode && f.calories > 0 && f.nutrients.calories > 0));
   assert.equal((await search(tokenA, 'r')).status, 400);
   assert.equal((await request(app).get('/api/foods/search').set('Authorization', `Bearer ${tokenA}`)).status, 400);
+});
+
+test('food search API exposes additive pagination and rejects invalid pagination/filter input', async () => {
+  const first = await request(app).get('/api/foods/search').query({ q: 'rice', page: 1, limit: 2 });
+  const second = await request(app).get('/api/foods/search').query({ q: 'rice', page: 2, limit: 2 });
+  assert.equal(first.status, 200);
+  assert.ok(Array.isArray(first.body.data));
+  assert.equal(first.body.pagination.page, 1);
+  assert.equal(first.body.pagination.limit, 2);
+  assert.ok(first.body.pagination.total > 2);
+  assert.notEqual(first.body.data[0].ifctCode, second.body.data[0].ifctCode);
+  assert.equal(typeof first.body.data[0].source.recordLevelMappingAvailable, 'boolean');
+  assert.equal((await request(app).get('/api/foods/search').query({ q: 'rice', page: 0 })).status, 400);
+  assert.equal((await request(app).get('/api/foods/search').query({ q: 'rice', state: 'unknown' })).status, 400);
 });
 
 test('POST /api/logs/add-food computes nutrition server-side and returns running totals', async () => {
