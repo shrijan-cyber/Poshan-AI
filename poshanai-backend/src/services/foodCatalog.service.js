@@ -1,5 +1,6 @@
 import httpError from '../utils/httpError.js';
 import { getIfctFoods, getIfctManifest } from '../rag/ifctLoader.js';
+import { IFCT_NUTRIENT_FIELDS } from '../rag/ifctDataValidation.js';
 
 let foods = [];
 try {
@@ -15,9 +16,21 @@ const datasetSource = Object.freeze({
   name: manifest.dataset.source.name,
   version: manifest.dataset.source.version,
   referenceUrl: manifest.dataset.source.url,
+  checksum: manifest.dataset.sha256,
+  reusePermission: manifest.dataset.source.reusePermission,
+  verificationStatus: manifest.dataset.source.sourceColumnMappingVerified ? 'record_mapping_verified' : 'dataset_level_only',
+  nutrientBasis: manifest.nutrientBasis,
   recordLevelMappingAvailable: Boolean(manifest.dataset.source.sourceColumnMappingVerified),
   foodStateAvailable: Boolean(manifest.foodState?.recordLevelStateAvailable),
 });
+const nutrientMetadata = Object.freeze(Object.fromEntries(IFCT_NUTRIENT_FIELDS.map((field) => {
+  const definition = manifest.nutrientFields?.[field] ?? {};
+  return [field, {
+    unit: definition.applicationUnit ?? null,
+    unitMappingStatus: definition.mappingStatus ?? 'unverified',
+    dataStatus: definition.dataStatus ?? 'unknown',
+  }];
+})));
 export const hasCalorieData = (food) => Number(food?.nutrients?.calories) > 0;
 
 // The IFCT build script writes 0 kcal when energy is missing (e.g. cooking oils). Those foods are
@@ -54,7 +67,13 @@ function publicFood({ ifctCode, foodName, category, nutrients, servingUnits, sou
       protein: nullableNumber(nutrients?.protein),
       carbs: nullableNumber(nutrients?.carbs),
       fat: nullableNumber(nutrients?.fat),
+      iron: nullableNumber(nutrients?.iron),
+      calcium: nullableNumber(nutrients?.calcium),
+      vitaminD: nullableNumber(nutrients?.vitaminD),
+      vitaminB12: nullableNumber(nutrients?.vitaminB12),
+      fiber: nullableNumber(nutrients?.fiber),
     },
+    nutrientMetadata,
   };
 }
 

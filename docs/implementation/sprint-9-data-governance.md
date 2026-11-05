@@ -1,0 +1,22 @@
+# Sprint 9 — food-data governance
+
+## Eligibility decisions
+
+| Source | Owner / version | License and commercial use | Redistribution / electronic storage | Attribution / share-alike | Nutrient compatibility | Decision |
+|---|---|---|---|---|---|---|
+| IFCT 2017 | Copyright © ICMR-NIN, 2017 | Official book's permission text; commercial product rights are not expressly granted | Personal reproduction with acknowledgment; electronic product storage/reproduction needs prior written NIN permission | Cite Longvah et al. 2017; no share-alike license identified | Analytical national samples, mostly raw except poultry/egg; raw ingredient profile. Current local unit/row mapping remains unverified. | Current data stays untouched pending written permission and original source rows. |
+| INDB | Jaacks Lab / named contributors; repository generated workbook, README version/date must be pinned per download | No repository dataset license found; commercial use not established | No redistribution/electronic product right established | Upstream terms vary (NIN, COFID, USDA, recipes); share-alike obligations unresolved | Broader ingredient/recipe/retention factors; mixed nutrient bases and source lineages need per-row separation | No import; request permission and dataset-level license map. |
+| OpenNosh | Individual community contributors; project snapshot/version must be pinned | MIT applies to application; CC0 applies only to qualifying community packs | Community rows may be redistributed under CC0; source-segregated OFF/USDA/private stores have separate treatment | Contributor credit is a project promise; CC0 has no share-alike | Community food records have different evidence quality than analytical FCT; don't merge by name | Architecture reference only; no data import. |
+| Indian Nutrition Data | GitHub repository author/contributors; repository snapshot | Repo declares CC0; rights to upstream IFCT/Gopalan data and compilation are not independently established | No independent upstream electronic/redistribution permission verified | CC0 declaration; upstream attribution/license obligations unresolved, no confirmed share-alike posture | Limited fields (energy, macros, fiber, calcium, iron, vitamin C) and uncertain row-level basis/state | Do not import; request provenance and upstream permission evidence. |
+| USDA FoodData Central | USDA / dataset-specific release and FDC ID | FDC data is public domain/CC0; commercial use allowed | Public redistribution allowed under FDC terms; keep exact source records and release metadata | Attribution is not a license condition but source citation is good practice; no share-alike | Strong nutrient IDs/units, but dataset types, preparations and coverage differ; normalize only after unit/state review | Existing source-separated staging allowed; no auto-promotion. |
+| Open Food Facts | Open Food Facts contributors; live record revision/barcode | ODbL database, DbCL contents; commercial use subject to those terms | Redistribution/use of database may trigger ODbL attribution/share-alike; API terms and rate policy apply | Attribution required; database share-alike duties apply to derivative database. Image rights are separately licensed. | Branded label declarations, serving data/allergens; not an analytical generic composition source | Keep packaged foods isolated; verify record, API terms and image rights separately. |
+
+## Local catalog verification fields
+
+`foodCatalog.service.js` now exposes additive dataset-level checksum, reuse-permission statement, nutrient-basis metadata and an explicit `dataset_level_only` status alongside the existing IFCT source/version fields. This is a projection change only; it does not assert individual row provenance. The UI labels source-row mapping and reuse uncertainty. Source JSON and recipe records remain unchanged.
+
+Baseline audit: 542 IFCT rows, 0 validated, 20 needing review, 522 incomplete; 1,084 null values (B12 and fiber), seven unit mappings unverified, two duplicate-name candidate groups and zero staging records. See `docs/research/indian-food-data-quality-comparison.md` for evidence and limitations.
+
+## Governance gate
+
+No external source enters runtime catalog until written license/permission evidence, exact dataset/version, stable source ID, source-row locator, nutrient name/unit mapping, edible basis and raw/cooked state are reviewed. Keep source records immutable; project projections may add normalized names/statuses without changing source values. Do not deduplicate on name or resolve conflicts by averaging.

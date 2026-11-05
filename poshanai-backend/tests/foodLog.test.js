@@ -18,7 +18,12 @@ test('food search: word-prefix matching, ranking, and no mid-word noise', () => 
   assert.deepEqual(searchFoods('zzzzqqq', 5), []);
   assert.deepEqual(searchFoods('(.*', 5), []); // regex characters are escaped
   const food = searchFoods('paneer', 1)[0];
-  assert.deepEqual(Object.keys(food.nutrients), ['calories', 'protein', 'carbs', 'fat']);
+  assert.deepEqual(Object.keys(food.nutrients), [
+    'calories', 'protein', 'carbs', 'fat', 'iron', 'calcium', 'vitaminD', 'vitaminB12', 'fiber',
+  ]);
+  assert.equal(food.nutrients.vitaminB12, null);
+  assert.equal(food.nutrients.fiber, null);
+  assert.equal(food.nutrientMetadata.calcium.unitMappingStatus, 'unverified');
 });
 
 test('food search never returns foods without calorie data', () => {
@@ -121,6 +126,13 @@ test('GET /api/foods/search returns IFCT foods and validates the query', async (
   assert.equal(res.status, 200);
   assert.ok(res.body.data.length > 0);
   assert.ok(res.body.data.every((f) => f.ifctCode && f.calories > 0 && f.nutrients.calories > 0));
+  assert.ok(res.body.data.every((f) => Object.hasOwn(f.nutrients, 'iron')
+    && Object.hasOwn(f.nutrients, 'vitaminB12')
+    && Object.hasOwn(f, 'nutrientMetadata')));
+  assert.equal(res.body.data[0].nutrients.vitaminB12, null);
+  assert.equal(res.body.data[0].nutrientMetadata.iron.unitMappingStatus, 'unverified');
+  assert.equal(res.body.data[0].source.verificationStatus, 'dataset_level_only');
+  assert.match(res.body.data[0].source.reusePermission, /Not confirmed/i);
   assert.equal((await search(tokenA, 'r')).status, 400);
   assert.equal((await request(app).get('/api/foods/search').set('Authorization', `Bearer ${tokenA}`)).status, 400);
 });

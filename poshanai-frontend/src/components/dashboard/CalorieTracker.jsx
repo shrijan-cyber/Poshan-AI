@@ -11,6 +11,7 @@ import {
 } from '../../api/dailyLogApi.js';
 import { Button, Card, Modal } from '../common/index.js';
 import SmoothInput from '../ui/SmoothInput.jsx';
+import SupplementTracker from './SupplementTracker.jsx';
 
 const initialLog = {
   meals: [],
@@ -458,6 +459,8 @@ export default function CalorieTracker() {
           </Card>
         </div>
       )}
+
+      <SupplementTracker />
 
       <Modal isOpen={foodModalOpen} onClose={() => { setFoodModalOpen(false); setSmartItems([]); }} title={smartItems.length ? 'Review smart log' : 'Add food'}>
         {smartItems.length ? (

@@ -22,6 +22,13 @@ const nutrientRows = [
   ['Carbohydrate', 'carbs', 'g'],
   ['Fat', 'fat', 'g'],
 ];
+const micronutrientRows = [
+  ['Iron', 'iron'],
+  ['Calcium', 'calcium'],
+  ['Vitamin D', 'vitaminD'],
+  ['Vitamin B12', 'vitaminB12'],
+  ['Fiber', 'fiber'],
+];
 
 const formatNutrient = (value, unit) => value === null || value === undefined || !Number.isFinite(Number(value))
   ? 'Unavailable'
@@ -29,6 +36,21 @@ const formatNutrient = (value, unit) => value === null || value === undefined ||
 
 function FoodResult({ food, expanded, onToggle }) {
   const nutrients = food.nutrients ?? {};
+  const renderNutrient = ([label, key]) => {
+    const value = nutrients[key];
+    const metadata = food.nutrientMetadata?.[key];
+    const hasValue = value !== null && value !== undefined && Number.isFinite(Number(value));
+    const unitLabel = metadata?.unit && metadata.unitMappingStatus !== 'unverified' ? ` ${metadata.unit}` : '';
+    return (
+      <div key={key} className="rounded-xl bg-paper p-3 dark:bg-slate-800">
+        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label} / 100 g</p>
+        <p className="mt-1 text-sm font-semibold tabular-nums text-slate-900 dark:text-white">
+          {hasValue ? `${Number(value).toLocaleString(undefined, { maximumFractionDigits: 1 })}${unitLabel}` : 'Unavailable'}
+        </p>
+        {hasValue && metadata?.unitMappingStatus === 'unverified' && <p className="mt-1 text-[11px] text-amber-800 dark:text-amber-200">Unit mapping under review</p>}
+      </div>
+    );
+  };
 
   return (
     <article className="overflow-hidden rounded-2xl border border-forest/10 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -57,9 +79,12 @@ function FoodResult({ food, expanded, onToggle }) {
               </div>
             ))}
           </div>
+          <h3 className="mt-5 text-sm font-semibold text-slate-800 dark:text-slate-100">Additional catalog nutrients</h3>
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{micronutrientRows.map(renderNutrient)}</div>
+          <p className="mt-3 text-xs leading-5 text-amber-800 dark:text-amber-200">IFCT source-unit mapping and record-level source matching are not verified in this application subset. Values marked unavailable are missing in the catalog. Serving conversions and raw/cooked state are shown only when recorded; no conversion is inferred here.</p>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div><dt className="font-medium text-slate-700 dark:text-slate-200">Preparation state</dt><dd className="mt-1 text-slate-600 dark:text-slate-400">{food.foodState || 'Not recorded for this food entry.'}</dd></div>
-            <div><dt className="font-medium text-slate-700 dark:text-slate-200">Source</dt><dd className="mt-1 text-slate-600 dark:text-slate-400">{food.source?.name || 'Source unavailable'}{food.source?.version ? ` · ${food.source.version}` : ''}. {food.source?.recordLevelMappingAvailable === false ? 'Record-level source mapping is unavailable.' : ''}</dd></div>
+            <div><dt className="font-medium text-slate-700 dark:text-slate-200">Source and verification</dt><dd className="mt-1 text-slate-600 dark:text-slate-400">{food.source?.name || 'Source unavailable'}{food.source?.version ? ` · ${food.source.version}` : ''}. {food.source?.recordLevelMappingAvailable === false ? 'Dataset-level reference only; this food is not mapped to a verified source row.' : ''} {food.source?.reusePermission ? `Reuse status: ${food.source.reusePermission}` : ''}</dd></div>
           </dl>
           {food.servingUnits && Object.keys(food.servingUnits).length > 0 && (
             <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">Available logging measures: {Object.keys(food.servingUnits).join(', ')}.</p>
