@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.js';
 import { ReactLenis } from 'lenis/dist/lenis-react.mjs';
@@ -48,11 +49,12 @@ function BalancedPlate() {
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
+  const reduceMotion = useReducedMotion();
   const actionHref = isAuthenticated ? '/dashboard' : '/register';
   const actionLabel = isAuthenticated ? 'Go to your dashboard' : 'Get started for free';
 
   return (
-    <ReactLenis root options={{ lerp: 0.1, smoothWheel: true }}>
+    <ReactLenis root options={{ lerp: 0.1, smoothWheel: !reduceMotion }}>
     <main className="landing-page">
       <section className="landing-hero" id="approach">
         <div className="hero-copy">

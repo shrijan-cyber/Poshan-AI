@@ -30,11 +30,15 @@ const authLimiterOptions = {
 };
 const registerLimiter = process.env.NODE_ENV === 'test'
   ? (_req, _res, next) => next()
-  : rateLimit(authLimiterOptions);
+  : rateLimit({
+    ...authLimiterOptions,
+    store: createSensitiveRateLimitStore('auth-register'),
+  });
 const loginLimiter = process.env.NODE_ENV === 'test'
   ? (_req, _res, next) => next()
   : rateLimit({
   ...authLimiterOptions,
+  store: createSensitiveRateLimitStore('auth-login'),
   skipSuccessfulRequests: true,
   keyGenerator: (req) => {
     const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';

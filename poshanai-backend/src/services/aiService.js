@@ -11,6 +11,7 @@ import logger from '../utils/logger.js';
 import httpError from '../utils/httpError.js';
 import { assertNoHighRiskConditions } from './medicalConditionPolicy.js';
 import { composeRecipeMealPlan } from './dietService.js';
+import { createChatCompletionProvider } from './aiProviders/chatCompletionProvider.js';
 
 const recipeInstructionSystemPrompt = [
   'You are a practical Indian household cooking assistant.',
@@ -30,68 +31,27 @@ const recipeInstructionResponseSchema = Joi.object({
   }).unknown(false)).min(1).max(300).required(),
 }).unknown(false);
 
-function getCompletionText(payload) {
-  const content = payload?.choices?.[0]?.message?.content;
-  if (typeof content === 'string') return content;
-  if (Array.isArray(content)) {
-    return content.filter((part) => part?.type === 'text').map((part) => part.text).join('\n');
-  }
-  throw httpError(502, 'AI_RESPONSE_INVALID', 'OmniRoute returned no meal-plan content.');
-}
-
-async function requestOmniRoute(
-  prompt,
-  systemPrompt = recipeInstructionSystemPrompt,
-  responseParser = (text) => text,
-) {
-  if (!env.omniRouteUrl || !env.omniRouteModel) {
-    throw httpError(503, 'AI_SERVICE_NOT_CONFIGURED', 'OmniRoute is not configured.');
-  }
-
-  const headers = { 'Content-Type': 'application/json' };
-  if (env.omniRouteApiKey) {
-    headers.Authorization = `Bearer ${env.omniRouteApiKey}`;
-  }
-
-  let response;
-  try {
-    response = await fetch(env.omniRouteUrl, {
-      method: 'POST',
-      headers,
-      signal: AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        model: env.omniRouteModel,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          { role: 'user', content: prompt },
-        ],
-      }),
+function getRecipeInstructionProvider() {
+  if (env.aiProvider === 'omniroute') {
+    return createChatCompletionProvider({
+      endpoint: env.omniroutePocUrl,
+      model: env.omniroutePocModel,
+      apiKey: env.omniroutePocApiKey,
+      timeoutMs: env.aiRequestTimeoutMs,
+      maxRetries: env.aiRequestMaxRetries,
+      providerName: 'OmniRoute POC',
     });
-  } catch (error) {
-    const timedOut = error.name === 'TimeoutError' || error.name === 'AbortError';
-    logger.warn(`OmniRoute request ${timedOut ? 'timed out' : 'failed to connect'}${error.cause?.code ? ` (${error.cause.code})` : ''}.`);
-    throw httpError(
-      timedOut ? 504 : 503,
-      timedOut ? 'OMNIROUTE_TIMEOUT' : 'OMNIROUTE_UNAVAILABLE',
-      timedOut ? 'OmniRoute request timed out.' : 'OmniRoute is unavailable.',
-    );
   }
-
-  if (!response.ok) {
-    logger.warn(`OmniRoute returned HTTP ${response.status}.`);
-    throw httpError(502, 'OMNIROUTE_REQUEST_FAILED', `OmniRoute returned HTTP ${response.status}.`);
-  }
-
-  let payload;
-  try {
-    payload = await response.json();
-  } catch {
-    throw httpError(502, 'AI_RESPONSE_INVALID', 'OmniRoute returned an invalid response body.');
-  }
-  return responseParser(getCompletionText(payload));
+  // Backward-compatible existing Gemini-model route; current source uses an
+  // OpenAI-compatible endpoint with gemini-2.0-flash as its default model.
+  return createChatCompletionProvider({
+    endpoint: env.omniRouteUrl,
+    model: env.omniRouteModel,
+    apiKey: env.omniRouteApiKey,
+    timeoutMs: env.aiRequestTimeoutMs,
+    maxRetries: env.aiRequestMaxRetries,
+    providerName: 'Existing AI route',
+  });
 }
 
 function staticInstructions(meal) {
@@ -100,28 +60,73 @@ function staticInstructions(meal) {
   return typeof instructions === 'string' && instructions.trim() ? [instructions.trim()] : [];
 }
 
+const ingredientAliases = new Map([
+  ['onion', ['onion', 'onions', 'pyaaz']], ['tomato', ['tomato', 'tomatoes']],
+  ['spinach', ['spinach', 'palak']],
+  ['spinach', ['spinach', 'palak']], ['potato', ['potato', 'potatoes', 'aloo']],
+  ['paneer', ['paneer']], ['milk', ['milk']], ['egg', ['egg', 'eggs']],
+  ['chicken', ['chicken']], ['fish', ['fish']], ['oil', ['oil']], ['ghee', ['ghee']],
+  ['wheat flour, atta', ['atta', 'wheat flour', 'roti', 'chapati']],
+  ['rice flakes', ['poha', 'flattened rice']], ['green gram, dal', ['moong dal', 'green gram']],
+  ['red gram, dal', ['toor dal', 'arhar dal', 'red gram']], ['lentil dal', ['masoor dal', 'lentil']],
+  ['rajmah', ['rajma']], ['bengal gram, whole', ['chole', 'chana', 'chickpeas']],
+  ['soya bean', ['soy', 'soya', 'soybean', 'soya chunks', 'tofu']],
+]);
+const commonIngredientTerms = [
+  'curd', 'dahi', 'yogurt', 'yoghurt', 'water', 'oil', 'ghee', 'salt', 'spice', 'spices', 'masala',
+  'spinach', 'palak', 'onion', 'pyaaz', 'tomato', 'potato', 'aloo', 'paneer', 'milk', 'egg', 'chicken', 'fish',
+];
+
+function foodTerms(food) {
+  const terms = new Set([food.foodName, getHouseholdFoodName(food)]);
+  const lowerName = String(food.foodName ?? '').toLowerCase();
+  const prefix = lowerName.split(',')[0].trim();
+  if (/^(?:onion|tomato|spinach|potato|paneer|milk|egg|chicken|fish|oil|ghee|garlic|ginger|cumin|turmeric|chilli|chili)$/.test(prefix)) terms.add(prefix);
+  for (const [catalogName, aliases] of ingredientAliases) {
+    if (lowerName.includes(catalogName) || String(getHouseholdFoodName(food)).toLowerCase() === catalogName) {
+      aliases.forEach((alias) => terms.add(alias));
+    }
+  }
+  const foodCategory = String(food.category ?? '').toLowerCase();
+  if (/condiments and spices/.test(foodCategory)) {
+    const spice = lowerName.split(',')[0].trim();
+    if (spice.length >= 4) terms.add(spice);
+  }
+  return [...terms].map((term) => String(term).trim().toLowerCase()).filter((term) => term.length >= 3);
+}
+
 function containsUnlistedFood(instruction, allowedCodes) {
-  const normalizedInstruction = String(instruction).toLocaleLowerCase('en');
-  const allowedNames = new Set(getIfctFoods()
+  const text = String(instruction).toLocaleLowerCase('en');
+  const catalog = getIfctFoods();
+  const allowedTerms = new Set(getIfctFoods()
     .filter((food) => allowedCodes.has(food.ifctCode))
-    .map((food) => getHouseholdFoodName(food).toLocaleLowerCase('en').trim()));
-  return getIfctFoods().some((food) => {
-    const name = getHouseholdFoodName(food).toLocaleLowerCase('en').trim();
-    if (allowedNames.has(name) || name.length < 4) return false;
-    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return new RegExp(`\\b${escaped}\\b`, 'i').test(normalizedInstruction);
+    .flatMap(foodTerms));
+  const allTerms = new Set([...commonIngredientTerms, ...catalog.flatMap(foodTerms)]);
+  return [...allTerms].some((term) => {
+    if (allowedTerms.has(term)) return false;
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}(?:s|es)?\\b`, 'i').test(text);
   });
+}
+
+function safeFallbackInstructions(meal) {
+  const instructions = staticInstructions(meal);
+  const allowedCodes = new Set((meal.ingredients ?? []).map(({ ifctCode }) => ifctCode).filter(Boolean));
+  if (instructions.length && instructions.every((step) => !containsUnlistedFood(step, allowedCodes))) return instructions;
+  return [
+    'Prepare the listed ingredients for this dish.',
+    'Cook the listed ingredients using a simple household method suitable for the dish; do not add unlisted ingredients.',
+    'Serve the prepared dish.',
+  ];
 }
 
 /** The model may polish instructions for fixed recipes; all food and nutrition remain backend-owned. */
 export async function enhanceRecipeInstructions(meals) {
   if (!Array.isArray(meals)) throw httpError(422, 'RECIPES_REQUIRED', 'A selected recipe list is required.');
-  const fallbacks = meals.map((meal) => ({
-    ...meal,
-    recipeInstructions: staticInstructions(meal),
-    cookingInstructions: staticInstructions(meal),
-    swapSuggestion: null,
-  }));
+  const fallbacks = meals.map((meal) => {
+    const instructions = safeFallbackInstructions(meal);
+    return { ...meal, recipeInstructions: instructions, cookingInstructions: instructions, swapSuggestion: null };
+  });
   if (!meals.length) return fallbacks;
 
   try {
@@ -136,7 +141,6 @@ export async function enhanceRecipeInstructions(meals) {
         unit,
         householdMeasure,
       })),
-      staticInstructions: staticInstructions(meal),
     }));
     const prompt = [
       'Write simple household cooking steps for the already-selected recipes below.',
@@ -144,7 +148,10 @@ export async function enhanceRecipeInstructions(meals) {
       'Return exactly one result for each mealIndex and preserve its recipeId. swapSuggestion must be null.',
       JSON.stringify({ recipes: mealInputs }),
     ].join('\n');
-    const responseText = await requestOmniRoute(prompt);
+    const { content: responseText } = await getRecipeInstructionProvider()([
+      { role: 'system', content: recipeInstructionSystemPrompt },
+      { role: 'user', content: prompt },
+    ]);
     const cleaned = responseText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     const parsed = JSON.parse(cleaned);
     const { error, value } = recipeInstructionResponseSchema.validate(parsed, { abortEarly: false, convert: true });
@@ -368,13 +375,10 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
   const instructedMeals = await enhanceRecipeInstructions(composedPlan.meals);
   const nutrientTargets = [...new Set(deficiencies.map(({ nutrient }) => nutrient))].slice(0, 5);
   const meals = instructedMeals.map((meal) => {
-    const proteinItem = meal.items
-      .filter((item) => Number(item.nutrients?.protein) > 0)
-      .sort((left, right) => right.nutrients.protein - left.nutrients.protein)[0];
     return {
       ...meal,
       nutrientTargets,
-      proteinSource: proteinItem?.foodName ?? meal.items[0]?.foodName ?? meal.dishName,
+      proteinSource: meal.primaryProteinSource ?? null,
       cookingInstructions: meal.cookingInstructions.join(' ').slice(0, 300),
     };
   });
@@ -397,6 +401,7 @@ export async function generateMealPlan(userId, reportId, preferences = {}) {
     macroTargets: composedPlan.macroTargets,
     planDurationDays: 7,
     meals,
+    diversityWarnings: composedPlan.diversityWarnings ?? [],
     supplementGuidance: hasSevereB12Deficiency(deficiencies)
       ? 'Discuss a clinician-supervised vitamin B12 supplement with your healthcare professional. They should decide whether it is appropriate and determine the dose and duration; do not self-medicate.'
       : null,

@@ -7,6 +7,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "worker": "node src/jobs/worker.js",
+    "seed:experts": "node src/scripts/seedExperts.js",
     "build": "node src/scripts/buildIfctData.js",
     "lint": "eslint src tests --ext .js",
     "test": "node --import ./src/scripts/setTestEnvironment.js --test --experimental-test-module-mocks --experimental-test-coverage"

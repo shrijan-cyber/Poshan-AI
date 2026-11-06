@@ -61,7 +61,7 @@ export default function TwoFactorVerify() {
   };
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-cream p-4 dark:bg-slate-950 sm:p-6">
+    <main className="auth-page relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-cream p-4 dark:bg-slate-950 sm:p-6">
       <section aria-labelledby="two-factor-title" className="relative z-10 w-full max-w-md rounded-2xl border border-white/70 bg-white/95 p-6 shadow-xl backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/95 sm:p-8">
         <Link to="/login" onClick={cancelTwoFactor} className="mb-6 inline-flex items-center gap-3" aria-label="Back to PoshanAI sign in">
           <img src={logo} alt="" className="h-12 w-12 rounded-xl object-contain" />

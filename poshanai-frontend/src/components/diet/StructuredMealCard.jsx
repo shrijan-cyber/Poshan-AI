@@ -48,9 +48,10 @@ export default function StructuredMealCard({ meal, day }) {
     <article className="rounded-3xl border border-sage/80 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-forest dark:text-emerald-300">{day ? `Day ${day} · ` : ''}{category}{meal.timing ? ` · ${meal.timing}` : ''}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-forest dark:text-emerald-300">{day ? `Day ${day} · ` : ''}{meal.scheduleLabel ?? category}{meal.scheduleLabel && meal.scheduleLabel !== category ? ` (${category})` : ''}{meal.timing ? ` · ${meal.timing}` : ''}</p>
           <h3 className="mt-2 font-heading text-xl font-semibold text-slate-900 dark:text-white">{name}</h3>
           {portion && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{portion}</p>}
+          {meal.primaryProteinSource && <p className="mt-2 inline-flex rounded-full bg-sage/55 px-2.5 py-1 text-xs font-semibold text-forest dark:bg-emerald-950 dark:text-emerald-200">Protein source: {meal.primaryProteinSource}</p>}
         </div>
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sage/55 text-forest dark:bg-emerald-950 dark:text-emerald-200"><Utensils size={18} aria-hidden="true" /></span>
       </header>

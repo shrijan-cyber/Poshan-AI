@@ -7,6 +7,7 @@ import {
 } from '../rag/ifctLoader.js';
 import { foodMatchesAnyRestriction } from './foodRestrictions.js';
 import recipeCatalog from './recipeCatalog.js';
+import { auditRecipeProvenance } from './recipeQualityAudit.js';
 
 let foods = [];
 try {
@@ -43,20 +44,59 @@ function calculateTargetCalories(profile) {
   if (required.some((field) => !Number.isFinite(Number(profile[field])) || Number(profile[field]) <= 0)) {
     throw httpError(422, 'PROFILE_REQUIRED_FOR_RECIPE_PLAN', 'Age, height, and weight are required to calculate a meal-plan target.');
   }
-  const genderOffset = profile.gender === 'male' ? 5 : profile.gender === 'female' ? -161 : -78;
-  const bmr = (10 * profile.weightKg) + (6.25 * profile.heightCm) - (5 * profile.age) + genderOffset;
-  const activityFactor = activityFactors[profile.activityLevel];
+  const age = Number(profile.age);
+  const weightKg = Number(profile.weightKg);
+  const heightCm = Number(profile.heightCm);
+  if (age < 13 || age > 100 || weightKg < 20 || weightKg > 200 || heightCm < 100 || heightCm > 250) {
+    throw httpError(422, 'PROFILE_OUT_OF_RANGE', 'Age, height, and weight must be within the supported profile ranges.');
+  }
+  const gender = String(profile.gender ?? '').toLowerCase();
+  if (!['male', 'female', 'other'].includes(gender)) {
+    throw httpError(400, 'INVALID_GENDER', 'Choose a supported gender value.');
+  }
+  const genderOffset = gender === 'male' ? 5 : gender === 'female' ? -161 : -78;
+  const bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + genderOffset;
+  const activityLevel = String(profile.activityLevel ?? '').toLowerCase().replace(/[ -]/g, '_');
+  const activityFactor = activityFactors[activityLevel];
   if (!activityFactor) throw httpError(400, 'INVALID_ACTIVITY_LEVEL', 'Choose a supported activity level.');
   const tdee = bmr * activityFactor;
-  const goalFactor = profile.goal === 'lose' ? 0.85 : profile.goal === 'gain' ? 1.1 : 1;
-  return Math.round(tdee * goalFactor);
+  const goal = String(profile.goal ?? 'maintain').toLowerCase();
+  if (!['lose', 'maintain', 'gain'].includes(goal)) {
+    throw httpError(400, 'INVALID_GOAL', 'Choose lose, maintain, or gain as the plan goal.');
+  }
+  const goalFactor = goal === 'lose' ? 0.85 : goal === 'gain' ? 1.1 : 1;
+  const targetCalories = Math.round(tdee * goalFactor);
+  if (!Number.isFinite(targetCalories) || targetCalories <= 0) {
+    throw httpError(422, 'INVALID_NUTRITION_TARGET', 'A valid positive calorie target could not be calculated from this profile.');
+  }
+  return targetCalories;
 }
 
 function calculateMacroTargets(profile, targetCalories) {
+  if (!Number.isFinite(Number(targetCalories)) || Number(targetCalories) <= 0
+    || !Number.isFinite(Number(profile.weightKg)) || Number(profile.weightKg) <= 0) {
+    throw httpError(422, 'INVALID_NUTRITION_TARGET', 'Positive calorie and weight values are required to calculate macro targets.');
+  }
   const protein = round1(Number(profile.weightKg) * 0.8);
   const fat = round1((targetCalories * 0.25) / 9);
   const carbs = round1(Math.max(0, (targetCalories - (protein * 4) - (fat * 9)) / 4));
-  return { protein, carbs, fat };
+  const targets = { protein, carbs, fat };
+  if (Object.values(targets).some((value) => !Number.isFinite(value) || value < 0)) {
+    throw httpError(422, 'INVALID_NUTRITION_TARGET', 'The profile produced invalid macronutrient targets.');
+  }
+  const targetEnergy = (protein * 4) + (carbs * 4) + (fat * 9);
+  if (Math.abs(targetEnergy - Number(targetCalories)) / Number(targetCalories) > 0.01) {
+    throw httpError(422, 'INVALID_NUTRITION_TARGET', 'Macronutrient targets do not reconcile with the calorie target.');
+  }
+  return targets;
+}
+
+function restrictionList(value, label) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string' || !item.trim())) {
+    throw httpError(400, 'INVALID_FOOD_RESTRICTIONS', `${label} must be an array of non-empty food names.`);
+  }
+  return [...new Set(value.map((item) => item.trim()))];
 }
 
 function hasDietCompatibleFood(food, dietPreference) {
@@ -78,7 +118,7 @@ function requestedRegion(region) {
   return ['north', 'south', 'east', 'west'].find((direction) => normalized.includes(direction)) ?? 'All';
 }
 
-function recipeAllowed(recipe, { dietPreference, restrictions, whitelistCodes, foodsByCode, region }) {
+function recipeAllowed(recipe, { dietPreference, allergies, dislikes, whitelistCodes, foodsByCode, region }) {
   if (!recipe.dietaryCompatibility.includes(dietPreference)) return false;
   if (region !== 'All' && recipe.region !== 'All' && recipe.region !== region) return false;
   return recipe.ingredients.every(({ ifctCode }) => {
@@ -86,43 +126,71 @@ function recipeAllowed(recipe, { dietPreference, restrictions, whitelistCodes, f
     return food
       && whitelistCodes.has(ifctCode)
       && hasDietCompatibleFood(food, dietPreference)
-      && !foodMatchesAnyRestriction(restrictions, { ...food, householdName: getHouseholdFoodName(food) });
+      && !foodMatchesAnyRestriction(allergies, { ...food, householdName: getHouseholdFoodName(food) })
+      && !foodMatchesAnyRestriction(dislikes, { ...food, householdName: getHouseholdFoodName(food) });
   });
 }
 
-function mealCategories(mealsPerDay) {
-  const count = Number(mealsPerDay);
+const defaultSchedule = Object.freeze({
+  1: [{ name: 'Meal', category: 'Lunch', time: null }],
+  2: [{ name: 'Brunch', category: 'Lunch', time: '10:30' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  3: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  4: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Evening snack', category: 'Snack', time: '17:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  5: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Mid-morning snack', category: 'Snack', time: '10:30' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Evening snack', category: 'Snack', time: '17:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  6: [{ name: 'Breakfast', category: 'Breakfast', time: '07:30' }, { name: 'Mid-morning snack', category: 'Snack', time: '10:00' }, { name: 'Lunch', category: 'Lunch', time: '12:30' }, { name: 'Afternoon snack', category: 'Snack', time: '15:30' }, { name: 'Dinner', category: 'Dinner', time: '19:00' }, { name: 'Evening snack', category: 'Snack', time: '21:00' }],
+});
+
+function mealScheduleFor(profile) {
+  const count = Number(profile.mealsPerDay ?? 3);
   if (!Number.isInteger(count) || count < 1 || count > 10) {
     throw httpError(400, 'INVALID_MEAL_FREQUENCY', 'Meal frequency must be from 1 to 10 meals per day.');
   }
-  if (count === 1) return ['Lunch'];
-  if (count === 2) return ['Breakfast', 'Dinner'];
+  if (Array.isArray(profile.mealSchedule) && profile.mealSchedule.length) {
+    if (profile.mealSchedule.length !== count) {
+      throw httpError(400, 'INVALID_MEAL_SCHEDULE', 'Custom meal schedule length must match mealsPerDay.');
+    }
+    return profile.mealSchedule.map(({ name, category, time }) => ({ name, category, time: time ?? null }));
+  }
+  if (defaultSchedule[count]) return defaultSchedule[count].map((slot) => ({ ...slot }));
   const categories = ['Breakfast', 'Lunch', 'Dinner'];
   while (categories.length < count) categories.splice(categories.length - 1, 0, 'Snack');
-  return categories;
+  return categories.map((category, index) => ({ name: category === 'Snack' ? `Snack ${index}` : category, category, time: null }));
 }
 
-function chooseRecipe(category, candidates, day, mealIndex, preferenceText, usedRecipeIds) {
-  const ranked = candidates
-    .map((recipe) => ({
-      recipe,
-      preferenceScore: recipe.ingredients.reduce((score, ingredient) => {
-        const food = foods.find((entry) => entry.ifctCode === ingredient.ifctCode);
-        return score + Number(Boolean(food && wasFoodExplicitlyRequested(food, preferenceText)));
-      }, 0),
-      calorieCapacity: recipeCalorieCapacity(recipe),
-    }))
-    .sort((left, right) => right.calorieCapacity - left.calorieCapacity
-      || right.preferenceScore - left.preferenceScore
-      || left.recipe.recipeId.localeCompare(right.recipe.recipeId));
-  if (!ranked.length) {
-    throw httpError(422, 'NO_MATCHING_RECIPES', `No ${category.toLowerCase()} recipes match the selected diet, allergies, dislikes, and region.`);
+function proteinSourceForRecipe(recipe, foodsByCode) {
+  const contributions = new Map();
+  let totalProtein = 0;
+  for (const ingredient of recipe.ingredients) {
+    const food = foodsByCode.get(ingredient.ifctCode);
+    const protein = Number(food?.nutrients?.protein);
+    if (!Number.isFinite(protein) || protein <= 0) continue;
+    const contribution = (protein * ingredient.rawQuantityGrams) / 100;
+    totalProtein += contribution;
+    const category = String(food.category ?? '').toLowerCase();
+    const name = String(food.foodName ?? '').toLowerCase();
+    let group = null;
+    if (category === 'milk and milk products') group = 'dairy';
+    else if (category === 'egg and egg products') group = 'eggs';
+    else if (/poultry|animal meat/.test(category)) group = 'poultry';
+    else if (/marine fish|marine shellfish|marine mollusks|fresh water fish/.test(category)) group = 'seafood';
+    else if (/soya|soy/.test(name)) group = 'soy';
+    else if (category === 'grain legumes') group = /rajmah|chana|gram, whole|lobia|cowpea/.test(name) ? 'beans' : 'legumes';
+    else if (category === 'nuts and oil seeds') group = 'nuts-seeds';
+    if (!group) continue;
+    const current = contributions.get(group) ?? { grams: 0, protein: 0, label: getHouseholdFoodName(food) };
+    current.protein += contribution;
+    current.grams += ingredient.rawQuantityGrams;
+    if (contribution > current.protein - contribution) current.label = getHouseholdFoodName(food);
+    contributions.set(group, current);
   }
-  const unused = ranked.filter(({ recipe }) => !usedRecipeIds.has(recipe.recipeId));
-  const options = unused.length ? unused : ranked;
-  const selected = options[0].recipe;
-  usedRecipeIds.add(selected.recipeId);
-  return selected;
+  const primary = [...contributions.entries()]
+    .filter(([, source]) => source.protein >= 3 && totalProtein > 0 && source.protein / totalProtein >= 0.3)
+    .sort((left, right) => right[1].protein - left[1].protein || left[0].localeCompare(right[0]))[0];
+  return primary ? { group: primary[0], label: primary[1].label, proteinGrams: round2(primary[1].protein) } : null;
+}
+
+export function getPrimaryProteinSource(recipe, foodRecords = foods) {
+  return proteinSourceForRecipe(recipe, new Map(foodRecords.map((food) => [food.ifctCode, food])));
 }
 
 function recipeCalorieCapacity(recipe) {
@@ -137,6 +205,111 @@ function recipeCalorieCapacity(recipe) {
     if (cap) limits.push(cap / ingredient.rawQuantityGrams);
   }
   return baseCalories * Math.min(MAX_RECIPE_PORTION_FACTOR, ...limits);
+}
+
+function recipeSetMetrics(recipes, targetCalories, targetProtein, foodsByCode) {
+  let baseCalories = 0;
+  let baseProtein = 0;
+  let maximumFactor = MAX_RECIPE_PORTION_FACTOR;
+  for (const recipe of recipes) {
+    let mealCalories = 0;
+    let mealProtein = 0;
+    let totalRawGrams = 0;
+    const constrainedWeights = new Map();
+    for (const ingredient of recipe.ingredients) {
+      const food = foodsByCode.get(ingredient.ifctCode);
+      mealCalories += (Number(food.nutrients.calories) * ingredient.rawQuantityGrams) / 100;
+      mealProtein += (Number(food.nutrients.protein) * ingredient.rawQuantityGrams) / 100;
+      totalRawGrams += ingredient.rawQuantityGrams;
+      const cap = rawPortionLimit(ingredient, food);
+      if (!cap) continue;
+      const group = food.category === 'Grain Legumes' ? 'dal'
+        : ingredient.ifctCode === 'A019' || /wheat flour, atta/i.test(food.foodName) ? 'atta' : 'rice';
+      const key = `${cap}:${group}`;
+      constrainedWeights.set(key, (constrainedWeights.get(key) ?? 0) + ingredient.rawQuantityGrams);
+    }
+    let mealLimit = Math.min(MAX_RECIPE_PORTION_FACTOR, totalRawGrams > 0 ? MAX_RAW_MEAL_GRAMS / totalRawGrams : MAX_RECIPE_PORTION_FACTOR);
+    for (const [key, grams] of constrainedWeights) mealLimit = Math.min(mealLimit, Number(key.split(':')[0]) / grams);
+    maximumFactor = Math.min(maximumFactor, mealLimit);
+    baseCalories += mealCalories;
+    baseProtein += mealProtein;
+  }
+  const requestedFactor = baseCalories > 0 ? targetCalories / baseCalories : Infinity;
+  const factor = Math.min(requestedFactor, maximumFactor);
+  const calories = baseCalories * factor;
+  const protein = baseProtein * factor;
+  const calorieDeviation = targetCalories > 0 ? Math.abs(calories - targetCalories) / targetCalories : Infinity;
+  const proteinDeviation = targetProtein > 0 ? Math.abs(protein - targetProtein) / targetProtein : 0;
+  return { baseCalories, baseProtein, maximumFactor, factor, calories, protein, calorieDeviation, proteinDeviation };
+}
+
+function selectDailyRecipes(categories, candidatesByCategory, targetCalories, macroTargets, preferenceText, foodsByCode) {
+  const maxBeamSize = 256;
+  let beam = [{ recipes: [], groups: [], preferenceScore: 0, capacity: 0, baseCalories: 0, baseProtein: 0 }];
+  for (const category of categories) {
+    const categoryCandidates = candidatesByCategory.get(category) ?? [];
+    const expanded = [];
+    for (const state of beam) {
+      const unused = categoryCandidates.filter(({ recipeId }) => !state.recipes.some((recipe) => recipe.recipeId === recipeId));
+      for (const recipe of unused) {
+        const source = proteinSourceForRecipe(recipe, foodsByCode);
+        const preferenceScore = recipe.ingredients.reduce((score, ingredient) => {
+          const food = foodsByCode.get(ingredient.ifctCode);
+          return score + Number(Boolean(food && wasFoodExplicitlyRequested(food, preferenceText)));
+        }, 0);
+        const baseCalories = recipe.ingredients.reduce((sum, ingredient) => (
+          sum + (Number(foodsByCode.get(ingredient.ifctCode).nutrients.calories) * ingredient.rawQuantityGrams) / 100
+        ), 0);
+        const baseProtein = recipe.ingredients.reduce((sum, ingredient) => (
+          sum + (Number(foodsByCode.get(ingredient.ifctCode).nutrients.protein) * ingredient.rawQuantityGrams) / 100
+        ), 0);
+        const combinedCalories = state.baseCalories + baseCalories;
+        const combinedProtein = state.baseProtein + baseProtein;
+        const proteinFit = combinedCalories > 0 && macroTargets.protein > 0
+          ? Math.abs((targetCalories * combinedProtein / combinedCalories) - macroTargets.protein) / macroTargets.protein
+          : 0;
+        expanded.push({
+          recipes: [...state.recipes, recipe],
+          groups: source ? [...state.groups, source.group] : state.groups,
+          preferenceScore: state.preferenceScore + preferenceScore,
+          capacity: state.capacity + recipeCalorieCapacity(recipe),
+          baseCalories: combinedCalories,
+          baseProtein: combinedProtein,
+          proteinFit,
+        });
+      }
+    }
+    expanded.sort((left, right) => {
+      const leftRepeatedSources = left.groups.length - new Set(left.groups).size;
+      const rightRepeatedSources = right.groups.length - new Set(right.groups).size;
+      const leftRepeatedRecipes = left.recipes.length - new Set(left.recipes.map(({ recipeId }) => recipeId)).size;
+      const rightRepeatedRecipes = right.recipes.length - new Set(right.recipes.map(({ recipeId }) => recipeId)).size;
+      return leftRepeatedSources - rightRepeatedSources
+        || leftRepeatedRecipes - rightRepeatedRecipes
+        || right.preferenceScore - left.preferenceScore
+        || left.proteinFit - right.proteinFit
+        || Math.abs(left.capacity - targetCalories) - Math.abs(right.capacity - targetCalories)
+        || right.preferenceScore - left.preferenceScore
+        || left.recipes.map(({ recipeId }) => recipeId).join('|').localeCompare(right.recipes.map(({ recipeId }) => recipeId).join('|'));
+    });
+    beam = expanded.slice(0, maxBeamSize);
+    if (!beam.length) return [];
+  }
+
+  const targetProtein = macroTargets.protein;
+  return beam.map((state) => {
+    const metrics = recipeSetMetrics(state.recipes, targetCalories, targetProtein, foodsByCode);
+    const repeats = state.groups.length - new Set(state.groups).size;
+    const duplicateRecipes = state.recipes.length - new Set(state.recipes.map(({ recipeId }) => recipeId)).size;
+    const outsideTolerance = metrics.calorieDeviation > 0.1 || metrics.factor < MIN_RECIPE_PORTION_FACTOR;
+    const score = (outsideTolerance ? 1000 + metrics.calorieDeviation * 10 : metrics.calorieDeviation * 5)
+      + metrics.proteinDeviation * 0.6
+      + repeats * 0.25
+      + duplicateRecipes * 0.1
+      - state.preferenceScore * 0.5;
+    return { ...state, metrics, score };
+  }).sort((left, right) => left.score - right.score
+    || left.recipes.map(({ recipeId }) => recipeId).join('|').localeCompare(right.recipes.map(({ recipeId }) => recipeId).join('|')))[0]?.recipes ?? [];
 }
 
 function scaledValue(per100Grams, grams) {
@@ -199,6 +372,7 @@ function cookedDescription(householdMeasure, cookedWeightGrams) {
 }
 
 function materializeMeal(recipe, factor, day, profile, foodsByCode) {
+  const primaryProteinSource = proteinSourceForRecipe(recipe, foodsByCode);
   const ingredientItems = recipe.ingredients.map((ingredient) => {
     const food = foodsByCode.get(ingredient.ifctCode);
     const grams = round1(ingredient.rawQuantityGrams * factor);
@@ -236,6 +410,8 @@ function materializeMeal(recipe, factor, day, profile, foodsByCode) {
     mealType,
     region: recipe.region,
     dietaryCompatibility: recipe.dietaryCompatibility,
+    primaryProteinSource: primaryProteinSource?.label ?? null,
+    primaryProteinSourceGroup: primaryProteinSource?.group ?? null,
     servings: recipe.servings,
     portionDescription: `1 serving, adjusted ${round1(factor)}× from the household recipe` ,
     cookedHouseholdMeasure: null,
@@ -278,17 +454,15 @@ function materializeMeal(recipe, factor, day, profile, foodsByCode) {
   };
 }
 
-function composeDay(day, categories, candidatesByCategory, targetCalories, profile, foodsByCode, previousMainCombination = null) {
-  const usedRecipeIds = new Set();
+function composeDay(day, categories, candidatesByCategory, targetCalories, macroTargets, profile, foodsByCode, previousMainCombination = null) {
   const preferenceText = [profile.typicalDiet, ...(profile.preferredFoods ?? [])].flat().filter(Boolean).join(' ');
-  const recipes = categories.map((category, index) => chooseRecipe(
-    category,
-    candidatesByCategory.get(category) ?? [],
-    day,
-    index,
-    preferenceText,
-    usedRecipeIds,
-  ));
+  const recipes = selectDailyRecipes(categories, candidatesByCategory, targetCalories, macroTargets, preferenceText, foodsByCode);
+  if (recipes.length !== categories.length || recipes.some((recipe) => !recipe)) {
+    return {
+      status: 'unachievable',
+      message: 'No safe recipe set covers every requested meal category with the selected diet, allergies, dislikes, and region.',
+    };
+  }
 
   const lunchIndex = categories.indexOf('Lunch');
   const dinnerIndex = categories.indexOf('Dinner');
@@ -316,30 +490,14 @@ function composeDay(day, categories, candidatesByCategory, targetCalories, profi
       return { status: 'unachievable', message: `Day ${day} cannot meet the required lunch and dinner diversity with the selected restrictions.` };
     }
   }
-  const baseCalories = recipes.reduce((total, recipe) => total + recipe.ingredients.reduce((mealTotal, ingredient) => {
-    const food = foodsByCode.get(ingredient.ifctCode);
-    return mealTotal + ((food.nutrients.calories * ingredient.rawQuantityGrams) / 100);
-  }, 0), 0);
+  const recipeSet = recipeSetMetrics(recipes, targetCalories, macroTargets.protein, foodsByCode);
+  const baseCalories = recipeSet.baseCalories;
   if (!Number.isFinite(baseCalories) || baseCalories <= 0) {
     throw httpError(422, 'RECIPE_NUTRITION_UNAVAILABLE', 'The selected recipes do not have complete IFCT energy data.');
   }
 
-  const portionLimits = recipes.map((recipe) => {
-    const baseGrams = recipe.ingredients.reduce((sum, ingredient) => sum + ingredient.rawQuantityGrams, 0);
-    const totalLimit = baseGrams > 0 ? MAX_RAW_MEAL_GRAMS / baseGrams : MAX_RECIPE_PORTION_FACTOR;
-    const constrainedRawWeights = new Map();
-    for (const ingredient of recipe.ingredients) {
-      const food = foodsByCode.get(ingredient.ifctCode);
-      const cap = rawPortionLimit(ingredient, food);
-      if (!cap) continue;
-      const key = `${cap}:${food.category === 'Grain Legumes' ? 'dal' : ingredient.ifctCode === 'A019' || /wheat flour, atta/i.test(food.foodName) ? 'atta' : 'rice'}`;
-      constrainedRawWeights.set(key, (constrainedRawWeights.get(key) ?? 0) + ingredient.rawQuantityGrams);
-    }
-    const ingredientLimits = [...constrainedRawWeights.entries()].map(([key, grams]) => Number(key.split(':')[0]) / grams);
-    return Math.min(totalLimit, ...ingredientLimits);
-  });
   const requestedFactor = targetCalories / baseCalories;
-  const maxSafeFactor = Math.min(MAX_RECIPE_PORTION_FACTOR, ...portionLimits);
+  const maxSafeFactor = recipeSet.maximumFactor;
   if (requestedFactor < MIN_RECIPE_PORTION_FACTOR || maxSafeFactor < MIN_RECIPE_PORTION_FACTOR) {
     return { status: 'unachievable', message: 'The calorie target is too low for realistic household recipe portions.' };
   }
@@ -359,7 +517,11 @@ function composeDay(day, categories, candidatesByCategory, targetCalories, profi
   if (actualCalories < targetCalories * 0.9 || actualCalories > targetCalories * 1.1) {
     return { status: 'unachievable', message: 'Available recipes cannot meet the calorie target within 10% without exceeding safe raw ingredient portions.' };
   }
-  return { meals, mainCombination: mainCombination() };
+  const sourceGroups = meals.map((meal) => meal.primaryProteinSourceGroup).filter(Boolean);
+  const diversityWarning = new Set(sourceGroups).size < sourceGroups.length
+    ? 'This plan repeats a primary protein source because the currently eligible recipes and portion limits did not produce a fully distinct combination.'
+    : null;
+  return { meals, mainCombination: mainCombination(), diversityWarning };
 }
 
 /** Deterministically compose meals from validated household recipes and calculate all nutrients from IFCT. */
@@ -370,20 +532,33 @@ export function composeRecipeMealPlan(profile, { days = 1 } = {}) {
   const dietPreference = normalizedDietPreference(profile.dietType);
   const targetCalories = calculateTargetCalories(profile);
   const macroTargets = calculateMacroTargets(profile, targetCalories);
-  const categories = mealCategories(profile.mealsPerDay ?? 3);
+  if (targetCalories < 1200) {
+    return { status: 'unachievable', message: 'The calorie target is too low for a safe, practical household meal plan.', targetCalories, macroTargets, meals: [] };
+  }
+  const schedule = mealScheduleFor(profile);
+  const categories = schedule.map(({ category }) => category);
   const requestText = [profile.typicalDiet, ...(profile.preferredFoods ?? [])].flat().filter(Boolean).join(' ');
   const householdFoods = getHouseholdFoodWhitelist(foods, requestText);
   const whitelistCodes = new Set(householdFoods.map(({ ifctCode }) => ifctCode));
   const foodsByCode = new Map(foods.map((food) => [food.ifctCode, food]));
-  const restrictions = [...(profile.allergies ?? []), ...(profile.dislikes ?? [])].filter(Boolean);
+  const recipeAudits = new Map(recipeCatalog.map((recipe) => [
+    recipe.recipeId,
+    auditRecipeProvenance(recipe, foods),
+  ]));
+  const allergies = restrictionList(profile.allergies, 'Allergies');
+  const dislikes = restrictionList(profile.dislikes, 'Dislikes');
   const region = requestedRegion(profile.region);
-  const eligibleRecipes = recipeCatalog.filter((recipe) => recipeAllowed(recipe, {
-    dietPreference,
-    restrictions,
-    whitelistCodes,
-    foodsByCode,
-    region,
-  }));
+  const eligibleRecipes = recipeCatalog.filter((recipe) => (
+    recipeAudits.get(recipe.recipeId)?.readiness !== 'blocked'
+      && recipeAllowed(recipe, {
+        dietPreference,
+        allergies,
+        dislikes,
+        whitelistCodes,
+        foodsByCode,
+        region,
+      })
+  ));
   const candidatesByCategory = new Map(['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((category) => [
     category,
     eligibleRecipes.filter((recipe) => recipe.mealCategory === category),
@@ -391,13 +566,19 @@ export function composeRecipeMealPlan(profile, { days = 1 } = {}) {
 
   const meals = [];
   const dailyNutrition = [];
+  const diversityWarnings = new Set();
   let previousMainCombination = null;
   for (let day = 1; day <= days; day += 1) {
-    const composedDay = composeDay(day, categories, candidatesByCategory, targetCalories, profile, foodsByCode, previousMainCombination);
+    const composedDay = composeDay(day, categories, candidatesByCategory, targetCalories, macroTargets, profile, foodsByCode, previousMainCombination);
     if (composedDay.status === 'unachievable') {
       return { status: 'unachievable', message: composedDay.message, targetCalories, macroTargets, meals: [] };
     }
-    const dailyMeals = composedDay.meals;
+    const dailyMeals = composedDay.meals.map((meal, index) => ({
+      ...meal,
+      scheduleLabel: schedule[index]?.name ?? meal.mealCategory,
+      timing: schedule[index]?.time ?? null,
+    }));
+    if (composedDay.diversityWarning) diversityWarnings.add(composedDay.diversityWarning);
     previousMainCombination = composedDay.mainCombination;
     meals.push(...dailyMeals);
     dailyNutrition.push({
@@ -409,6 +590,10 @@ export function composeRecipeMealPlan(profile, { days = 1 } = {}) {
     });
   }
   const average = (key) => round2(dailyNutrition.reduce((sum, day) => sum + (day[key] ?? 0), 0) / days);
+  const selectedAudits = [...new Set(meals.map(({ recipeId }) => recipeId))]
+    .map((recipeId) => recipeAudits.get(recipeId));
+  const nutritionWarnings = [...new Set(selectedAudits.flatMap((audit) => audit?.warnings ?? []))];
+  const hasUnverifiedRecipeProvenance = nutritionWarnings.length > 0;
   return {
     reportId: null,
     goal: profile.goal ?? 'maintain',
@@ -419,7 +604,14 @@ export function composeRecipeMealPlan(profile, { days = 1 } = {}) {
     meals,
     type: 'basic',
     profile: { ...profile, dietType: dietPreference.toLowerCase().replace('-', '') },
-    disclaimer: 'This general nutrition plan is educational and is not medical advice. Consult a qualified healthcare professional for individual dietary needs.',
+    diversityWarnings: [...diversityWarnings],
+    disclaimer: [
+      'This general nutrition plan is educational and is not medical advice. Consult a qualified healthcare professional for individual dietary needs.',
+      ...diversityWarnings,
+      hasUnverifiedRecipeProvenance
+        ? `Recipe data limitations (not independently source-verified): ${nutritionWarnings.slice(0, 4).join(' ')} Nutrition totals use the recorded raw ingredient quantities and IFCT values.`
+        : null,
+    ].filter(Boolean).join(' '),
   };
 }
 
@@ -428,4 +620,4 @@ export function generateBasicDietPlan(profile) {
 }
 
 export { calculateTargetCalories, calculateMacroTargets };
-export default { generateBasicDietPlan, composeRecipeMealPlan, calculateTargetCalories, calculateMacroTargets };
+export default { generateBasicDietPlan, composeRecipeMealPlan, calculateTargetCalories, calculateMacroTargets, getPrimaryProteinSource };

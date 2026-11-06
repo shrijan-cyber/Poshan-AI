@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getIfctFoods } from '../src/rag/ifctLoader.js';
+import { getHouseholdFoodName, getIfctFoods } from '../src/rag/ifctLoader.js';
 import { buildGroceryList } from '../src/services/groceryService.js';
 import {
   calculateIfctNutrition,
+  calculateTargetCalories,
   composeRecipeMealPlan,
   generateBasicDietPlan,
+  getPrimaryProteinSource,
   validateMacroEnergyConsistency,
 } from '../src/services/dietService.js';
 import { recipeCatalog } from '../src/services/recipeCatalog.js';
@@ -35,7 +37,9 @@ test('validates a catalog of 15–20 recipes and excludes foods outside the hous
 
 test('selects only diet-compatible recipes for vegan and eggetarian users', () => {
   const veganPlan = generateBasicDietPlan(profile({ dietType: 'vegan' }));
-  const eggetarianPlan = generateBasicDietPlan(profile({ dietType: 'eggetarian', allergies: ['eggs'] }));
+  const eggetarianPlan = generateBasicDietPlan(profile({
+    dietType: 'eggetarian', allergies: ['eggs'], preferredFoods: ['eggs'],
+  }));
 
   assert.ok(veganPlan.meals.every((meal) => meal.dietaryCompatibility.includes('Vegan')));
   assert.ok(veganPlan.meals.every((meal) => meal.items.every((item) => !['L003', 'M001', 'N003'].includes(item.ifctCode))));
@@ -48,12 +52,22 @@ test('dislike aliases exclude matching recipe ingredients', () => {
   assert.ok(plan.meals.every((meal) => meal.items.every((item) => item.ifctCode !== 'G017')));
 });
 
+test('prioritizes familiar foods when the recipe can still cover a reasonable calorie share', () => {
+  const plan = generateBasicDietPlan(profile({ typicalDiet: 'Rajma and rice are regular foods for me.' }));
+  const lunch = plan.meals.find((meal) => meal.mealType === 'lunch');
+
+  assert.equal(lunch.recipeId, 'rajma-chawal');
+  assert.ok(plan.meals.reduce((sum, meal) => sum + meal.calories, 0) >= plan.targetCalories * 0.9);
+});
+
 test('portion scaling reaches calorie target and computes nutrients from raw IFCT weights', () => {
   const plan = generateBasicDietPlan(profile());
   const actualCalories = plan.meals.reduce((sum, meal) => sum + meal.calories, 0);
   assert.ok(actualCalories >= plan.targetCalories * 0.9);
   assert.ok(actualCalories <= plan.targetCalories * 1.1);
   assert.ok(plan.macroTargets.protein > 0 && plan.macroTargets.carbs > 0 && plan.macroTargets.fat > 0);
+  assert.ok(['Breakfast', 'Lunch', 'Dinner'].every((category) => plan.meals.some((meal) => meal.mealCategory === category)));
+  assert.match(plan.disclaimer, /not independently source-verified/i);
 
   const foodByCode = new Map(getIfctFoods().map((food) => [food.ifctCode, food]));
   for (const item of plan.meals.flatMap((meal) => meal.items)) {
@@ -64,6 +78,95 @@ test('portion scaling reaches calorie target and computes nutrients from raw IFC
     assert.equal(item.cookedWeightGrams, Math.round(item.rawWeightGrams * item.yieldFactor * 10) / 10);
     assert.match(item.cookedServingDescription, /cooked/i);
   }
+});
+
+test('validates demographic, activity, goal, calorie and macro target inputs', () => {
+  assert.throws(() => calculateTargetCalories(profile({ gender: 'unknown' })), (error) => error.code === 'INVALID_GENDER');
+  assert.throws(() => calculateTargetCalories(profile({ goal: 'crash-diet' })), (error) => error.code === 'INVALID_GOAL');
+  assert.throws(() => calculateTargetCalories(profile({ weightKg: 500 })), (error) => error.code === 'PROFILE_OUT_OF_RANGE');
+  const plan = generateBasicDietPlan(profile());
+  const targetEnergy = (plan.macroTargets.protein * 4)
+    + (plan.macroTargets.carbs * 4)
+    + (plan.macroTargets.fat * 9);
+  assert.ok(Math.abs(targetEnergy - plan.targetCalories) / plan.targetCalories <= 0.01);
+});
+
+test('covers breakfast, lunch, snack and dinner when the user selects four meals', () => {
+  const plan = generateBasicDietPlan(profile({ mealsPerDay: 4 }));
+  assert.equal(plan.meals.length, 4);
+  assert.deepEqual(new Set(plan.meals.map((meal) => meal.mealCategory)), new Set(['Breakfast', 'Lunch', 'Snack', 'Dinner']));
+  assert.ok(plan.meals.filter((meal) => meal.primaryProteinSource === 'Paneer').length <= 1);
+  assert.ok(plan.meals.every((meal) => meal.items.every((item) => !['M001', 'M004', 'N003'].includes(item.ifctCode))));
+  assert.ok(new Set(plan.meals.map((meal) => meal.primaryProteinSourceGroup).filter(Boolean)).size >= 2);
+  if (plan.diversityWarnings.length) assert.ok(plan.diversityWarnings.every((warning) => /repeats a primary protein source/i.test(warning)));
+});
+
+test('supports 2 through 6 meal schedules without repeating recipes to fill slots', () => {
+  for (const mealsPerDay of [2, 3, 4, 5, 6]) {
+    const plan = generateBasicDietPlan(profile({ mealsPerDay }));
+    if (plan.status === 'unachievable') {
+      assert.ok([2, 6].includes(mealsPerDay), `${mealsPerDay} meals unexpectedly unavailable: ${plan.message}`);
+      continue;
+    }
+    assert.equal(plan.meals.length, mealsPerDay);
+    assert.equal(new Set(plan.meals.map(({ recipeId }) => recipeId)).size, mealsPerDay);
+    assert.ok(plan.meals.every(({ scheduleLabel, timing }) => scheduleLabel && (timing === null || /^\d{2}:\d{2}$/.test(timing))));
+  }
+});
+
+test('custom meal names and timings are preserved and schedule count is validated', () => {
+  const mealSchedule = [
+    { name: 'Late breakfast', category: 'Breakfast', time: '10:00' },
+    { name: 'Lunch break', category: 'Lunch', time: '14:00' },
+    { name: 'Supper', category: 'Dinner', time: '20:00' },
+  ];
+  const plan = generateBasicDietPlan(profile({ mealsPerDay: 3, mealSchedule }));
+  assert.notEqual(plan.status, 'unachievable');
+  assert.deepEqual(plan.meals.map(({ scheduleLabel, timing }) => [scheduleLabel, timing]), mealSchedule.map(({ name, time }) => [name, time]));
+  assert.throws(() => generateBasicDietPlan(profile({ mealsPerDay: 3, mealSchedule: mealSchedule.slice(0, 2) })),
+    (error) => error.code === 'INVALID_MEAL_SCHEDULE');
+});
+
+test('recognizes different paneer recipes as the same primary protein source', () => {
+  const foods = getIfctFoods();
+  const paneerRecipes = recipeCatalog.filter(({ recipeId }) => ['paneer-bhurji-roti', 'palak-paneer-roti', 'gobhi-paneer-roti'].includes(recipeId));
+  assert.equal(paneerRecipes.length, 3);
+  const sources = paneerRecipes.map((recipe) => getPrimaryProteinSource(recipe, foods));
+  assert.deepEqual(new Set(sources.map((source) => source?.group)), new Set(['dairy']));
+  assert.ok(sources.every((source) => source?.label === 'Paneer'));
+});
+
+test('protein-source labels only appear when a verified ingredient contributes materially', () => {
+  const plan = generateBasicDietPlan(profile());
+  for (const meal of plan.meals) {
+    if (meal.primaryProteinSource) {
+      assert.ok(meal.ingredients.some((ingredient) => ingredient.canonicalName === meal.primaryProteinSource));
+      assert.ok(meal.macros.protein > 0);
+    }
+  }
+});
+
+test('returns an unachievable result when restrictions leave a required meal category empty', () => {
+  const foodsByCode = new Map(getIfctFoods().map((food) => [food.ifctCode, food]));
+  const everyCatalogFood = [...new Set(recipeCatalog.flatMap((recipe) => recipe.ingredients.map(({ ifctCode }) => {
+    const food = foodsByCode.get(ifctCode);
+    return [food.foodName, getHouseholdFoodName(food)];
+  }).flat()))];
+  const result = composeRecipeMealPlan(profile({ allergies: everyCatalogFood }));
+  assert.equal(result.status, 'unachievable');
+  assert.match(result.message, /no safe recipe set covers every requested meal category/i);
+  assert.deepEqual(result.meals, []);
+});
+
+test('rejects malformed allergy and dislike values instead of silently ignoring restrictions', () => {
+  assert.throws(
+    () => composeRecipeMealPlan(profile({ allergies: 'peanuts' })),
+    (error) => error.code === 'INVALID_FOOD_RESTRICTIONS',
+  );
+  assert.throws(
+    () => composeRecipeMealPlan(profile({ dislikes: [''] })),
+    (error) => error.code === 'INVALID_FOOD_RESTRICTIONS',
+  );
 });
 
 test('IFCT nutrition uses raw ingredient grams and preserves null values', () => {
@@ -135,7 +238,7 @@ test('grocery aggregation deduplicates identical raw ingredients across recipes'
   const groceryList = buildGroceryList(plan);
   const onions = groceryList.flatMap(({ items }) => items).filter(({ ifctCodes }) => ifctCodes.includes('G017'));
   assert.equal(onions.length, 1);
-  assert.equal(onions[0].quantity, expectedOnionGrams);
+  assert.equal(onions[0].quantity, Math.round(expectedOnionGrams * 10) / 10);
   assert.equal(onions[0].unit, 'g');
 });
 
@@ -159,6 +262,31 @@ test('AI failure falls back to static recipe cooking instructions', async () => 
     assert.deepEqual(enhanced.cookingInstructions, expected);
     assert.deepEqual(enhanced.recipeInstructions, expected);
     assert.equal(enhanced.swapSuggestion, null);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('rejects AI instructions that add oil, spices, salt, or vegetables outside the selected ingredients', async () => {
+  const selected = generateBasicDietPlan(profile()).meals.find((meal) => !meal.ingredients.some(({ canonicalName }) => /oil|spinach|palak/i.test(canonicalName)));
+  const originalFetch = globalThis.fetch;
+  let sentRequest;
+  let sentUrl;
+  globalThis.fetch = async (url, options) => {
+    sentUrl = url;
+    sentRequest = JSON.parse(options.body);
+    const recipe = { mealIndex: 0, recipeId: selected.recipeId, cookingInstructions: ['Add oil, salt, spices, spinach and water before cooking the ingredients.'], swapSuggestion: null };
+    return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({ recipes: [recipe] }) } }] }) };
+  };
+  try {
+    const [enhanced] = await enhanceRecipeInstructions([selected]);
+    assert.ok(!enhanced.cookingInstructions.some((step) => /\b(oil|spices|salt|spinach|water)\b/i.test(step)));
+    assert.equal(enhanced.swapSuggestion, null);
+    assert.match(sentUrl, /\/v1\/chat\/completions$/);
+    assert.equal(sentRequest.model, process.env.OMNIROUTE_MODEL || 'gemini-2.0-flash');
+    assert.match(sentRequest.messages[1].content, new RegExp(selected.recipeId));
+    assert.match(sentRequest.messages[1].content, /"quantity"\s*:/);
+    assert.doesNotMatch(sentRequest.messages[1].content, /staticInstructions/);
   } finally {
     globalThis.fetch = originalFetch;
   }

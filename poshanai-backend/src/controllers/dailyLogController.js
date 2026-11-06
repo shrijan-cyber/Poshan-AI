@@ -13,7 +13,7 @@ import {
   compareMicronutrientsToRda,
   getTodayDateKey,
   sumFoodEntries,
-  sumMicronutrients,
+  summarizeMicronutrientsBySource,
 } from '../services/dailyLogService.js';
 
 export const searchFoods = asyncHandler(async (req, res) => res.json({
@@ -109,7 +109,8 @@ export const getToday = asyncHandler(async (req, res) => {
 
   const meals = dailyLog?.meals ?? [];
   const totals = sumFoodEntries(meals);
-  const micronutrientTotals = sumMicronutrients(meals, supplements);
+  const micronutrientSources = summarizeMicronutrientsBySource(meals, supplements);
+  const micronutrientTotals = micronutrientSources.combined;
   let targetCalories = null;
   try {
     targetCalories = calculateMaintenanceCalories(user.profile).targetCalories;
@@ -122,12 +123,15 @@ export const getToday = asyncHandler(async (req, res) => {
     data: {
       date,
       meals,
-      supplements: supplements.map(({ _id, supplementName, supplementId, dosage, unit, vitamins }) => ({
-        id: _id, supplementName, supplementId, dosage, unit, vitamins,
+      supplements: supplements.map(({ _id, supplementName, supplementId, dosage, unit, vitamins, components, servingsConsumed, loggedAt }) => ({
+        id: _id, supplementName, supplementId, dosage, unit, vitamins, components, servingsConsumed, loggedAt,
       })),
       totals,
       micronutrients: {
         totals: micronutrientTotals,
+        foodTotals: micronutrientSources.food,
+        supplementTotals: micronutrientSources.supplement,
+        combinedTotals: micronutrientSources.combined,
         rdaComparison: compareMicronutrientsToRda(micronutrientTotals, user.profile),
         disclaimer: 'Logged intake compared with ICMR-NIN reference values; unknown nutrient amounts reflect missing IFCT data. This is not a medical diagnosis.',
       },

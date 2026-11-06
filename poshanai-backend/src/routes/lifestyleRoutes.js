@@ -37,6 +37,8 @@ const explainSchema = Joi.object({
   testName: Joi.string().valid(
     'Vitamin D', '25-hydroxyvitamin D', 'Vitamin B12', 'Complete blood count (CBC)',
     'CBC (Complete Blood Count)', 'HbA1c', 'TSH (Thyroid-Stimulating Hormone)',
+    'Vitamin B12 assessment discussion', 'Clinical evaluation for fatigue',
+    'Clinical discussion about hair fall', 'Vitamin D assessment discussion',
   ).required(),
   reason: Joi.string().trim().min(1).max(500).required(),
   language: Joi.string().valid('hinglish', 'english').required(),

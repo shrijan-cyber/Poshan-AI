@@ -3,10 +3,14 @@ import { getSupplementList } from '../services/supplementCatalogService.js';
 import httpError from '../utils/httpError.js';
 import {
   createUserSupplement,
+  deleteLoggedSupplement,
+  duplicateLoggedSupplement,
   deleteUserSupplement,
   listSupplementHistory,
+  logUserSupplement,
   listUserSupplements,
   updateUserSupplement,
+  updateLoggedSupplement,
 } from '../services/userSupplementService.js';
 
 export const list = asyncHandler(async (_req, res) => res.json({
@@ -44,4 +48,27 @@ export const history = asyncHandler(async (req, res) => res.json({
   data: { entries: await listSupplementHistory(req.user.id, req.query) },
 }));
 
-export default { list, listMine, createMine, updateMine, deleteMine, history };
+export const logMine = asyncHandler(async (req, res) => {
+  const entry = await logUserSupplement(req.user.id, req.params.id, req.body.servingsConsumed);
+  return res.status(201).json({ success: true, data: { entry } });
+});
+
+export const updateLog = asyncHandler(async (req, res) => {
+  const entry = await updateLoggedSupplement(req.user.id, req.params.logId, req.body.servingsConsumed);
+  if (!entry) throw httpError(404, 'SUPPLEMENT_LOG_NOT_FOUND', 'Supplement log entry was not found.');
+  return res.json({ success: true, data: { entry } });
+});
+
+export const deleteLog = asyncHandler(async (req, res) => {
+  const entry = await deleteLoggedSupplement(req.user.id, req.params.logId);
+  if (!entry) throw httpError(404, 'SUPPLEMENT_LOG_NOT_FOUND', 'Supplement log entry was not found.');
+  return res.json({ success: true, data: { deleted: true, id: req.params.logId } });
+});
+
+export const duplicateLog = asyncHandler(async (req, res) => {
+  const entry = await duplicateLoggedSupplement(req.user.id, req.params.logId);
+  if (!entry) throw httpError(404, 'SUPPLEMENT_LOG_NOT_FOUND', 'Supplement log entry was not found.');
+  return res.status(201).json({ success: true, data: { entry } });
+});
+
+export default { list, listMine, createMine, updateMine, deleteMine, history, logMine, updateLog, deleteLog, duplicateLog };

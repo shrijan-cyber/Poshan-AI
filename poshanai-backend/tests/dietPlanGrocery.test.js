@@ -90,12 +90,20 @@ describe('GET /api/diet-plans/:id/grocery-list', () => {
         goal: 'maintain',
         dietType: 'veg',
         mealsPerDay: 3,
+        mealSchedule: [
+          { name: 'Late breakfast', category: 'Breakfast', time: '10:00' },
+          { name: 'Lunch break', category: 'Lunch', time: '14:00' },
+          { name: 'Supper', category: 'Dinner', time: '20:00' },
+        ],
       });
 
     assert.equal(response.status, 201, JSON.stringify(response.body));
     assert.equal(response.body.success, true);
     assert.equal(response.body.data.type, 'basic');
     assert.equal(response.body.data.meals.length, 3);
+    assert.deepEqual(response.body.data.meals.map(({ scheduleLabel, timing }) => [scheduleLabel, timing]), [
+      ['Late breakfast', '10:00'], ['Lunch break', '14:00'], ['Supper', '20:00'],
+    ]);
     const item = response.body.data.meals[0].items[0];
     assert.equal(typeof item.quantity, 'number');
     assert.equal(item.weightBasis, 'raw');
@@ -109,6 +117,20 @@ describe('GET /api/diet-plans/:id/grocery-list', () => {
     assert.equal(typeof response.body.data.dailyNutrition[0].calories, 'number');
     const stored = await DietPlan.findById(response.body.data._id).lean();
     assert.equal(stored.dailyNutrition[0].calories, response.body.data.dailyNutrition[0].calories);
+
+    const invalidSchedule = await request(app)
+      .post('/api/diet-plans/generate-basic')
+      .set('Authorization', `Bearer ${owner.token}`)
+      .set('X-Forwarded-For', owner.ip)
+      .send({
+        age: 35, gender: 'female', weightKg: 60, heightCm: 165,
+        activityLevel: 'moderate', goal: 'maintain', dietType: 'veg', mealsPerDay: 3,
+        mealSchedule: [
+          { name: 'Brunch', category: 'Lunch', time: '11:00' },
+          { name: 'Dinner', category: 'Dinner', time: '19:00' },
+        ],
+      });
+    assert.equal(invalidSchedule.status, 400);
 
     const extreme = await request(app)
       .post('/api/diet-plans/generate-basic')

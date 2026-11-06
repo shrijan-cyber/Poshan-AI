@@ -68,6 +68,8 @@ const mealSchema = new mongoose.Schema(
     mealCategory: { type: String, enum: ['Breakfast', 'Lunch', 'Dinner', 'Snack'], default: null },
     region: { type: String, enum: ['North', 'South', 'East', 'West', 'All'], default: null },
     dietaryCompatibility: { type: [String], default: [] },
+    primaryProteinSource: { type: String, trim: true, default: null },
+    primaryProteinSourceGroup: { type: String, trim: true, default: null },
     servings: { type: Number, min: 0.1, default: null },
     // Additive persisted totals from the deterministic IFCT composer. Optional
     // so existing meal-plan documents remain readable without a migration.
@@ -83,7 +85,7 @@ const mealSchema = new mongoose.Schema(
       enum: ['breakfast', 'lunch', 'dinner', 'snack'],
     },
     nutrientTargets: { type: [String], required: true, default: [] },
-    proteinSource: { type: String, trim: true, maxlength: 200, required: true },
+    proteinSource: { type: String, trim: true, maxlength: 200, default: null },
     cookingInstructions: { type: String, trim: true, maxlength: 300, required: true },
     recipeInstructions: { type: [String], default: [] },
     prepTime: { type: Number, min: 0, default: null },
@@ -138,6 +140,7 @@ const mealPlanSchema = new mongoose.Schema(
         message: 'A meal plan must cover all seven days.',
       },
     },
+    diversityWarnings: { type: [String], default: [] },
     aiModelUsed: { type: String, default: 'omniroute-default' },
     ragSourcesUsed: { type: [String], default: [] },
     disclaimer: { type: String, required: true },

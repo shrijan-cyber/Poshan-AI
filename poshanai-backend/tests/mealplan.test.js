@@ -174,7 +174,10 @@ describe('Meal Plan API (/api/mealplans)', () => {
       assert.equal(res.body.data.planDurationDays, 7);
       assert.equal(res.body.data.meals.length, 21);
       assert.ok(res.body.data.meals[0].cookingInstructions.length > 0);
-      assert.ok(res.body.data.meals[0].proteinSource);
+      // The legacy response field remains present, but may be null when no
+      // single verified IFCT protein source materially contributes to a meal.
+      assert.ok(Object.hasOwn(res.body.data.meals[0], 'proteinSource'));
+      assert.ok(res.body.data.meals.every((meal) => meal.proteinSource === null || typeof meal.proteinSource === 'string'));
       assert.ok(res.body.data.meals.every((meal) => Number.isFinite(meal.calories) && meal.calories >= 0));
       assert.ok(res.body.data.meals.every((meal) => (
         Number.isFinite(meal.macros?.protein)

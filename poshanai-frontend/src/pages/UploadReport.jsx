@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
 import { getReport, uploadReport } from '../api/reportApi.js';
 import UplinkLoader from '../components/ui/UplinkLoader.jsx';
@@ -8,10 +8,12 @@ export default function UploadReport() {
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const submissionLock = useRef(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!file) return;
+    if (!file || submissionLock.current) return;
+    submissionLock.current = true;
     setError('');
     setMessage('Uploading your report…');
     setProcessing(true);
@@ -39,12 +41,13 @@ export default function UploadReport() {
     } catch (requestError) {
       setError(requestError.message || 'The report could not be processed. Please try again.');
     } finally {
+      submissionLock.current = false;
       setProcessing(false);
     }
   }
 
   return (
-    <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900" aria-labelledby="upload-title">
+    <section className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900" aria-labelledby="upload-title" aria-busy={processing}>
       <h1 id="upload-title" className="text-3xl font-bold text-slate-900 dark:text-white">Upload report</h1>
       <p className="mt-3 text-slate-600 dark:text-slate-300">Upload a PDF or image of your report for secure text extraction.</p>
       {processing ? <UplinkLoader label={message} /> : (
@@ -58,7 +61,7 @@ export default function UploadReport() {
           {file && <p className="text-sm text-slate-600 dark:text-slate-300">Selected file: {file.name}</p>}
           {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
           {message && <p role="status" className="text-sm text-emerald-800">{message}</p>}
-          <button type="submit" disabled={!file} className="rounded-xl bg-leaf px-5 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">Upload securely</button>
+          <button type="submit" disabled={!file || processing} className="rounded-xl bg-leaf px-5 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">Upload securely</button>
         </form>
       )}
     </section>

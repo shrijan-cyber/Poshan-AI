@@ -1151,6 +1151,177 @@ html.dark body {
   color: #e2ece5;
 }
 
+/* Shared PoshanAI product surfaces */
+:root {
+  --pa-forest: #244b36;
+  --pa-deep-forest: #173a2c;
+  --pa-moss: #728f5b;
+  --pa-sage: #e8eddf;
+  --pa-paper: #f8f7f1;
+  --pa-ink: #27362d;
+  --pa-surface: #fffefa;
+  --pa-line: rgb(39 54 45 / 11%);
+  --pa-muted: #5f6c63;
+  --pa-focus: #477a50;
+  --shadow-card: 0 8px 24px rgb(23 58 44 / 7%);
+  --shadow-card-hover: 0 14px 32px rgb(23 58 44 / 11%);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--pa-paper); color: var(--pa-ink); }
+::selection { background: #dce8d6; color: var(--pa-deep-forest); }
+:focus-visible { outline: 3px solid var(--pa-focus); outline-offset: 3px; }
+
+.pa-public-content {
+  background: var(--pa-paper);
+}
+
+.pa-app-header {
+  box-shadow: 0 1px 0 rgb(23 58 44 / 3%);
+}
+
+.pa-app-frame {
+  min-height: calc(100vh - 4.25rem);
+}
+
+.pa-app-sidebar {
+  flex: 0 0 17rem;
+  background: #f3f3e9;
+}
+
+.pa-nav-link[aria-current='page'] {
+  box-shadow: inset 3px 0 0 var(--pa-forest);
+}
+
+.pa-app-main {
+  background: var(--pa-paper);
+}
+
+.pa-app-main h1 {
+  color: var(--pa-deep-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.pa-app-main h2 {
+  color: var(--pa-forest);
+  letter-spacing: -0.015em;
+}
+
+.pa-app-main :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: 2.75rem;
+  border-color: #d6ded4;
+  border-radius: 0.7rem;
+  background-color: var(--pa-surface);
+  box-shadow: 0 1px 2px rgb(23 58 44 / 3%);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.pa-app-main :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
+  border-color: var(--pa-focus);
+  box-shadow: 0 0 0 3px rgb(71 122 80 / 14%);
+  outline: none;
+}
+
+.auth-page {
+  position: relative;
+  background-color: var(--pa-paper);
+}
+
+.auth-page :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: 2.75rem;
+  border-radius: 0.7rem;
+  box-shadow: 0 1px 2px rgb(23 58 44 / 3%);
+}
+
+.auth-page :is(input:not([type='checkbox']):not([type='radio']), select, textarea):focus {
+  border-color: var(--pa-focus);
+  box-shadow: 0 0 0 3px rgb(71 122 80 / 14%);
+  outline: none;
+}
+
+.pa-public-content > main:not(.landing-page):not(.auth-page) {
+  background-color: var(--pa-paper) !important;
+}
+
+.pa-skip-link {
+  position: fixed;
+  z-index: 50;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.65rem;
+  background: var(--pa-deep-forest);
+  color: #fff;
+  font-weight: 600;
+  transform: translateY(-160%);
+}
+
+.pa-skip-link:focus { transform: translateY(0); }
+
+.auth-card {
+  border-color: var(--pa-line);
+  background: var(--pa-surface);
+  box-shadow: 0 18px 48px rgb(23 58 44 / 9%);
+}
+
+.dark {
+  --pa-surface: #18231c;
+  --pa-line: rgb(205 223 208 / 14%);
+  --pa-muted: #b7c5ba;
+  --pa-focus: #a8d2b2;
+}
+
+.dark .pa-public-content,
+.dark .pa-app-main,
+.dark .pa-app-sidebar {
+  background: #111a14;
+}
+
+.dark .pa-public-content > main:not(.landing-page):not(.auth-page) {
+  background-color: #111a14 !important;
+}
+
+.dark .auth-page { background-color: #111a14; }
+.dark .auth-page :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  border-color: #405248;
+  background-color: #18231c;
+  color: #e5eee7;
+}
+
+.dark .pa-app-sidebar { background: #141f17; }
+.dark .pa-app-main h1 { color: #e1eee4; }
+.dark .pa-app-main h2 { color: #c8ddce; }
+.dark .pa-app-main :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  border-color: #405248;
+  background-color: #18231c;
+  color: #e5eee7;
+}
+
+@media (max-width: 767px) {
+  .pa-app-frame { min-height: calc(100vh - 4.25rem); }
+  .pa-app-sidebar {
+    position: fixed;
+    top: 4.25rem;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    box-shadow: 12px 0 30px rgb(23 58 44 / 12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html,
   body,

@@ -56,7 +56,17 @@ export default function Recommendations() {
           setState({ status: data.length === 0 ? 'needs-onboarding' : 'ready', data });
           return;
         }
-        setState({ status: 'ready', data });
+        const responseStatus = data?.recommendationStatus;
+        setState({
+          status: responseStatus === 'needs_onboarding'
+            ? 'needs-onboarding'
+            : responseStatus === 'pending_clinical_review'
+              ? 'pending-review'
+              : responseStatus === 'no_matches' || (Array.isArray(data?.recommendations) && data.recommendations.length === 0)
+                ? 'no-matches'
+                : 'ready',
+          data,
+        });
       })
       .catch((error) => {
         if (controller.signal.aborted || error.name === 'CanceledError') return;
@@ -86,10 +96,10 @@ export default function Recommendations() {
       <header>
         <p className="text-sm font-semibold text-leaf dark:text-emerald-300">Your lifestyle check</p>
         <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">
-          Tests worth discussing with your doctor
+          Health topics worth discussing with your doctor
         </h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-          Based on your answers. These are suggestions, not a diagnosis.
+          Your answers can suggest discussion topics, not a diagnosis or a direction to order tests.
         </p>
       </header>
 
@@ -119,28 +129,51 @@ export default function Recommendations() {
         </div>
       )}
 
+      {state.status === 'pending-review' && (
+        <>
+          <div className={`${cardClass} mt-6`} role="status">
+            <p className="font-semibold text-slate-900 dark:text-white">Recommendations are being reviewed</p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Our current recommendation rules are awaiting review by a qualified healthcare professional, so they are not active. Your answers do not mean that you have a condition or need a test.
+            </p>
+            <p className="mt-3 text-xs text-slate-600 dark:text-slate-300">{state.data?.disclaimer}</p>
+          </div>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Link to="/upload" className={primaryLink}>Upload my report</Link>
+            <Link to="/onboarding" className={secondaryLink}>Update my answers</Link>
+          </div>
+        </>
+      )}
+
+      {state.status === 'no-matches' && (
+        <>
+          <div className={`${cardClass} mt-6 text-center`} role="status">
+            <p className="text-3xl" aria-hidden="true">✅</p>
+            <p className="mt-2 font-semibold text-slate-900 dark:text-white">No specific discussion topics matched</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              {state.data?.routineMessage ?? 'Routine check-ups depend on your health history and local guidance. Ask a qualified healthcare professional what is appropriate for you.'}
+            </p>
+          </div>
+          <p className="mt-6 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
+            {state.data?.disclaimer}
+          </p>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Link to="/upload" className={primaryLink}>Upload my report</Link>
+            <Link to="/onboarding" className={secondaryLink}>Update my answers</Link>
+          </div>
+        </>
+      )}
+
       {state.status === 'ready' && (
         <>
-          {tests.length === 0 ? (
-            <div className={`${cardClass} mt-6 text-center`}>
-              <p className="text-3xl" aria-hidden="true">✅</p>
-              <p className="mt-2 font-semibold text-slate-900 dark:text-white">No specific tests suggested</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                Based on your answers, no specific tests triggered our current rules. Discuss routine screening with your doctor.
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="mt-5 text-sm font-medium text-slate-700 dark:text-slate-200" aria-live="polite">
-                {tests.length} {tests.length === 1 ? 'test' : 'tests'} suggested
-              </p>
-              <ul className="mt-3 space-y-3">
-                {tests.map((test, index) => (
-                  <TestCard key={test.ruleId ?? test.testName} test={test} index={index} onWhyThis={openWhyThis} />
-                ))}
-              </ul>
-            </>
-          )}
+          <p className="mt-5 text-sm font-medium text-slate-700 dark:text-slate-200" aria-live="polite">
+            {tests.length} {tests.length === 1 ? 'discussion topic' : 'discussion topics'}
+          </p>
+          <ul className="mt-3 space-y-3">
+            {tests.map((test, index) => (
+              <TestCard key={test.ruleId ?? test.testName} test={test} index={index} onWhyThis={openWhyThis} />
+            ))}
+          </ul>
 
           <p className="mt-6 rounded-xl bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
             {state.data.disclaimer}

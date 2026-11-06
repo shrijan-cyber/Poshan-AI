@@ -139,6 +139,7 @@ export default function MealPlanView() {
           </p>
         </section>
       )}
+      {plan?.diversityWarnings?.map((warning) => <p key={warning} role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">{warning}</p>)}
       <div className="grid gap-4 sm:grid-cols-2">{meals.map((meal, index) => <StructuredMealCard key={`${meal.recipeId ?? meal.dishName ?? meal.day}-${meal.mealType}-${index}`} meal={meal} day={meal.day} index={index} />)}</div>
       {!meals.length && <p role="status" className="rounded-xl bg-amber-50 p-4 text-amber-900">This plan has no meal details to display.</p>}
       <GroceryListPanel key={plan?._id ?? plan?.id ?? id} planId={plan?._id ?? plan?.id ?? (!isJobId(id) ? id : null)} fetchList={getMealPlanGroceryList} />

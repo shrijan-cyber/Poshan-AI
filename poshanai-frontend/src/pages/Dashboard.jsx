@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowRight, CalendarDays, ClipboardCheck, Salad } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Skeleton } from '../components/common/index.js';
 import { useAuth } from '../hooks/useAuth.js';
@@ -9,7 +10,7 @@ import CalorieTracker from '../components/dashboard/CalorieTracker.jsx';
 import { generateMealPlan } from '../api/mealPlanApi.js';
 
 const REPORTS_URL = '/reports?page=1&limit=50';
-const MEAL_PLANS_URL = '/mealplans?page=1&limit=100';
+const MEAL_PLANS_URL = '/diet-plans';
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
 });
@@ -24,6 +25,12 @@ function getMealPlans(data) {
   if (Array.isArray(data?.mealPlans)) return data.mealPlans;
   if (Array.isArray(data?.plans)) return data.plans;
   if (Array.isArray(data)) return data;
+  return null;
+}
+
+function getRecommendations(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.recommendations)) return data.recommendations;
   return null;
 }
 
@@ -53,105 +60,52 @@ function retryRequest(refetch) {
   refetch().catch(() => {});
 }
 
-function StatCard({ label, value, detail, loading, className }) {
-  return (
-    <Card as="article" className={`dashboard-clay-stat h-full ${className || ''}`}>
-      <h2 className="text-sm font-medium text-slate-600 dark:text-slate-300">{label}</h2>
-      {loading ? (
-        <Skeleton className="mt-3" width="16" height="8" />
-      ) : (
-        <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">{value}</p>
-      )}
-      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{detail}</p>
-    </Card>
-  );
-}
-
 function ProfileSummary({ user }) {
+  const profile = user?.profile ?? {};
+  const fields = [
+    ['Age', profile.age], ['Gender', profile.gender], ['Height', profile.heightCm],
+    ['Weight', profile.weightKg], ['Diet', profile.dietType], ['Activity', profile.activityLevel],
+    ['Region', profile.region],
+  ];
+  const completed = fields.filter(([, value]) => value !== undefined && value !== null && value !== '').length;
+  const completion = Math.round((completed / fields.length) * 100);
+
   return (
-    <Card as="section" aria-labelledby="profile-summary-title" className="dashboard-modern-card h-full">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <Card as="section" aria-labelledby="profile-summary-title" className="h-full p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 id="profile-summary-title" className="text-lg font-semibold text-slate-900 dark:text-white">
-            Profile
+          <h2 id="profile-summary-title" className="font-heading text-xl text-slate-900 dark:text-white">
+            Your profile
           </h2>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-            Account details from your signed-in session.
+            {user?.onboardingCompleted ? 'Your lifestyle profile is saved.' : 'Add a few details to personalize your workspace.'}
           </p>
         </div>
         <Link
           to="/profile"
-          className="text-sm font-semibold text-leaf underline decoration-emerald-300 underline-offset-4 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
+          aria-label="Edit your profile"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 text-forest transition hover:bg-sage focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:border-slate-700 dark:text-emerald-200 dark:hover:bg-slate-800"
         >
-          View profile
+          <ArrowRight size={18} aria-hidden="true" />
         </Link>
       </div>
 
-      <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Name
-          </dt>
-          <dd className="mt-1 font-medium text-slate-900 dark:text-white">
-            {user?.name || 'Name unavailable'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Email
-          </dt>
-          <dd className="mt-1 break-all font-medium text-slate-900 dark:text-white">
-            {user?.email || 'Email unavailable'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Age
-          </dt>
-          <dd className="mt-1 font-medium text-slate-900 dark:text-white">
-            {user?.profile?.age ?? 'Not provided'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Gender
-          </dt>
-          <dd className="mt-1 capitalize font-medium text-slate-900 dark:text-white">
-            {user?.profile?.gender || 'Not provided'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Weight
-          </dt>
-          <dd className="mt-1 font-medium text-slate-900 dark:text-white">
-            {user?.profile?.weightKg ? `${user.profile.weightKg} kg` : 'Not provided'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Height
-          </dt>
-          <dd className="mt-1 font-medium text-slate-900 dark:text-white">
-            {user?.profile?.heightCm ? `${user.profile.heightCm} cm` : 'Not provided'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Diet type
-          </dt>
-          <dd className="mt-1 capitalize font-medium text-slate-900 dark:text-white">
-            {user?.profile?.dietType || 'Not provided'}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Region
-          </dt>
-          <dd className="mt-1 font-medium text-slate-900 dark:text-white">
-            {user?.profile?.region || 'Not provided'}
-          </dd>
-        </div>
+      <div className="mt-6 flex items-end justify-between gap-4">
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Profile details</p>
+        <p className="text-sm tabular-nums text-slate-500 dark:text-slate-400">{completed} of {fields.length}</p>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-sage dark:bg-slate-800" role="progressbar" aria-label="Profile details completed" aria-valuemin="0" aria-valuemax={fields.length} aria-valuenow={completed}>
+        <div className="h-full rounded-full bg-forest transition-[width] duration-500 dark:bg-emerald-400" style={{ width: `${completion}%` }} />
+      </div>
+      <dl className="mt-5 grid grid-cols-2 gap-x-5 gap-y-3">
+        {fields.slice(0, 4).map(([label, value]) => (
+          <div key={label}>
+            <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+            <dd className="mt-0.5 truncate text-sm font-medium capitalize text-slate-800 dark:text-slate-100">
+              {value ?? 'Not added'}{label === 'Height' && value != null ? ' cm' : ''}{label === 'Weight' && value != null ? ' kg' : ''}
+            </dd>
+          </div>
+        ))}
       </dl>
     </Card>
   );
@@ -273,14 +227,23 @@ export default function Dashboard() {
     error: mealPlansError,
     refetch: refetchMealPlans,
   } = useCachedFetch(MEAL_PLANS_URL);
+  const {
+    data: recommendationData,
+    isLoading: recommendationsLoading,
+    error: recommendationsError,
+    refetch: refetchRecommendations,
+  } = useCachedFetch('/lifestyle/recommendations');
 
   const firstPageReports = getReports(reportData);
   const reports = firstPageReports === null ? null : [...firstPageReports, ...additionalReports];
   const mealPlans = getMealPlans(mealPlanData);
   const mealPlansFormatError = !mealPlansLoading && !mealPlansError && mealPlans === null;
   const activeMealPlans = mealPlans?.filter((plan) => plan.status === 'active') ?? [];
-  const latestMealPlanId = mealPlans?.map(getId).find(Boolean);
+  const latestMealPlan = mealPlans?.[0] ?? null;
+  const activeMealPlanId = activeMealPlans.map(getId).find(Boolean);
   const hasMoreMealPlans = (mealPlanData?.pagination?.pages ?? 1) > 1;
+  const recommendations = getRecommendations(recommendationData);
+  const recommendationsStatus = recommendationData?.recommendationStatus;
 
   // --- State for Report Review (from Member 2) ---
   const [selectedReport, setSelectedReport] = useState(null);
@@ -347,128 +310,159 @@ export default function Dashboard() {
 
   return (
     <motion.div
-      className="dashboard-modern mx-auto max-w-6xl space-y-8"
+      className="dashboard-modern mx-auto max-w-[88rem] space-y-8 pb-8 sm:space-y-10"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
     >
-      <motion.header initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <p className="text-sm font-semibold uppercase tracking-wide text-leaf dark:text-emerald-300">
-          Your nutrition workspace
-        </p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
-          Welcome, {user?.name || 'there'}
-        </h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">
-          Review your account, reports, and meal plans in one place.
-        </p>
-      </motion.header>
-
-      <section aria-label="Nutrition overview" className="grid gap-5 sm:grid-cols-2">
-        <StatCard
-          label="Reports"
-          value={reportsLoading ? null : reports?.length ?? '—'}
-          detail="Reports in your account (up to 50)."
-          loading={reportsLoading}
-        />
-        {mealPlansError || mealPlansFormatError ? (
-          <RequestError
-            title="Meal-plan data unavailable"
-            message={mealPlansError?.message || 'The meal-plans service returned data in an unexpected format.'}
-            onRetry={() => retryRequest(refetchMealPlans)}
-          />
-        ) : (
-          <StatCard
-            label="Active meal plans"
-            value={mealPlansLoading ? null : mealPlans ? activeMealPlans.length : '—'}
-            detail={hasMoreMealPlans ? 'Active plans on the first page; additional plans exist.' : 'Plans currently marked active.'}
-            loading={mealPlansLoading}
-          />
-        )}
-      </section>
-
-      <CalorieTracker />
-
-      <section aria-label="Profile and reports" className="grid gap-5 lg:grid-cols-2">
-        <div><ProfileSummary user={user} /></div>
-        <div><ReportList reports={reports} isLoading={reportsLoading} error={reportsError} onRetry={() => retryRequest(refetchReports)} hasMore={reportsHasMore || (firstPageReports?.length === 50 && reportsPage === 1)} loadMore={loadMoreReports} /></div>
-      </section>
-
-      {/* --- Report Review Section (Integrated from Member 2) --- */}
-      <section className="dashboard-modern-card rounded-2xl p-6">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Report review</h2>
-        <p className="mt-1 text-sm text-slate-500">Confirm extracted lab values before generating a meal plan.</p>
-        {reviewError && <p role="alert" className="mt-3 text-sm text-red-600">{reviewError}</p>}
-        
-        {reports && reports.filter((r) => r.ocrStatus === 'completed').length > 0 ? (
-          <ul className="mt-4 space-y-2">
-            {reports.filter((report) => report.ocrStatus === 'completed').map((report) => (
-              <li key={report.id ?? report._id} className="flex items-center justify-between gap-3 rounded border p-3 dark:border-slate-700">
-                <span className="text-slate-700 dark:text-slate-300">Report · {report.reviewStatus ?? 'pending review'}</span>
-                <button className="text-leaf underline" onClick={() => handleOpenReport(report)}>Review values</button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-sm text-slate-500">No completed reports available for review.</p>
-        )}
-
-        {selectedReport && (
-          <div className="mt-6 space-y-3 rounded-lg border border-slate-200 p-4 dark:border-slate-700">
-            <h3 className="font-semibold text-slate-900 dark:text-white">Extracted values</h3>
-            {selectedReport.extractedValues?.map((value, index) => (
-              <label key={`${value.nutrient}-${index}`} className="grid gap-1 text-sm text-slate-700 dark:text-slate-300">
-                {value.nutrient} ({value.unit ?? 'unit unavailable'})
-                <input
-                  type="number"
-                  step="any"
-                  value={value.value}
-                  onChange={(event) => handleInputChange(index, event.target.value)}
-                  className="rounded border p-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-                />
-              </label>
-            ))}
-            <div className="flex gap-3 mt-4">
-              <button disabled={savingReview} className="rounded bg-leaf px-4 py-2 text-white disabled:opacity-50" onClick={() => handleSubmitReview('confirmed')}>
-                {savingReview ? 'Saving...' : 'Confirm values'}
-              </button>
-              <button disabled={savingReview} className="rounded border px-4 py-2 disabled:opacity-50 dark:border-slate-600 dark:text-slate-300" onClick={() => handleSubmitReview('corrected')}>
-                Save corrections
-              </button>
-              {(selectedReport.reviewStatus === 'confirmed' || selectedReport.reviewStatus === 'corrected') && <button type="button" disabled={generatingPlan} className="rounded bg-orange-600 px-4 py-2 text-white disabled:opacity-50" onClick={handleGeneratePlan}>{generatingPlan ? 'Starting…' : 'Generate meal plan'}</button>}
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section aria-labelledby="quick-actions-title">
-        <h2 id="quick-actions-title" className="text-xl font-semibold text-slate-900 dark:text-white">Quick actions</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card as="article" className="dashboard-modern-card h-full">
-            <h3 className="font-semibold text-slate-900 dark:text-white">Upload a report</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Add a PDF or image report to your account.</p>
-            <Button as={Link} to="/upload" className="mt-4" size="sm">Upload report</Button>
-          </Card>
-
-          <Card as="article" className="dashboard-modern-card h-full">
-            <h3 className="font-semibold text-slate-900 dark:text-white">View meal plans</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-              {latestMealPlanId ? 'Open your latest meal plan.' : 'No meal plan is available yet. Upload a report to get started.'}
-            </p>
-            <Button onClick={() => navigate(latestMealPlanId ? `/meal-plan/${encodeURIComponent(latestMealPlanId)}` : '/upload')} className="mt-4" size="sm" variant="secondary">
-              {latestMealPlanId ? 'View latest plan' : 'Upload a report'}
-            </Button>
-          </Card>
-
-          <Card as="article" className="dashboard-modern-card h-full">
-            <h3 className="font-semibold text-slate-900 dark:text-white">Complete your profile</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Review your account details and profile options.</p>
-            <Button className="mt-4" size="sm" variant="secondary" onClick={() => navigate('/profile')}>View profile</Button>
-          </Card>
+      <header className="grid gap-6 border-b border-forest/10 pb-7 dark:border-slate-700 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:pb-8">
+        <div className="max-w-3xl">
+          <h1 className="font-heading text-4xl leading-tight tracking-tight text-forest dark:text-white sm:text-5xl">
+            Welcome back, {user?.name || 'there'}.
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
+            Your day, food log, reports, and plans are together here. Start with what you’ve eaten today.
+          </p>
         </div>
+        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+          <div className="flex min-h-11 items-center gap-2 rounded-full border border-forest/10 bg-white/70 px-4 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+            <CalendarDays size={17} aria-hidden="true" />
+            <time dateTime={new Date().toISOString().slice(0, 10)}>{formatDate(new Date())}</time>
+          </div>
+          <nav aria-label="Quick nutrition links" className="flex flex-wrap gap-2 sm:justify-end">
+            <Button as={Link} to="/calorie-tracker" className="min-h-11">Food log <ArrowRight size={16} aria-hidden="true" /></Button>
+            <Button as={Link} to="/food-library" variant="secondary" className="min-h-11">Food library</Button>
+            <Button as={Link} to="/diet-plan" variant="secondary" className="min-h-11">Diet plan</Button>
+          </nav>
+        </div>
+      </header>
+
+      <section aria-label="Today’s nutrition and next steps" className="grid items-start gap-7 2xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,0.72fr)] 2xl:gap-9">
+        <div className="min-w-0 rounded-[1.75rem] bg-white p-4 shadow-[0_14px_40px_rgba(23,58,44,0.06)] dark:bg-slate-900 sm:p-6">
+          <CalorieTracker />
+        </div>
+        <aside className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-1" aria-label="Profile and plan">
+          <ProfileSummary user={user} />
+          <Card as="section" aria-labelledby="active-plan-title" className="h-full p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="active-plan-title" className="font-heading text-xl text-slate-900 dark:text-white">Meal plan</h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Most recently saved</p>
+              </div>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-sage text-forest dark:bg-emerald-950 dark:text-emerald-200"><Salad size={19} aria-hidden="true" /></span>
+            </div>
+            {mealPlansLoading ? (
+              <div className="mt-5 space-y-3" role="status" aria-label="Loading meal plan"><Skeleton height="5" width="half" /><Skeleton height="4" /></div>
+            ) : mealPlansError || mealPlansFormatError ? (
+              <div className="mt-5"><RequestError title="Meal plan unavailable" message={mealPlansError?.message || 'The meal-plans service returned an unexpected response.'} onRetry={() => retryRequest(refetchMealPlans)} /></div>
+            ) : latestMealPlan ? (
+              <div className="mt-6">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-medium text-slate-900 dark:text-white">{latestMealPlan.title || latestMealPlan.name || (latestMealPlan.type === 'basic' ? 'Basic diet plan' : 'Personalized meal plan')}</p>
+                  <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold capitalize text-forest dark:bg-emerald-950 dark:text-emerald-200">{latestMealPlan.status || (latestMealPlan.type === 'basic' ? 'Saved' : 'Status unavailable')}</span>
+                </div>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{hasMoreMealPlans ? 'This is your most recent plan. Other saved plans are available.' : 'Open it to review meals and portions.'}</p>
+                <Button as={Link} to={latestMealPlan.type === 'basic' ? '/diet-plan/view' : getId(latestMealPlan) ? `/meal-plan/${encodeURIComponent(getId(latestMealPlan))}` : activeMealPlanId ? `/meal-plan/${encodeURIComponent(activeMealPlanId)}` : '/meal-plan'} variant="secondary" className="mt-5 w-full">Open meal plan <ArrowRight size={16} aria-hidden="true" /></Button>
+              </div>
+            ) : (
+              <div className="mt-6">
+                <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">No active plan is saved yet. Build a plan around your preferences.</p>
+                <Button as={Link} to="/diet-plan" variant="secondary" className="mt-5 w-full">Build a diet plan <ArrowRight size={16} aria-hidden="true" /></Button>
+              </div>
+            )}
+          </Card>
+          <Card as="section" aria-labelledby="lifestyle-summary-title" className="h-full p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="lifestyle-summary-title" className="font-heading text-xl text-slate-900 dark:text-white">Lifestyle check-in</h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Topics you may discuss with a qualified professional.</p>
+              </div>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-sage text-forest dark:bg-emerald-950 dark:text-emerald-200" aria-hidden="true">✓</span>
+            </div>
+            {recommendationsLoading ? (
+              <div className="mt-5 space-y-3" role="status" aria-label="Loading lifestyle topics"><Skeleton height="5" width="half" /><Skeleton height="4" /></div>
+            ) : recommendationsError ? (
+              <div className="mt-5"><RequestError title="Lifestyle topics unavailable" message={recommendationsError.message || 'Please try again.'} onRetry={() => retryRequest(refetchRecommendations)} /></div>
+            ) : recommendations === null ? (
+              <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">Your lifestyle topics could not be displayed.</p>
+            ) : recommendationsStatus === 'needs_onboarding' ? (
+              <div className="mt-5"><p className="text-sm leading-6 text-slate-600 dark:text-slate-300">Complete your lifestyle profile to see relevant discussion topics.</p><Button as={Link} to="/onboarding" variant="secondary" className="mt-4 w-full">Complete check-in</Button></div>
+            ) : recommendationsStatus === 'pending_clinical_review' ? (
+              <p className="mt-5 text-sm leading-6 text-slate-600 dark:text-slate-300">Your answers are saved. Recommendation rules are waiting for clinical review, so no topics are shown yet.</p>
+            ) : recommendations.length > 0 ? (
+              <div className="mt-5 space-y-3">
+                {recommendations.slice(0, 2).map((item) => <div key={item.ruleId ?? item.testName} className="rounded-xl bg-paper p-3 dark:bg-slate-800"><p className="text-sm font-semibold text-slate-900 dark:text-white">{item.testName || 'Health topic'}</p><p className="mt-1 text-sm leading-5 text-slate-600 dark:text-slate-300">{item.rationale || item.reason || 'Discuss this topic with a healthcare professional.'}</p></div>)}
+                <p className="text-xs leading-5 text-slate-500 dark:text-slate-400">Suggestions are not a diagnosis. A clinician can decide whether any assessment is appropriate.</p>
+                <Button as={Link} to="/recommendations" variant="secondary" className="w-full">View all topics <ArrowRight size={16} aria-hidden="true" /></Button>
+              </div>
+            ) : (
+              <div className="mt-5"><p className="text-sm leading-6 text-slate-600 dark:text-slate-300">{recommendationData?.routineMessage || 'No specific discussion topics matched your saved answers. Ask your doctor about routine care that fits your health history.'}</p><Button as={Link} to="/recommendations" variant="secondary" className="mt-4 w-full">View check-in</Button></div>
+            )}
+          </Card>
+        </aside>
       </section>
 
-      <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100">
+      <section aria-label="Reports and review" className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]">
+        <ReportList reports={reports} isLoading={reportsLoading} error={reportsError} onRetry={() => retryRequest(refetchReports)} hasMore={reportsHasMore || (firstPageReports?.length === 50 && reportsPage === 1)} loadMore={loadMoreReports} />
+
+        <details className="group rounded-2xl border border-forest/10 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-6" open={Boolean(selectedReport)}>
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-sage text-forest dark:bg-emerald-950 dark:text-emerald-200"><ClipboardCheck size={19} aria-hidden="true" /></span>
+              <span><span className="block font-heading text-xl text-slate-900 dark:text-white">Review a report</span><span className="mt-0.5 block text-sm text-slate-600 dark:text-slate-300">Check extracted values before using them.</span></span>
+            </span>
+            <ArrowRight size={17} className="shrink-0 text-forest transition-transform group-open:rotate-90 dark:text-emerald-200" aria-hidden="true" />
+          </summary>
+          <div className="mt-5 border-t border-slate-100 pt-5 dark:border-slate-800">
+            {reviewError && <p role="alert" className="mb-3 text-sm text-red-700 dark:text-red-300">{reviewError}</p>}
+            {reports && reports.filter((report) => report.ocrStatus === 'completed').length > 0 ? (
+              <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+                {reports.filter((report) => report.ocrStatus === 'completed').map((report) => (
+                  <li key={report.id ?? report._id} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                    <span className="text-sm text-slate-700 dark:text-slate-200">Report · {report.reviewStatus ?? 'pending review'}</span>
+                    <Button size="sm" variant="secondary" onClick={() => handleOpenReport(report)}>Review values</Button>
+                  </li>
+                ))}
+              </ul>
+            ) : reportsLoading ? (
+              <p className="text-sm text-slate-500" role="status">Loading completed reports…</p>
+            ) : (
+              <p className="text-sm text-slate-600 dark:text-slate-300">No completed reports available for review.</p>
+            )}
+
+            {selectedReport && (
+              <div className="mt-5 space-y-4 rounded-xl bg-paper p-4 dark:bg-slate-800">
+                <h3 className="font-semibold text-slate-900 dark:text-white">Extracted values</h3>
+                {selectedReport.extractedValues?.map((value, index) => (
+                  <label key={`${value.nutrient}-${index}`} className="grid gap-1 text-sm text-slate-700 dark:text-slate-300">
+                    {value.nutrient} ({value.unit ?? 'unit unavailable'})
+                    <input type="number" step="any" value={value.value} onChange={(event) => handleInputChange(index, event.target.value)} className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:border-slate-600 dark:bg-slate-900 dark:text-white" />
+                  </label>
+                ))}
+                <div className="flex flex-wrap gap-2">
+                  <Button disabled={savingReview} onClick={() => handleSubmitReview('confirmed')}>{savingReview ? 'Saving…' : 'Confirm values'}</Button>
+                  <Button disabled={savingReview} variant="secondary" onClick={() => handleSubmitReview('corrected')}>Save corrections</Button>
+                  {(selectedReport.reviewStatus === 'confirmed' || selectedReport.reviewStatus === 'corrected') && <Button disabled={generatingPlan} variant="secondary" onClick={handleGeneratePlan}>{generatingPlan ? 'Starting…' : 'Generate meal plan'}</Button>}
+                </div>
+              </div>
+            )}
+          </div>
+        </details>
+      </section>
+
+      <nav aria-label="More nutrition tools" className="flex flex-col gap-4 border-y border-forest/10 py-6 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-heading text-xl text-slate-900 dark:text-white">Continue with PoshanAI</h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Choose a next step when you’re ready.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button as={Link} to="/upload" variant="secondary">Upload report <ArrowRight size={15} aria-hidden="true" /></Button>
+          <Button as={Link} to="/food-library" variant="secondary">Explore food library <ArrowRight size={15} aria-hidden="true" /></Button>
+          <Button as={Link} to="/recommendations" variant="secondary">Lifestyle check <ArrowRight size={15} aria-hidden="true" /></Button>
+        </div>
+      </nav>
+
+      <p className="max-w-4xl text-xs leading-6 text-slate-500 dark:text-slate-400">
         PoshanAI provides nutrition awareness and food suggestions. It does not diagnose or replace advice from a qualified healthcare professional.
       </p>
     </motion.div>

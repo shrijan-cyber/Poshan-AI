@@ -4,14 +4,25 @@ import { MICRONUTRIENTS } from '../config/constants.js';
 const micronutrientFields = Object.fromEntries(MICRONUTRIENTS.map(({ key }) => [key, {
   type: Number,
   min: 0,
-  default: 0,
+  default: null,
 }]));
+
+const consumedComponentSchema = new mongoose.Schema({
+  nutrient: { type: String, enum: MICRONUTRIENTS.map(({ key }) => key), required: true },
+  labelAmountPerServing: { type: Number, min: 0, required: true },
+  consumedAmount: { type: Number, min: 0, required: true },
+  unit: { type: String, trim: true, required: true },
+}, { _id: false });
 
 const supplementLogSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
   supplementName: { type: String, required: true, trim: true, minlength: 1, maxlength: 120 },
   supplementId: { type: String, trim: true, maxlength: 80 },
+  userSupplementId: { type: mongoose.Schema.Types.ObjectId, ref: 'UserSupplement', default: null },
+  servingsConsumed: { type: Number, min: 0.001, max: 100, default: null },
+  components: { type: [consumedComponentSchema], default: undefined },
+  loggedAt: { type: Date, default: Date.now },
   dosage: { type: Number, min: 0 },
   unit: { type: String, trim: true, maxlength: 20 },
   vitamins: {

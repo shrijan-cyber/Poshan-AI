@@ -57,6 +57,11 @@ test('requires a valid access token for lifestyle onboarding', async () => {
   assert.equal(response.status, 401);
 });
 
+test('requires authentication to read recommendations', async () => {
+  const response = await request(app).get('/api/lifestyle/recommendations');
+  assert.equal(response.status, 401);
+});
+
 test('overwrites the authenticated user profile on repeat submissions without duplicates or data leaks', async () => {
   const { token, ip, email, userId } = await registerUser();
   assert.equal((await User.findById(userId)).onboardingCompleted, false);
@@ -103,33 +108,40 @@ test('rejects unknown questionnaire fields and invalid profile values', async ()
   assert.equal(await LifestyleProfile.countDocuments(), 0);
 });
 
-test('test rules are structured suggestions to discuss with a doctor', () => {
-  assert.match(testRules.disclaimer, /doctor/i);
-  assert.equal(testRules.rules.length, 5);
-  assert.ok(testRules.rules.every((rule) => rule.ruleId && rule.testName && rule.conditions.length));
+test('test rules are structured health topics to discuss with a doctor', () => {
+  assert.match(testRules.disclaimer, /doctor|clinician|healthcare professional/i);
+  assert.equal(testRules.version, 4);
+  assert.equal(testRules.rules.length, 4);
+  assert.ok(testRules.rules.every((rule) => rule.ruleId && rule.testName && rule.whatItMeasures && rule.conditions.length));
   assert.throws(() => validateTestRules({
-    version: 1,
+    version: 4,
+    catalogVersion: '4.0.0',
     disclaimer: 'Suggestions to discuss with a doctor.',
+    routineMessage: 'Ask a doctor about a routine check-up.',
     rules: [{ ruleId: 'unsafe', suggestion: 'This test diagnoses a deficiency.' }],
-  }), /unique ID, test, category, conditions, and rationale/);
+  }), /unique ID, topic, category, details, conditions, and trigger fields/);
   assert.throws(() => validateTestRules({
-    version: 1,
+    version: 4,
+    catalogVersion: '4.0.0',
     disclaimer: 'Suggestions to discuss with a doctor.',
     medicalClaim: 'This test diagnoses a deficiency.',
+    routineMessage: 'Ask a doctor about a routine check-up.',
     rules: [],
-  }), /unsupported top-level field/);
+  }), /versioned catalog/);
 });
 
-test('recommendations endpoint evaluates the authenticated user profile', async () => {
+test('recommendation endpoints use the same evaluator on the authenticated user profile', async () => {
   const { token, ip } = await registerUser();
-  await request(app)
+  const saved = await request(app)
     .post('/api/lifestyle/onboarding')
     .set('Authorization', `Bearer ${token}`)
     .set('X-Forwarded-For', ip)
     .send({
       ...validOnboarding,
-      dietType: 'veg',
-      symptoms: ['fatigue'],
+      dietType: 'vegan',
+      typicalDiet: ['rice', 'dal'],
+      symptoms: ['fatigue', 'bone pain'],
+      sunExposure: 'low',
       familyHistory: ['diabetes'],
       age: 42,
     })
@@ -141,7 +153,27 @@ test('recommendations endpoint evaluates the authenticated user profile', async 
     .set('X-Forwarded-For', ip)
     .expect(200);
   const recommendations = response.body.data.recommendations;
-  assert.ok(recommendations.some((item) => item.testName === 'Vitamin B12'));
-  assert.ok(recommendations.some((item) => item.testName === 'HbA1c'));
+  assert.deepEqual(recommendations.map(({ testName }) => testName), saved.body.data.recommendations.map(({ testName }) => testName));
+  assert.ok(recommendations.some((item) => item.testName.includes('B12')));
+  assert.ok(recommendations.some((item) => item.testName.includes('fatigue')));
+  assert.ok(recommendations.some((item) => item.testName.includes('Vitamin D')));
+  assert.equal(recommendations.some((item) => item.testName === 'HbA1c'), false);
   assert.ok(recommendations.every((item) => item.disclaimer && Array.isArray(item.triggeringFactors)));
+});
+
+test('recommendations are scoped to the authenticated user and no-match response has routine guidance', async () => {
+  const firstUser = await registerUser();
+  const secondUser = await registerUser();
+  await request(app).post('/api/lifestyle/onboarding')
+    .set('Authorization', `Bearer ${firstUser.token}`).set('X-Forwarded-For', firstUser.ip)
+    .send({ ...validOnboarding, dietType: 'vegan', typicalDiet: ['rice', 'dal'] }).expect(200);
+  await request(app).post('/api/lifestyle/onboarding')
+    .set('Authorization', `Bearer ${secondUser.token}`).set('X-Forwarded-For', secondUser.ip)
+    .send({ ...validOnboarding, dietType: 'non-veg' }).expect(200);
+
+  const response = await request(app).get('/api/lifestyle/recommendations')
+    .set('Authorization', `Bearer ${secondUser.token}`).set('X-Forwarded-For', secondUser.ip).expect(200);
+  assert.deepEqual(response.body.data.recommendations, []);
+  assert.equal(response.body.data.recommendationStatus, 'no_matches');
+  assert.match(response.body.data.routineMessage, /routine check-ups/i);
 });

@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom';
 import { Button } from '../common/index.js';
 import TestIcon from './TestIcon.jsx';
 
+function sourceLabel(source) {
+  try {
+    return new URL(source).hostname.replace(/^www\./, '');
+  } catch {
+    return 'Reference';
+  }
+}
+
 export default function TestCard({ test, index, onWhyThis }) {
   const reduceMotion = useReducedMotion();
   const rationale = test.rationale ?? test.reason ?? 'Discuss whether this test is appropriate with your doctor.';
@@ -18,10 +26,33 @@ export default function TestCard({ test, index, onWhyThis }) {
           <div className="min-w-0">
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">{test.testName}</h2>
             <p className="mt-1 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{rationale}</p>
+            {test.whatItMeasures && (
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
+                <span className="font-semibold">What this covers: </span>{test.whatItMeasures}
+              </p>
+            )}
             {test.triggeringFactors?.length > 0 && (
               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 Based on: {test.triggeringFactors.map((factor) => factor.label).join('; ')}
               </p>
+            )}
+            {test.sources?.length > 0 && (
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                <span className="font-semibold">Guidance: </span>
+                {test.sources.map((source, sourceIndex) => (
+                  <span key={source}>
+                    {sourceIndex > 0 ? ', ' : ''}
+                    <a
+                      href={source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline underline-offset-2 hover:text-leaf focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf"
+                    >
+                      {sourceLabel(source)}
+                    </a>
+                  </span>
+                ))}
+              </div>
             )}
             <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
               {test.disclaimer ?? 'This is not a diagnosis. Discuss any test with a qualified doctor.'}

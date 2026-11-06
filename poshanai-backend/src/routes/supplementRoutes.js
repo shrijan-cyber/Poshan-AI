@@ -52,6 +52,10 @@ const historyQuerySchema = Joi.object({
 }).unknown(false).custom((value, helpers) => (
   value.from && value.to && value.from > value.to ? helpers.error('any.invalid') : value
 ));
+const consumedDoseSchema = Joi.object({
+  servingsConsumed: Joi.number().min(0.001).max(100).precision(3).required(),
+}).unknown(false);
+const historyIdSchema = Joi.object({ logId: Joi.string().hex().length(24).required() }).unknown(false);
 
 function validate(schema, source) {
   return (req, _res, next) => {
@@ -67,6 +71,10 @@ router.get('/list', supplementController.list);
 router.get('/mine', verifyToken, supplementController.listMine);
 router.post('/mine', verifyToken, validate(supplementSchema, 'body'), supplementController.createMine);
 router.get('/history', verifyToken, validate(historyQuerySchema, 'query'), supplementController.history);
+router.post('/mine/:id/log', verifyToken, validate(idSchema, 'params'), validate(consumedDoseSchema, 'body'), supplementController.logMine);
+router.patch('/history/:logId', verifyToken, validate(historyIdSchema, 'params'), validate(consumedDoseSchema, 'body'), supplementController.updateLog);
+router.delete('/history/:logId', verifyToken, validate(historyIdSchema, 'params'), supplementController.deleteLog);
+router.post('/history/:logId/duplicate', verifyToken, validate(historyIdSchema, 'params'), supplementController.duplicateLog);
 router.patch('/mine/:id', verifyToken, validate(idSchema, 'params'), validate(updateSupplementSchema, 'body'), supplementController.updateMine);
 router.delete('/mine/:id', verifyToken, validate(idSchema, 'params'), supplementController.deleteMine);
 

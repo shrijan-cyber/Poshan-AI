@@ -1,55 +1,58 @@
 {
-  "version": 1,
-  "disclaimer": "These are prompts for discussion with a qualified doctor, not a diagnosis or medical advice.",
+  "version": 4,
+  "catalogVersion": "4.0.0",
+  "disclaimer": "These are educational topics to discuss with a qualified healthcare professional, not medical advice or a diagnosis. Only a clinician can decide whether any test is appropriate.",
+  "routineMessage": "No specific discussion topics matched the answers in your profile. Routine check-ups depend on your health history and local guidance; ask a qualified healthcare professional what is appropriate for you.",
   "rules": [
     {
-      "ruleId": "rule_b12_vegetarian_fatigue_01",
-      "testName": "Vitamin B12",
-      "category": "Nutritional discussion",
+      "ruleId": "rule_vegan_fatigue_b12_discussion_01",
+      "testName": "Vitamin B12 assessment discussion",
+      "category": "Lifestyle risk and symptom discussion",
+      "whatItMeasures": "A clinician may consider a blood test of vitamin B12 status alongside symptoms, diet, medicines and other health information.",
+      "rationale": "You reported fatigue and follow a vegan diet. NICE guidance treats both symptoms and a B12 risk factor as relevant when considering assessment; these answers do not establish a deficiency, and a clinician decides whether testing is appropriate.",
+      "sources": ["https://www.nice.org.uk/guidance/ng239/chapter/recommendations"],
       "conditions": [
-        { "field": "dietType", "operator": "oneOf", "value": ["veg", "vegan"] },
+        { "field": "dietType", "operator": "equals", "value": "vegan" },
         { "field": "symptoms", "operator": "includes", "value": "fatigue" }
       ],
-      "rationale": "Fatigue has many possible causes, and vegetarian diets can provide less vitamin B12 depending on food choices. Ask your doctor whether a vitamin B12 test is appropriate; these answers cannot establish a deficiency."
+      "triggerFields": ["dietType", "symptoms"]
     },
     {
-      "ruleId": "rule_cbc_fatigue_01",
-      "testName": "CBC (Complete Blood Count)",
-      "category": "Symptom-based",
+      "ruleId": "rule_fatigue_clinical_evaluation_01",
+      "testName": "Clinical evaluation for fatigue",
+      "category": "Reported symptom discussion",
+      "whatItMeasures": "This is not a specific test order. A clinician assesses fatigue and decides whether tests such as a complete blood count (CBC) or other evaluation are appropriate.",
+      "rationale": "You reported fatigue. It can have many causes; if it persists or affects daily life, a healthcare professional can assess it and decide whether any tests are useful.",
+      "sources": ["https://www.nhs.uk/symptoms/tiredness-and-fatigue/"],
       "conditions": [
         { "field": "symptoms", "operator": "includes", "value": "fatigue" }
       ],
-      "rationale": "Fatigue is nonspecific and can have many causes. A doctor can assess your symptoms and decide whether a CBC or another evaluation is suitable."
+      "triggerFields": ["symptoms"]
     },
     {
-      "ruleId": "rule_hba1c_age_family_history_01",
-      "testName": "HbA1c",
-      "category": "Screening",
+      "ruleId": "rule_hair_fall_clinical_discussion_01",
+      "testName": "Clinical discussion about hair fall",
+      "category": "Reported symptom discussion",
+      "whatItMeasures": "No particular blood test is selected. A healthcare professional can review possible causes and decide whether any assessment is needed.",
+      "rationale": "You reported hair fall. It can have several causes, so discuss it with a healthcare professional rather than assuming a deficiency or ordering a specific test.",
+      "sources": ["https://www.nhs.uk/symptoms/hair-loss/"],
       "conditions": [
-        { "field": "age", "operator": "greaterThanOrEqual", "value": 41 },
-        { "field": "familyHistory", "operator": "includes", "value": "diabetes" }
+        { "field": "symptoms", "operator": "includes", "value": "hair fall" }
       ],
-      "rationale": "A family history of diabetes can be one factor in deciding when to screen. Discuss your full risk profile and whether HbA1c or another screening test is appropriate with your doctor."
+      "triggerFields": ["symptoms"]
     },
     {
-      "ruleId": "rule_tsh_hairfall_thyroid_history_01",
-      "testName": "TSH (Thyroid-Stimulating Hormone)",
-      "category": "Symptom-based",
-      "conditions": [
-        { "field": "symptoms", "operator": "includes", "value": "hair fall" },
-        { "field": "familyHistory", "operator": "includes", "value": "thyroid disease" }
-      ],
-      "rationale": "Hair fall has many possible causes. Given the reported family history, ask your doctor whether thyroid evaluation, which may include a TSH test, is suitable."
-    },
-    {
-      "ruleId": "rule_vitamin_d_low_sun_bone_pain_01",
-      "testName": "25-hydroxyvitamin D",
-      "category": "Symptom-based",
+      "ruleId": "rule_low_sun_bone_discomfort_vitamin_d_01",
+      "testName": "Vitamin D assessment discussion",
+      "category": "Lifestyle risk and symptom discussion",
+      "whatItMeasures": "A clinician may consider a 25-hydroxyvitamin D blood test to assess vitamin D status.",
+      "rationale": "You reported low sunlight exposure and bone discomfort. These answers do not establish a cause; NICE guidance says testing should be clinically considered for symptoms or very high risk, and a clinician decides whether it is appropriate.",
+      "sources": ["https://www.nice.org.uk/guidance/ph56/chapter/Recommendations"],
       "conditions": [
         { "field": "sunExposure", "operator": "equals", "value": "low" },
         { "field": "symptoms", "operator": "includes", "value": "bone pain" }
       ],
-      "rationale": "Bone pain and low sun exposure do not identify a cause. Discuss the symptoms with a doctor, who can decide whether vitamin D testing is appropriate."
+      "triggerFields": ["sunExposure", "symptoms"]
     }
   ]
 }

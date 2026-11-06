@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { MotionConfig } from 'framer-motion';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout, { PublicLayout } from './components/layout/Layout.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -36,9 +37,10 @@ function LazyPage({ component: Page }) {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Routes>
+    <MotionConfig reducedMotion="user">
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LazyPage component={Landing} />} />
@@ -71,8 +73,9 @@ export default function App() {
           {/* Fallback */}
           <Route path="/not-found" element={<LazyPage component={NotFound} />} />
           <Route path="*" element={<Navigate to="/not-found" replace />} />
-        </Routes>
-      </AuthProvider>
-    </ThemeProvider>
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
+    </MotionConfig>
   );
 }

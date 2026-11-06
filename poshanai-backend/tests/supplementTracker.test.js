@@ -18,6 +18,10 @@ class FakeUserSupplement {
     userRows.push(row);
     return { ...row };
   }
+  static findOne({ _id, userId }) {
+    const row = userRows.find((item) => item._id === _id && item.userId === String(userId));
+    return { lean: async () => row ? { ...row } : null };
+  }
   static findOneAndUpdate({ _id, userId }, { $set }) {
     return { lean: async () => {
       const row = userRows.find((item) => item._id === _id && item.userId === String(userId));
@@ -34,6 +38,21 @@ class FakeUserSupplement {
 }
 
 class FakeSupplementLog {
+  static async create(data) {
+    const row = { ...data, userId: String(data.userId), _id: String(historyRows.length + 1).padStart(24, '0') };
+    historyRows.push(row);
+    return { ...row };
+  }
+  static async findOne({ _id, userId, userSupplementId }) {
+    const row = historyRows.find((item) => item._id === _id && item.userId === String(userId)
+      && (userSupplementId?.$ne !== null || item.userSupplementId));
+    return row ? { ...row, save: async function save() { Object.assign(row, this); } } : null;
+  }
+  static async findOneAndDelete({ _id, userId, userSupplementId }) {
+    const index = historyRows.findIndex((item) => item._id === _id && item.userId === String(userId)
+      && (userSupplementId?.$ne !== null || item.userSupplementId));
+    return index < 0 ? null : historyRows.splice(index, 1)[0];
+  }
   static find(filter) {
     return {
       sort: () => ({ limit: () => ({ lean: async () => historyRows
@@ -113,4 +132,44 @@ test('supplement history is authenticated, date-filtered and owner-scoped', asyn
   assert.deepEqual(response.body.data.entries.map((row) => row.supplementName), ['Iron']);
   assert.equal((await request(app).get('/api/supplements/history?from=2026-02-31')
     .set('Authorization', `Bearer ${tokenOne}`)).status, 400);
+});
+
+test('saved supplement intake scales label amounts and supports owner-scoped history edits', async () => {
+  const saved = await request(app).post('/api/supplements/mine')
+    .set('Authorization', `Bearer ${tokenOne}`).send(validSupplement);
+  const id = saved.body.data.supplement.id;
+
+  assert.equal((await request(app).post(`/api/supplements/mine/${id}/log`).send({ servingsConsumed: 1 })).status, 401);
+  assert.equal((await request(app).post(`/api/supplements/mine/${id}/log`)
+    .set('Authorization', `Bearer ${tokenTwo}`).send({ servingsConsumed: 1 })).status, 404);
+  assert.equal((await request(app).post(`/api/supplements/mine/${id}/log`)
+    .set('Authorization', `Bearer ${tokenOne}`).send({ servingsConsumed: 0 })).status, 400);
+
+  const logged = await request(app).post(`/api/supplements/mine/${id}/log`)
+    .set('Authorization', `Bearer ${tokenOne}`).send({ servingsConsumed: 1.5 });
+  assert.equal(logged.status, 201);
+  assert.equal(logged.body.data.entry.servingsConsumed, 1.5);
+  assert.deepEqual(logged.body.data.entry.components, [{
+    nutrient: 'vitaminD', labelAmountPerServing: 25, consumedAmount: 37.5, unit: 'µg',
+  }]);
+
+  const logId = logged.body.data.entry._id;
+  assert.equal((await request(app).post(`/api/supplements/history/${logId}/duplicate`)
+    .set('Authorization', `Bearer ${tokenTwo}`)).status, 404);
+  const duplicated = await request(app).post(`/api/supplements/history/${logId}/duplicate`)
+    .set('Authorization', `Bearer ${tokenOne}`);
+  assert.equal(duplicated.status, 201);
+  assert.equal(duplicated.body.data.entry.servingsConsumed, 1.5);
+  assert.equal(duplicated.body.data.entry.components[0].consumedAmount, 37.5);
+
+  assert.equal((await request(app).patch(`/api/supplements/history/${logId}`)
+    .set('Authorization', `Bearer ${tokenTwo}`).send({ servingsConsumed: 2 })).status, 404);
+  const updated = await request(app).patch(`/api/supplements/history/${logId}`)
+    .set('Authorization', `Bearer ${tokenOne}`).send({ servingsConsumed: 2 });
+  assert.equal(updated.status, 200);
+  assert.equal(updated.body.data.entry.components[0].consumedAmount, 50);
+  assert.equal((await request(app).delete(`/api/supplements/history/${logId}`)
+    .set('Authorization', `Bearer ${tokenTwo}`)).status, 404);
+  assert.equal((await request(app).delete(`/api/supplements/history/${logId}`)
+    .set('Authorization', `Bearer ${tokenOne}`)).status, 200);
 });

@@ -51,6 +51,10 @@ function formatAmount(value) {
   return Number.isFinite(Number(value)) ? round(Number(value)).toLocaleString() : '—';
 }
 
+function formatAvailableAmount(value) {
+  return value === null || value === undefined ? 'Unavailable' : formatAmount(value);
+}
+
 function CountUp({ value }) {
   const outputRef = useRef(null);
   const number = Number(value) || 0;
@@ -96,32 +100,28 @@ function ProgressRow({ label, consumed, target, unit = 'g', color = 'bg-emerald-
   );
 }
 
-function Ring({ consumed, target }) {
+function CalorieProgress({ consumed, target }) {
   const ratio = target > 0 ? consumed / target : 0;
   const percentage = Math.round(ratio * 100);
-  const color = ratio > 0.9 ? '#dc4b35' : ratio >= 0.5 ? '#e58a27' : '#397a55';
-  const shadowColor = ratio > 0.9 ? 'rgba(220, 75, 53, 0.28)' : ratio >= 0.5 ? 'rgba(229, 138, 39, 0.28)' : 'rgba(57, 122, 85, 0.28)';
   const progress = Math.min(Math.max(ratio * 100, 0), 100);
   return (
-    <div
-      className="relative grid h-48 w-48 shrink-0 place-items-center rounded-full"
-      role="img"
-      aria-label={`${formatAmount(consumed)} of ${target ? formatAmount(target) : 'unknown'} calories`}
-    >
-      <svg className="absolute inset-0 h-full w-full -rotate-90 overflow-visible" viewBox="0 0 160 160" aria-hidden="true">
-        <circle cx="80" cy="80" r="69" fill="none" strokeWidth="11" className="stroke-slate-200 dark:stroke-slate-700" />
-        <circle
-          cx="80" cy="80" r="69" fill="none" stroke={color} strokeWidth="11" strokeLinecap="round"
-          pathLength="100" strokeDasharray={`${progress} 100`}
-          className="transition-[stroke-dasharray,stroke] duration-700 ease-out"
-          style={{ filter: `drop-shadow(0 3px 6px ${shadowColor})` }}
-        />
-      </svg>
-      <div className="relative grid h-40 w-40 content-center justify-items-center rounded-full bg-white/80 dark:bg-slate-900/80">
-        <span className="mb-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-orange-600 dark:bg-orange-400/10 dark:text-orange-300"><Flame size={18} strokeWidth={2.2} /></span>
-        <span className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white"><CountUp value={consumed} /></span>
-        <span className="mt-1 text-xs text-slate-500 dark:text-slate-400">of {target ? <><CountUp value={target} /> kcal</> : 'target unavailable'}</span>
-        <span className="mt-2 text-xs font-bold" style={{ color }}><CountUp value={percentage} />%</span>
+    <div className="mt-7" aria-label="Calorie target progress">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-white/75">Calories logged</p>
+          <p className="mt-1 text-4xl font-semibold tabular-nums tracking-tight text-white sm:text-5xl"><CountUp value={consumed} /><span className="ml-2 text-base font-medium text-white/75">kcal</span></p>
+        </div>
+        <div className="text-left sm:text-right">
+          <p className="text-sm text-white/75">Daily target</p>
+          <p className="mt-1 text-xl font-semibold tabular-nums text-white">{target ? <><CountUp value={target} /> kcal</> : 'Not available'}</p>
+        </div>
+      </div>
+      <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/20" role="progressbar" aria-label="Calories toward daily target" aria-valuemin="0" aria-valuemax={target || 100} aria-valuenow={target ? Math.min(consumed, target) : 0} aria-valuetext={target ? `${formatAmount(consumed)} of ${formatAmount(target)} kcal` : 'Daily target unavailable'}>
+        <div className="h-full rounded-full bg-[#c8d8a8] transition-[width] duration-700 ease-out" style={{ width: `${target ? progress : 0}%` }} />
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3 text-sm text-white/80">
+        <span>{target ? `${Math.min(percentage, 100)}% of target` : 'Add profile details to see a target'}</span>
+        {target && <span>{consumed > target ? `${formatAmount(consumed - target)} kcal above target` : `${formatAmount(target - consumed)} kcal remaining`}</span>}
       </div>
     </div>
   );
@@ -372,19 +372,17 @@ export default function CalorieTracker() {
         </div>
       </div>
 
-      {loadError && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">{loadError}</p>}
+      {loadError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"><span>{loadError}</span><button type="button" className="min-h-10 rounded-lg px-3 font-semibold underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700" onClick={() => { setLoading(true); setLoadError(''); Promise.allSettled([refresh(), client.get('/calories/maintenance').then((response) => { const data = response.data?.data ?? response.data; setMacroTargets(data.macros); })]).then(([logResult, targetResult]) => { if (logResult.status === 'rejected') setLoadError(logResult.reason?.message || 'Could not load today’s log.'); if (targetResult.status === 'rejected') setMacroTargets(null); }).finally(() => setLoading(false)); }}>Retry</button></div>}
       {loading ? (
         <Card><p className="text-sm text-slate-500" role="status">Loading today’s nutrition…</p></Card>
       ) : (
-        <div className="grid gap-5 lg:grid-cols-2">
-          <Card as="article" className="flex flex-col items-center justify-center gap-5 bg-gradient-to-br from-white to-slate-50 shadow-md dark:from-slate-900 dark:to-slate-950 sm:flex-row sm:justify-start">
-            <Ring consumed={consumed} target={target} />
-            <div className="text-center sm:text-left">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-300"><Flame size={14} /> Calories today</span>
-              <h3 className="mt-3 text-xl font-bold tracking-tight text-slate-900 dark:text-white">A little progress, every day</h3>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{target ? <><CountUp value={Math.max(0, target - consumed)} /> kcal left in your daily target</> : 'Complete your profile to calculate a daily target.'}</p>
-              {target && consumed > target && <p className="mt-2 text-sm font-medium text-red-700 dark:text-red-300">You are {formatAmount(consumed - target)} kcal over your target.</p>}
+        <div className="grid gap-5 lg:grid-cols-[1.12fr_0.88fr]">
+          <Card as="article" className="overflow-hidden border-0 bg-forest text-white shadow-lg dark:bg-[#143b2c]">
+            <div className="flex items-start justify-between gap-4">
+              <div><span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90"><Flame size={14} aria-hidden="true" /> DAILY INTAKE</span><h3 className="mt-4 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">Calories today</h3></div>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/10 text-sage"><Apple size={21} aria-hidden="true" /></span>
             </div>
+            <CalorieProgress consumed={consumed} target={target} />
           </Card>
           <Card as="section" aria-labelledby="macro-title" className="bg-gradient-to-br from-white to-slate-50 transition duration-200 hover:scale-[1.01] hover:shadow-md dark:from-slate-900 dark:to-slate-950">
             <h3 id="macro-title" className="mb-5 flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white"><span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300"><Dumbbell size={18} /></span>Macros</h3>
@@ -395,7 +393,7 @@ export default function CalorieTracker() {
             </div>
           </Card>
 
-          <Card as="section" aria-labelledby="micronutrient-title" className="bg-gradient-to-br from-white to-slate-50 transition duration-200 hover:scale-[1.01] hover:shadow-md dark:from-slate-900 dark:to-slate-950">
+          <Card as="section" aria-labelledby="micronutrient-title" className="bg-white dark:bg-slate-900">
             <h3 id="micronutrient-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white"><span className="grid h-9 w-9 place-items-center rounded-xl bg-violet-50 text-violet-700 dark:bg-violet-400/10 dark:text-violet-300"><Pill size={18} /></span>Micronutrient progress</h3>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Daily logged intake compared with your reference. Select an info icon to learn what each nutrient does.</p>
             <div className="mt-5 max-h-[34rem] space-y-5 overflow-y-auto pr-2" aria-label="Micronutrient progress list">
@@ -418,6 +416,12 @@ export default function CalorieTracker() {
                       dataUnavailable={item.dataUnavailable}
                       color={belowHalf ? 'bg-amber-500' : 'bg-emerald-600'}
                     />
+                    {today.micronutrients?.foodTotals && today.micronutrients?.supplementTotals && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Food: {formatAvailableAmount(today.micronutrients.foodTotals[item.key])} {item.unit}
+                        {' · '}Supplements: {formatAvailableAmount(today.micronutrients.supplementTotals[item.key])} {item.unit}
+                      </p>
+                    )}
                     {belowHalf && guidance.suggestion && (
                       <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
                         Below 50% today. Try adding {guidance.suggestion} to a meal.
@@ -430,7 +434,7 @@ export default function CalorieTracker() {
             {comparisons.length === 0 && <p className="mt-4 text-sm text-slate-500">Micronutrient data is not available yet.</p>}
           </Card>
 
-          <Card as="section" aria-labelledby="today-meals-title" className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950">
+          <Card as="section" aria-labelledby="today-meals-title" className="bg-white dark:bg-slate-900">
             <div className="flex items-center justify-between gap-3">
               <h3 id="today-meals-title" className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white"><span className="grid h-9 w-9 place-items-center rounded-xl bg-orange-50 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300"><Apple size={18} /></span>Today’s food</h3>
               <span className="text-sm text-slate-500 dark:text-slate-400">{today.meals.length} {today.meals.length === 1 ? 'item' : 'items'}</span>
@@ -452,7 +456,10 @@ export default function CalorieTracker() {
               <div className="mt-5 border-t border-slate-100 pt-4 dark:border-slate-800">
                 <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Supplements</h4>
                 <ul className="mt-2 space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                  {today.supplements.map((supplement) => <li key={supplement.id}>{supplement.supplementName}</li>)}
+                  {today.supplements.map((supplement) => <li key={supplement.id}>
+                    {supplement.supplementName}{supplement.servingsConsumed != null && ` · ${supplement.servingsConsumed} label servings`}
+                    {supplement.components?.length > 0 && <ul className="ml-3 text-xs text-slate-500 dark:text-slate-400">{supplement.components.map((component, index) => <li key={`${component.nutrient}-${index}`}>{component.nutrient}: {component.consumedAmount} {component.unit}</li>)}</ul>}
+                  </li>)}
                 </ul>
               </div>
             )}
@@ -460,7 +467,7 @@ export default function CalorieTracker() {
         </div>
       )}
 
-      <SupplementTracker />
+      <SupplementTracker onLogChange={refresh} />
 
       <Modal isOpen={foodModalOpen} onClose={() => { setFoodModalOpen(false); setSmartItems([]); }} title={smartItems.length ? 'Review smart log' : 'Add food'}>
         {smartItems.length ? (

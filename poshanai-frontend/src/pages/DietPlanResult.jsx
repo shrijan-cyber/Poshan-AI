@@ -87,6 +87,7 @@ export default function DietPlanResult() {
 
       <section className="mt-8">
         <div className="mb-4"><p className="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-700">Your day</p><h2 className="mt-1 text-2xl font-bold text-slate-900">Meals and portions</h2></div>
+        {plan.diversityWarnings?.map((warning) => <p key={warning} className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950" role="status">{warning}</p>)}
         <div className="grid gap-4 md:grid-cols-2">{(plan.meals ?? []).map((meal, index) => <StructuredMealCard key={`${meal.recipeId ?? meal.dishName ?? meal.mealName}-${index}`} meal={meal} />)}</div>
         {!plan.meals?.length && <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950" role="status">Meal details are unavailable for this saved plan.</p>}
       </section>

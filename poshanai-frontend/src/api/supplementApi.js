@@ -23,6 +23,23 @@ export async function getSupplementHistory({ from, to, limit = 50, signal } = {}
   }));
 }
 
+export async function logSavedSupplement(id, servingsConsumed) {
+  return payloadFrom(await client.post(`/supplements/mine/${encodeURIComponent(id)}/log`, { servingsConsumed }));
+}
+
+export async function updateSupplementLog(id, servingsConsumed) {
+  return payloadFrom(await client.patch(`/supplements/history/${encodeURIComponent(id)}`, { servingsConsumed }));
+}
+
+export async function deleteSupplementLog(id) {
+  return payloadFrom(await client.delete(`/supplements/history/${encodeURIComponent(id)}`));
+}
+
+export async function duplicateSupplementLog(id) {
+  return payloadFrom(await client.post(`/supplements/history/${encodeURIComponent(id)}/duplicate`));
+}
+
 export default {
   getMySupplements, createUserSupplement, updateUserSupplement, deleteUserSupplement, getSupplementHistory,
+  logSavedSupplement, updateSupplementLog, deleteSupplementLog, duplicateSupplementLog,
 };

@@ -1,6 +1,7 @@
 import { getFoodByIfctCode, getIfctNutrientAvailability } from '../rag/ragService.js';
 import httpError from '../utils/httpError.js';
 import { MICRONUTRIENTS, MICRONUTRIENT_RDA } from '../config/constants.js';
+import { getSupplementById } from './supplementCatalogService.js';
 
 const round = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
 
@@ -58,13 +59,54 @@ export function sumMicronutrients(meals = [], supplements = []) {
   }
   for (const supplement of supplements) {
     for (const { key } of MICRONUTRIENTS) {
-      const value = key === 'vitaminB12'
-        ? supplement.vitamins?.vitaminB12 ?? supplement.vitamins?.b12 ?? 0
-        : supplement.vitamins?.[key] ?? 0;
-      totals[key] += value;
+      const value = supplementAmountForKey(supplement, key, MICRONUTRIENTS.find((item) => item.key === key).unit);
+      if (value === null) known[key] = false;
+      else totals[key] += value;
     }
   }
   return Object.fromEntries(MICRONUTRIENTS.map(({ key }) => [key, known[key] ? round(totals[key]) : null]));
+}
+
+function canonicalSupplementUnit(unit) {
+  return ({ mcg: 'µg', 'mcg RAE': 'µg RAE', 'mcg DFE': 'µg DFE' })[unit] ?? unit;
+}
+
+function supplementAmountForKey(supplement, key, expectedUnit) {
+  const components = supplement.components;
+  if (Array.isArray(components)) {
+    const matching = components.filter((component) => component.nutrient === key);
+    if (!matching.length || matching.some((component) => canonicalSupplementUnit(component.unit) !== expectedUnit
+      || component.consumedAmount === null || component.consumedAmount === undefined
+      || !Number.isFinite(Number(component.consumedAmount)))) return null;
+    return matching.reduce((sum, component) => sum + Number(component.consumedAmount), 0);
+  }
+
+  const catalog = supplement.supplementId ? getSupplementById(supplement.supplementId) : null;
+  if (!catalog) return null;
+  if (!catalog.vitaminKey) return null;
+  const catalogKey = catalog.vitaminKey === 'b12' ? 'vitaminB12' : catalog.vitaminKey;
+  if (catalogKey !== key || canonicalSupplementUnit(supplement.unit) !== expectedUnit) return null;
+  const amount = supplement.vitamins?.[key] ?? (key === 'vitaminB12' ? supplement.vitamins?.b12 : null);
+  return amount !== null && amount !== undefined && Number.isFinite(Number(amount)) ? Number(amount) : null;
+}
+
+export function summarizeMicronutrientsBySource(meals = [], supplements = []) {
+  const food = sumMicronutrients(meals);
+  const supplement = Object.fromEntries(MICRONUTRIENTS.map(({ key, unit }) => [
+    key,
+    supplements.length === 0
+      ? 0
+      : supplements.reduce((sum, entry) => {
+        if (sum === null) return null;
+        const amount = supplementAmountForKey(entry, key, unit);
+        return amount === null ? null : sum + amount;
+      }, 0),
+  ]));
+  const combined = Object.fromEntries(MICRONUTRIENTS.map(({ key }) => [
+    key,
+    food[key] === null || supplement[key] === null ? null : round(food[key] + supplement[key]),
+  ]));
+  return { food, supplement, combined };
 }
 
 export function getMicronutrientRda(profile = {}) {

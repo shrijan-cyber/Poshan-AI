@@ -57,6 +57,18 @@ if (!['local', 's3'].includes(storageType)) {
 if (storageType === 's3' && (!process.env.S3_BUCKET || !process.env.S3_REGION)) {
   throw new Error('S3_BUCKET and S3_REGION are required when STORAGE_TYPE=s3.');
 }
+const aiProvider = process.env.AI_PROVIDER ?? 'legacy';
+if (!['legacy', 'omniroute'].includes(aiProvider)) {
+  throw new Error('AI_PROVIDER must be either legacy or omniroute.');
+}
+const aiRequestTimeoutMs = Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 15_000);
+const aiRequestMaxRetries = Number(process.env.AI_REQUEST_MAX_RETRIES ?? 1);
+if (!Number.isInteger(aiRequestTimeoutMs) || aiRequestTimeoutMs < 100 || aiRequestTimeoutMs > 60_000) {
+  throw new Error('AI_REQUEST_TIMEOUT_MS must be an integer between 100 and 60000.');
+}
+if (!Number.isInteger(aiRequestMaxRetries) || aiRequestMaxRetries < 0 || aiRequestMaxRetries > 2) {
+  throw new Error('AI_REQUEST_MAX_RETRIES must be an integer between 0 and 2.');
+}
 if (Boolean(process.env.S3_ACCESS_KEY) !== Boolean(process.env.S3_SECRET_KEY)) {
   throw new Error('Set both S3_ACCESS_KEY and S3_SECRET_KEY, or use the AWS default credential provider.');
 }
@@ -98,6 +110,13 @@ export const env = {
   omniRouteUrl: process.env.OMNIROUTE_URL ?? 'http://localhost:20128/v1/chat/completions',
   omniRouteModel: process.env.OMNIROUTE_MODEL ?? 'gemini-2.0-flash',
   omniRouteApiKey: process.env.OMNIROUTE_API_KEY ?? null,
+  aiProvider,
+  omniroutePocUrl: process.env.OMNIROUTE_POC_URL ?? null,
+  omniroutePocModel: process.env.OMNIROUTE_POC_MODEL ?? null,
+  omniroutePocApiKey: process.env.OMNIROUTE_POC_API_KEY ?? null,
+  aiRequestTimeoutMs,
+  aiRequestMaxRetries,
+  fdcApiKey: process.env.FDC_API_KEY?.trim() || null,
   jwtAccessSecret: accessSecret,
   jwtRefreshSecret: refreshSecret,
   jwtAccessExpiry: process.env.JWT_ACCESS_EXPIRY ?? '15m',

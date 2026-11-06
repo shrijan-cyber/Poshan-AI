@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, ChevronDown, ChevronUp, Pencil, Pill, Plus, RotateCw, Trash2, X } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp, Copy, Pencil, Pill, Plus, RotateCw, Trash2, X } from 'lucide-react';
 import { getApiError } from '../../api/client.js';
 import {
   createUserSupplement,
   deleteUserSupplement,
   getMySupplements,
   getSupplementHistory,
+  logSavedSupplement,
+  updateSupplementLog,
+  deleteSupplementLog,
+  duplicateSupplementLog,
   updateUserSupplement,
 } from '../../api/supplementApi.js';
 import { Button, Card } from '../common/index.js';
@@ -54,7 +58,7 @@ function fromSupplement(supplement) {
   };
 }
 
-export default function SupplementTracker() {
+export default function SupplementTracker({ onLogChange }) {
   const [items, setItems] = useState([]);
   const [history, setHistory] = useState([]);
   const [form, setForm] = useState(blankForm);
@@ -64,6 +68,10 @@ export default function SupplementTracker() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [loadError, setLoadError] = useState('');
+  const [logAmounts, setLogAmounts] = useState({});
+  const [loggingId, setLoggingId] = useState(null);
+  const [editingLogId, setEditingLogId] = useState(null);
+  const [historyAmounts, setHistoryAmounts] = useState({});
 
   const refresh = useCallback(async (signal) => {
     setLoadError('');
@@ -129,6 +137,77 @@ export default function SupplementTracker() {
     }
   };
 
+  const refreshDailySummary = async () => {
+    try {
+      await onLogChange?.();
+    } catch {
+      setLoadError('The supplement was saved, but the daily summary could not be refreshed.');
+    }
+  };
+
+  const logSupplement = async (supplement) => {
+    const id = supplement._id ?? supplement.id;
+    const servingsConsumed = Number(logAmounts[id] ?? 1);
+    setError('');
+    setLoggingId(id);
+    try {
+      await logSavedSupplement(id, servingsConsumed);
+      await refresh();
+      await refreshDailySummary();
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setLoggingId(null);
+    }
+  };
+
+  const updateLog = async (entry) => {
+    const id = entry._id ?? entry.id;
+    const servingsConsumed = Number(historyAmounts[id] ?? entry.servingsConsumed);
+    setError('');
+    setLoggingId(id);
+    try {
+      await updateSupplementLog(id, servingsConsumed);
+      setEditingLogId(null);
+      await refresh();
+      await refreshDailySummary();
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setLoggingId(null);
+    }
+  };
+
+  const removeLog = async (entry) => {
+    const id = entry._id ?? entry.id;
+    setError('');
+    setLoggingId(id);
+    try {
+      await deleteSupplementLog(id);
+      setHistory((current) => current.filter((item) => (item._id ?? item.id) !== id));
+      await refreshDailySummary();
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setLoggingId(null);
+    }
+  };
+
+  const duplicateLog = async (entry) => {
+    const id = entry._id ?? entry.id;
+    setError('');
+    setLoggingId(id);
+    try {
+      await duplicateSupplementLog(id);
+      await refresh();
+      await refreshDailySummary();
+    } catch (requestError) {
+      setError(getApiError(requestError));
+    } finally {
+      setLoggingId(null);
+    }
+  };
+
   return (
     <Card as="section" aria-labelledby="supplement-tracker-title" className="bg-white dark:bg-slate-900">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -169,9 +248,9 @@ export default function SupplementTracker() {
             <Button type="submit" loading={saving} className="w-full">{saving ? 'Saving…' : editingId ? 'Save changes' : 'Save supplement'}</Button>
           </form>
 
-          <div><h3 className="font-semibold text-slate-900 dark:text-white">Saved supplements</h3>{loading ? <p role="status" className="mt-2 text-sm text-slate-500">Loading saved supplements…</p> : items.length === 0 ? <p className="mt-2 rounded-xl bg-paper p-3 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">No saved supplements yet.</p> : <ul className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">{items.map((item) => { const id = item._id ?? item.id; return <li key={id} className="flex items-start justify-between gap-3 py-3"><div className="min-w-0"><p className="font-medium text-slate-900 dark:text-white">{item.name} {item.brand && <span className="font-normal text-slate-500">· {item.brand}</span>}</p><p className="text-xs text-slate-500 dark:text-slate-400">Serving: {item.servingSize?.amount} {item.servingSize?.unit}{item.components?.length ? ` · ${item.components.length} nutrient label value${item.components.length === 1 ? '' : 's'}` : ''}</p></div><div className="flex shrink-0 gap-1"><button type="button" onClick={() => edit(item)} aria-label={`Edit ${item.name}`} className="grid h-10 w-10 place-items-center rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:hover:bg-slate-800"><Pencil size={16} /></button><button type="button" onClick={() => remove(id)} aria-label={`Delete ${item.name}`} className="grid h-10 w-10 place-items-center rounded-lg text-rose-700 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:text-rose-300 dark:hover:bg-rose-950/40"><Trash2 size={16} /></button></div></li>; })}</ul>}</div>
+          <div><h3 className="font-semibold text-slate-900 dark:text-white">Saved supplements</h3>{loading ? <p role="status" className="mt-2 text-sm text-slate-500">Loading saved supplements…</p> : items.length === 0 ? <p className="mt-2 rounded-xl bg-paper p-3 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">No saved supplements yet.</p> : <ul className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">{items.map((item) => { const id = item._id ?? item.id; return <li key={id} className="py-3"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="font-medium text-slate-900 dark:text-white">{item.name} {item.brand && <span className="font-normal text-slate-500">· {item.brand}</span>}</p><p className="text-xs text-slate-500 dark:text-slate-400">Serving: {item.servingSize?.amount} {item.servingSize?.unit}{item.components?.length ? ` · ${item.components.length} nutrient label value${item.components.length === 1 ? '' : 's'}` : ''}</p></div><div className="flex shrink-0 gap-1"><button type="button" onClick={() => edit(item)} aria-label={`Edit ${item.name}`} className="grid h-10 w-10 place-items-center rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:hover:bg-slate-800"><Pencil size={16} /></button><button type="button" onClick={() => remove(id)} aria-label={`Delete ${item.name}`} className="grid h-10 w-10 place-items-center rounded-lg text-rose-700 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:text-rose-300 dark:hover:bg-rose-950/40"><Trash2 size={16} /></button></div></div><div className="mt-2 flex items-end gap-2"><label className="text-xs font-medium text-slate-600 dark:text-slate-300">Servings consumed<input type="number" min="0.001" max="100" step="0.25" value={logAmounts[id] ?? '1'} onChange={(event) => setLogAmounts((current) => ({ ...current, [id]: event.target.value }))} className="mt-1 block min-h-10 w-28 rounded-lg border border-slate-300 bg-white px-2 dark:border-slate-700 dark:bg-slate-950" /></label><Button type="button" variant="secondary" loading={loggingId === id} onClick={() => logSupplement(item)}>Log intake</Button></div></li>; })}</ul>}</div>
         </div>
-        <div><h3 className="font-semibold text-slate-900 dark:text-white">Supplement log history</h3>{history.length === 0 ? <p className="mt-2 rounded-xl bg-paper p-3 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">No logged supplement history yet.</p> : <ul className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">{history.map((entry) => <li key={entry._id} className="py-3"><p className="font-medium text-slate-900 dark:text-white">{entry.supplementName}</p><p className="text-xs text-slate-500 dark:text-slate-400">{entry.date} · {display(entry.dosage)} {display(entry.unit)}</p></li>)}</ul>}</div>
+        <div><h3 className="font-semibold text-slate-900 dark:text-white">Supplement log history</h3>{history.length === 0 ? <p className="mt-2 rounded-xl bg-paper p-3 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">No logged supplement history yet.</p> : <ul className="mt-2 divide-y divide-slate-100 dark:divide-slate-800">{history.map((entry) => { const id = entry._id ?? entry.id; return <li key={id} className="py-3"><div className="flex items-start justify-between gap-2"><div><p className="font-medium text-slate-900 dark:text-white">{entry.supplementName}</p><p className="text-xs text-slate-500 dark:text-slate-400">{entry.date} · {entry.servingsConsumed ? `${entry.servingsConsumed} label servings` : `${display(entry.dosage)} ${display(entry.unit)}`}</p>{entry.components?.length > 0 && <ul className="mt-1 text-xs text-slate-600 dark:text-slate-300">{entry.components.map((component, index) => <li key={`${component.nutrient}-${index}`}>{component.nutrient}: {component.consumedAmount} {component.unit}</li>)}</ul>}</div>{entry.servingsConsumed != null && <div className="flex gap-1"><button type="button" onClick={() => duplicateLog(entry)} aria-label={`Log ${entry.supplementName} again`} disabled={loggingId === id} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest disabled:opacity-50 dark:hover:bg-slate-800"><Copy size={15} /></button><button type="button" onClick={() => { setEditingLogId(editingLogId === id ? null : id); setHistoryAmounts((current) => ({ ...current, [id]: String(entry.servingsConsumed) })); }} aria-label={`Edit ${entry.supplementName} log`} className="grid h-9 w-9 place-items-center rounded-lg hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:hover:bg-slate-800"><Pencil size={15} /></button><button type="button" onClick={() => removeLog(entry)} aria-label={`Delete ${entry.supplementName} log`} className="grid h-9 w-9 place-items-center rounded-lg text-rose-700 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest dark:text-rose-300 dark:hover:bg-rose-950/40"><Trash2 size={15} /></button></div>}</div>{editingLogId === id && <div className="mt-2 flex items-end gap-2"><label className="text-xs font-medium text-slate-600 dark:text-slate-300">Label servings<input type="number" min="0.001" max="100" step="0.25" value={historyAmounts[id]} onChange={(event) => setHistoryAmounts((current) => ({ ...current, [id]: event.target.value }))} className="mt-1 block min-h-10 w-28 rounded-lg border border-slate-300 bg-white px-2 dark:border-slate-700 dark:bg-slate-950" /></label><Button type="button" variant="secondary" loading={loggingId === id} onClick={() => updateLog(entry)}>Save log</Button></div>}</li>; })}</ul>}</div>
       </div>}
     </Card>
   );

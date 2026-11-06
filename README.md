@@ -133,3 +133,11 @@ Meal-plan endpoints require a bearer access token. `POST /api/mealplans/generate
 Every plan response includes the disclaimer: “PoshanAI provides nutrition awareness and suggestions. It does not diagnose, treat, or replace advice from a qualified healthcare professional.” If OmniRoute is unavailable or returns an invalid plan, generation fails with a structured API error rather than returning a fabricated plan. Both RAG and basic diet generation use the same cached IFCT 2017 catalogue; unavailable nutrient values remain `null`, and an absent food record is never assigned invented nutrient values. Configure the model and any gateway credential only in the backend environment.
 
 Redis is optional for local development. `/api/mealplans/generate` runs synchronously outside production and falls back to synchronous generation if the production Redis queue cannot accept the job. Production deployments still require Redis for normal asynchronous meal-plan and OCR processing.
+
+## Contributor and Codex context
+
+- [`AI_CONTEXT.json`](AI_CONTEXT.json) and [`PROJECT_AI_GUIDE.json`](PROJECT_AI_GUIDE.json) provide repository orientation; verify behavior against current source and Git state.
+- [`AGENTS.md`](AGENTS.md) contains project-local coding-agent guardrails. Existing [`CLAUDE.md`](CLAUDE.md) remains in place for Claude/Ruflo workflows.
+- [`PRODUCT.md`](PRODUCT.md) and [`DESIGN.md`](DESIGN.md) record the current product constraints and frontend design system.
+- [`docs/architecture/poshanai-system-map.html`](docs/architecture/poshanai-system-map.html) contains source-grounded architecture diagrams. [`docs/ux/frontend-audit.md`](docs/ux/frontend-audit.md) records the static frontend UX review.
+- [`docs/codex-workflow-setup.md`](docs/codex-workflow-setup.md) records evaluated repository integrations, skill trust state, and local workflow notes. [`docs/research/competitor-research-template.md`](docs/research/competitor-research-template.md) is an evidence template; no competitor feature roadmap is implied.

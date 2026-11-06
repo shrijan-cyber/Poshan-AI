@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks.js';
 import { addFoodEntry, fetchTodayLog, selectFoodLog, selectTotals } from '../store/slices/foodLogSlice.js';
 import { Button, Card, Skeleton, useToast } from '../components/common/index.js';
+import { CalendarDays, Flame } from 'lucide-react';
 import AddFoodModal from '../components/tracker/AddFoodModal.jsx';
 import CalorieRing from '../components/tracker/CalorieRing.jsx';
 import FoodLogList from '../components/tracker/FoodLogList.jsx';
@@ -63,13 +64,14 @@ export default function CalorieTracker() {
   const isEmpty = entries.length === 0;
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto w-full max-w-6xl space-y-7 pb-8 sm:space-y-9">
+      <header className="grid gap-5 border-b border-forest/10 pb-7 dark:border-slate-700 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:pb-9">
         <div>
-          <p className="text-sm font-semibold text-leaf dark:text-emerald-300">{longDate.format(new Date())}</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">Calorie tracker</h1>
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-leaf dark:text-emerald-300"><CalendarDays size={16} aria-hidden="true" />{longDate.format(new Date())}</p>
+          <h1 className="mt-3 font-heading text-4xl tracking-tight text-forest dark:text-white sm:text-5xl">Your food journal</h1>
+          <p className="mt-3 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">Keep a simple record of what you eat and review the day’s nutrition at your own pace.</p>
         </div>
-        <Button className="w-full sm:w-auto" onClick={() => setIsModalOpen(true)}>+ Add food</Button>
+        <Button className="min-h-11 w-full sm:w-auto" onClick={() => setIsModalOpen(true)}>+ Add food</Button>
       </header>
 
       {status === 'loading' || status === 'idle' ? <TrackerSkeleton /> : null}
@@ -84,20 +86,23 @@ export default function CalorieTracker() {
       )}
 
       {status === 'ready' && (
-        <div className="mt-6 space-y-4">
-          <Card className="flex flex-col items-center py-6">
+        <div className="mt-6 space-y-6">
+          <section aria-label="Daily nutrition overview" className="grid items-stretch gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <Card className="flex flex-col items-center justify-center rounded-[1.75rem] bg-white p-6 shadow-md dark:bg-slate-900 sm:p-8">
+            <div className="mb-3 flex items-center gap-2 self-start text-sm font-semibold text-slate-700 dark:text-slate-200"><span className="grid h-9 w-9 place-items-center rounded-xl bg-sage text-forest dark:bg-emerald-950 dark:text-emerald-200"><Flame size={18} aria-hidden="true" /></span>Energy logged today</div>
             <CalorieRing consumed={totals.calories} target={DEFAULT_TARGETS.calories} />
           </Card>
 
-          <Card className="space-y-5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Macros</h2>
+          <Card className="flex flex-col justify-center space-y-6 rounded-[1.75rem] bg-white p-6 shadow-md dark:bg-slate-900 sm:p-8">
+            <div><h2 className="font-heading text-2xl text-slate-900 dark:text-white">Macronutrients</h2><p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Logged intake compared with general reference targets.</p></div>
             <MacroBar label="Protein" consumed={totals.protein} target={DEFAULT_TARGETS.protein} />
             <MacroBar label="Carbs" consumed={totals.carbs} target={DEFAULT_TARGETS.carbs} />
             <MacroBar label="Fat" consumed={totals.fat} target={DEFAULT_TARGETS.fat} />
           </Card>
+          </section>
 
-          <Card>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Today’s foods</h2>
+          <Card className="rounded-[1.75rem] bg-white p-6 shadow-sm dark:bg-slate-900 sm:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-semibold text-leaf dark:text-emerald-300">Food history</p><h2 className="mt-1 font-heading text-2xl text-slate-900 dark:text-white">Today’s meals</h2></div>{!isEmpty && <span className="text-sm text-slate-500 dark:text-slate-400">{entries.length} logged {entries.length === 1 ? 'item' : 'items'}</span>}</div>
             {isEmpty ? (
               <div className="py-8 text-center">
                 <p className="text-3xl" aria-hidden="true">🍽️</p>

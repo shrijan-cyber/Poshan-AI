@@ -17,6 +17,11 @@ const basicPlanSchema = Joi.object({
   goal: Joi.string().valid('lose', 'maintain', 'gain').required(),
   dietType: Joi.string().valid('veg', 'eggetarian', 'nonveg', 'non-veg', 'vegan').required(),
   mealsPerDay: Joi.number().integer().min(1).max(10).required(),
+  mealSchedule: Joi.array().items(Joi.object({
+    name: Joi.string().trim().min(2).max(40).required(),
+    category: Joi.string().valid('Breakfast', 'Lunch', 'Dinner', 'Snack').required(),
+    time: Joi.string().pattern(/^(?:[01]\d|2[0-3]):[0-5]\d$/).allow(null),
+  }).unknown(false)).min(2).max(6),
   dislikes: Joi.array().items(Joi.string().trim().min(1).max(80)).max(50).unique().default([]),
   allergies: Joi.array().items(Joi.string().trim().min(1).max(80)).max(20).unique().default([]),
   conditions: Joi.array().items(Joi.string().trim().min(2).max(80)).max(20).unique().default([]),
@@ -25,7 +30,11 @@ const basicPlanSchema = Joi.object({
     Joi.string().trim().max(600),
     Joi.array().items(Joi.string().trim().min(1).max(80)).max(20),
   ).default(''),
-}).unknown(false);
+}).unknown(false).custom((value, helpers) => (
+  value.mealSchedule && value.mealSchedule.length !== value.mealsPerDay
+    ? helpers.error('any.invalid')
+    : value
+));
 
 const idSchema = Joi.object({ id: Joi.string().hex().length(24).required() }).unknown(false);
 

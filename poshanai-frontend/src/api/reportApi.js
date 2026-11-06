@@ -20,7 +20,11 @@ export async function uploadReport(fileOrFormData) {
     body = new FormData();
     body.append('file', fileOrFormData);
   }
-  return payloadFrom(await client.post('/reports', body));
+  // Override the client's JSON default so Axios keeps FormData intact and the
+  // browser can add the multipart boundary required by Multer.
+  return payloadFrom(await client.post('/reports', body, {
+    headers: { 'Content-Type': null },
+  }));
 }
 
 export async function deleteReport(id) {

@@ -114,7 +114,7 @@ export default function OtpLogin() {
   const inputClass = 'w-full rounded-md border border-[#d8d9ce] bg-white px-3.5 py-3 text-[#27362d] outline-none transition placeholder:text-slate-400 focus:border-[#244b36] focus:ring-2 focus:ring-[#244b36]/15 dark:bg-slate-950 dark:text-white';
 
   return (
-    <main className="flex min-h-[70vh] items-center justify-center bg-[#f8f7f1] px-5 py-14 text-[#27362d] dark:bg-slate-950 dark:text-slate-100 sm:px-8 sm:py-20">
+    <main className="auth-page flex min-h-[70vh] items-center justify-center bg-[#f8f7f1] px-5 py-14 text-[#27362d] dark:bg-slate-950 dark:text-slate-100 sm:px-8 sm:py-20">
       <section aria-labelledby="otp-title" className={cardClass}>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#728f5b] dark:text-emerald-300">
           PoshanAI account security

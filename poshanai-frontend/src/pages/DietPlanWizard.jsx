@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, Salad } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { generateBasicDietPlan } from '../api/dietPlanApi.js';
@@ -15,7 +15,12 @@ const wizardSchema = z.object({
   activityLevel: z.enum(['sedentary', 'light', 'moderate', 'active', 'very_active']),
   goal: z.enum(['lose', 'maintain', 'gain']),
   dietType: z.enum(['veg', 'nonveg', 'vegan']),
-  mealsPerDay: z.coerce.number().int().min(1).max(5),
+  mealsPerDay: z.coerce.number().int().min(2).max(6),
+  mealSchedule: z.array(z.object({
+    name: z.string().trim().min(2).max(40),
+    category: z.enum(['Breakfast', 'Lunch', 'Dinner', 'Snack']),
+    time: z.union([z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/), z.literal('')]).nullable().optional(),
+  })).min(2).max(6).optional(),
   dislikes: z.array(z.string().max(80)).max(50),
   conditions: z.object({
     diabetes: z.boolean(),
@@ -30,6 +35,13 @@ const conditionOptions = [
   { name: 'conditions.kidneyDisease', label: 'Kidney disease' },
   { name: 'conditions.pregnancy', label: 'Pregnancy' },
 ];
+const defaultMealSchedule = {
+  2: [{ name: 'Brunch', category: 'Lunch', time: '10:30' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  3: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  4: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Evening snack', category: 'Snack', time: '17:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  5: [{ name: 'Breakfast', category: 'Breakfast', time: '08:00' }, { name: 'Mid-morning snack', category: 'Snack', time: '10:30' }, { name: 'Lunch', category: 'Lunch', time: '13:00' }, { name: 'Evening snack', category: 'Snack', time: '17:00' }, { name: 'Dinner', category: 'Dinner', time: '19:30' }],
+  6: [{ name: 'Breakfast', category: 'Breakfast', time: '07:30' }, { name: 'Mid-morning snack', category: 'Snack', time: '10:00' }, { name: 'Lunch', category: 'Lunch', time: '12:30' }, { name: 'Afternoon snack', category: 'Snack', time: '15:30' }, { name: 'Dinner', category: 'Dinner', time: '19:00' }, { name: 'Evening snack', category: 'Snack', time: '21:00' }],
+};
 
 const steps = [
   { title: 'Your health', description: 'A few basics help us estimate your daily needs.' },
@@ -44,6 +56,7 @@ function FieldError({ children }) {
 export default function DietPlanWizard() {
   const [step, setStep] = useState(0);
   const [requestError, setRequestError] = useState('');
+  const [customScheduleEnabled, setCustomScheduleEnabled] = useState(false);
   const navigate = useNavigate();
   const {
     register,
@@ -66,8 +79,14 @@ export default function DietPlanWizard() {
       conditions: { diabetes: false, kidneyDisease: false, pregnancy: false },
     },
   });
+  const { fields: scheduleFields, replace: replaceSchedule } = useFieldArray({ control, name: 'mealSchedule' });
+  const mealCount = Number(useWatch({ control, name: 'mealsPerDay' }) ?? 3);
   const selectedConditions = useWatch({ control, name: 'conditions' });
   const hasSafetyCondition = Object.values(selectedConditions ?? {}).some(Boolean);
+
+  useEffect(() => {
+    if (customScheduleEnabled) replaceSchedule(defaultMealSchedule[mealCount] ?? defaultMealSchedule[3]);
+  }, [customScheduleEnabled, mealCount, replaceSchedule]);
 
   async function continueWizard() {
     const fieldsByStep = [
@@ -94,6 +113,10 @@ export default function DietPlanWizard() {
         goal: values.goal,
         dietType: values.dietType,
         mealsPerDay: values.mealsPerDay,
+        ...(customScheduleEnabled ? {
+          mealSchedule: values.mealSchedule?.slice(0, values.mealsPerDay)
+            .map((slot) => ({ ...slot, time: slot.time || null })),
+        } : {}),
         dislikes: values.dislikes,
       };
       const plan = await generateBasicDietPlan(request);
@@ -196,10 +219,27 @@ export default function DietPlanWizard() {
             </fieldset>
 
             <label className={labelClass}>Meals per day
-              <select {...register('mealsPerDay')} className={inputClass}>
-                {[1, 2, 3, 4, 5].map((count) => <option key={count} value={count}>{count} {count === 1 ? 'meal' : 'meals'}</option>)}
+              <select {...register('mealsPerDay', { valueAsNumber: true })} className={inputClass}>
+                {[2, 3, 4, 5, 6].map((count) => <option key={count} value={count}>{count} meals</option>)}
               </select>
             </label>
+
+            <div className="rounded-2xl border border-slate-200 p-4">
+              <label className="flex items-center gap-3 text-sm font-semibold text-slate-800">
+                <input type="checkbox" checked={customScheduleEnabled} onChange={(event) => setCustomScheduleEnabled(event.target.checked)} className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500" />
+                Customize meal names and times <span className="font-normal text-slate-400">(optional)</span>
+              </label>
+              {customScheduleEnabled && <div className="mt-4 space-y-3">
+                {scheduleFields.slice(0, mealCount).map((field, index) => (
+                  <div key={field.id} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)_8rem]">
+                    <label className={labelClass}>Meal name<input {...register(`mealSchedule.${index}.name`)} maxLength={40} className={inputClass} /></label>
+                    <label className={labelClass}>Meal category<select {...register(`mealSchedule.${index}.category`)} className={inputClass}>{['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((category) => <option key={category}>{category}</option>)}</select></label>
+                    <label className={labelClass}>Time<input type="time" {...register(`mealSchedule.${index}.time`)} className={inputClass} /></label>
+                  </div>
+                ))}
+                <p className="text-xs leading-5 text-slate-500">The selected food recipe category still follows each meal category; only your preferred label and time change.</p>
+              </div>}
+            </div>
 
             <fieldset>
               <legend className={labelClass}>Foods to avoid <span className="font-normal text-slate-400">(optional)</span></legend>
